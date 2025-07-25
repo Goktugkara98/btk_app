@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>About BTK App</h1>
+<p class="lead">A modern web application built with Flask and MySQL.</p>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>Our Mission</h3>
+        <p>To provide a solid foundation for building scalable web applications with Python and Flask.</p>
+        
+        <h3 class="mt-4">Features</h3>
+        <ul>
+            <li>User authentication system</li>
+            <li>RESTful API endpoints</li>
+            <li>Responsive design</li>
+            <li>Database integration</li>
+            <li>Modular architecture with blueprints</li>
+        </ul>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Technical Details</h5>
+                <p class="card-text">
+                    This application is built using the following technologies:
+                </p>
+                <ul>
+                    <li>Python 3.x</li>
+                    <li>Flask web framework</li>
+                    <li>MySQL database</li>
+                    <li>Bootstrap 5</li>
+                    <li>SQLAlchemy ORM</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

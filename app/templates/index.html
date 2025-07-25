@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to BTK App</h1>
+    <p class="lead">This is a basic Flask application with blueprints and MySQL integration.</p>
+    <hr class="my-4">
+    <p>Get started by exploring the navigation menu or try the API endpoints.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('pages.about') }}" role="button">Learn more</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h3>Feature One</h3>
+        <p>Basic user management system with registration and authentication.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Feature Two</h3>
+        <p>RESTful API endpoints for programmatic access.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Feature Three</h3>
+        <p>Responsive design that works on all devices.</p>
+    </div>
+</div>
+{% endblock %}

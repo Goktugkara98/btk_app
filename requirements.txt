@@ -1,0 +1,16 @@
+# Core
+Flask==2.3.3
+python-dotenv==1.0.0
+
+# Database
+Flask-SQLAlchemy==3.0.3
+mysql-connector-python==8.1.0
+SQLAlchemy==2.0.19
+
+# Web
+requests==2.31.0
+Werkzeug==2.3.7
+Jinja2==3.1.2
+
+# Development
+python-dotenv==1.0.0

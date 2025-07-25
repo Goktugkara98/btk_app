@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="display-1">500</h1>
+    <p class="lead">Something went wrong on our end.</p>
+    <p>We're working to fix the issue. Please try again later.</p>
+    <a href="{{ url_for('pages.index') }}" class="btn btn-primary">Go to Homepage</a>
+</div>
+{% endblock %}
