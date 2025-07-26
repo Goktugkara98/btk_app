@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eğitim Soru Bankası - Veritabanı Şeması</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 8px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .visualization-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .hierarchy-view, .database-view {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Hiyerarşi Görünümü */
+        .hierarchy-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .hierarchy-level {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background: var(--light-color);
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .hierarchy-level:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        .level-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .level-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .level-info p {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .education-level { background: var(--primary-color); }
+        .grade-level { background: var(--success-color); }
+        .subject-level { background: var(--warning-color); }
+        .topic-level { background: var(--danger-color); }
+        .subtopic-level { background: var(--info-color); }
+        .question-level { background: var(--secondary-color); }
+
+        /* Veritabanı Tabloları */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .table-card {
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .table-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .table-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-fields {
+            padding: 15px;
+        }
+
+        .field-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .field-item:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .field-type {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            background: var(--light-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .primary-key { background: #d4edda; color: #155724; }
+        .foreign-key { background: #fff3cd; color: #856404; }
+        .text-field { background: #d1ecf1; color: #0c5460; }
+        .boolean-field { background: #f8d7da; color: #721c24; }
+
+        /* Örnek Veri Görünümü */
+        .example-data {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        .data-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .data-step {
+            background: var(--light-color);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            min-width: 120px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .data-step.active {
+            border-color: var(--primary-color);
+            background: #e3f2fd;
+        }
+
+        .data-step h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .data-step p {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .visualization-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-flow {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hierarchy-level, .table-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .hierarchy-level:nth-child(1) { animation-delay: 0.1s; }
+        .hierarchy-level:nth-child(2) { animation-delay: 0.2s; }
+        .hierarchy-level:nth-child(3) { animation-delay: 0.3s; }
+        .hierarchy-level:nth-child(4) { animation-delay: 0.4s; }
+        .hierarchy-level:nth-child(5) { animation-delay: 0.5s; }
+        .hierarchy-level:nth-child(6) { animation-delay: 0.6s; }
+
+        /* İnteraktif Özellikler */
+        .clickable {
+            cursor: pointer;
+        }
+
+        .highlight {
+            background: #fff3cd !important;
+            border-color: var(--warning-color) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="bi bi-diagram-3"></i> Eğitim Soru Bankası</h1>
+            <p>Veritabanı Şeması ve Hiyerarşi Görselleştirmesi</p>
+        </div>
+
+        <div class="visualization-container">
+            <!-- Hiyerarşi Görünümü -->
+            <div class="hierarchy-view">
+                <div class="section-title">
+                    <i class="bi bi-tree"></i>
+                    Eğitim Hiyerarşisi
+                </div>
+                <div class="hierarchy-tree">
+                    <div class="hierarchy-level clickable" data-level="education">
+                        <div class="level-icon education-level">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+                        <div class="level-info">
+                            <h3>Eğitim Seviyesi</h3>
+                            <p>İlkokul, Ortaokul, Lise, Üniversite</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hierarchy-level clickable" data-level="grade">
+                        <div class="level-icon grade-level">
+                            <i class="bi bi-123"></i>
+                        </div>
+                        <div class="level-info">
+                            <h3>Sınıf Seviyesi</h3>
+                            <p>1. Sınıf, 2. Sınıf, 5. Sınıf, 9. Sınıf...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hierarchy-level clickable" data-level="subject">
+                        <div class="level-icon subject-level">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="level-info">
+                            <h3>Ders</h3>
+                            <p>Matematik, Türkçe, Fen Bilgisi, Sosyal Bilgiler</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hierarchy-level clickable" data-level="topic">
+                        <div class="level-icon topic-level">
+                            <i class="bi bi-collection"></i>
+                        </div>
+                        <div class="level-info">
+                            <h3>Konu</h3>
+                            <p>Sayılar, Geometri, Cebir, Dilbilgisi</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hierarchy-level clickable" data-level="subtopic">
+                        <div class="level-icon subtopic-level">
+                            <i class="bi bi-list-nested"></i>
+                        </div>
+                        <div class="level-info">
+                            <h3>Alt Konu</h3>
+                            <p>Doğal Sayılar, Kesirler, Üçgenler, Fiiller</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hierarchy-level clickable" data-level="question">
+                        <div class="level-icon question-level">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="level-info">
+                            <h3>Soru</h3>
+                            <p>Çoktan seçmeli sorular (1 doğru + 4 yanlış)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Veritabanı Tabloları -->
+            <div class="database-view">
+                <div class="section-title">
+                    <i class="bi bi-database"></i>
+                    Veritabanı Tabloları
+                </div>
+                <div class="tables-grid">
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-table"></i>
+                            education_levels
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type primary-key">SERIAL PRIMARY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">name</span>
+                                <span class="field-type text-field">VARCHAR(50)</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">short_name</span>
+                                <span class="field-type text-field">VARCHAR(10)</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">is_active</span>
+                                <span class="field-type boolean-field">BOOLEAN</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-table"></i>
+                            grade_levels
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type primary-key">SERIAL PRIMARY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">education_level_id</span>
+                                <span class="field-type foreign-key">FOREIGN KEY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">name</span>
+                                <span class="field-type text-field">VARCHAR(20)</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">short_name</span>
+                                <span class="field-type text-field">VARCHAR(10)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-table"></i>
+                            subjects
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type primary-key">SERIAL PRIMARY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">name</span>
+                                <span class="field-type text-field">VARCHAR(100)</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">short_name</span>
+                                <span class="field-type text-field">VARCHAR(20)</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">icon</span>
+                                <span class="field-type text-field">VARCHAR(50)</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">color</span>
+                                <span class="field-type text-field">VARCHAR(7)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-table"></i>
+                            questions
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type primary-key">SERIAL PRIMARY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">grade_level_id</span>
+                                <span class="field-type foreign-key">FOREIGN KEY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">subject_id</span>
+                                <span class="field-type foreign-key">FOREIGN KEY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">topic_id</span>
+                                <span class="field-type foreign-key">FOREIGN KEY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">subtopic_id</span>
+                                <span class="field-type foreign-key">FOREIGN KEY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">question_text</span>
+                                <span class="field-type text-field">TEXT</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">explanation</span>
+                                <span class="field-type text-field">TEXT</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-table"></i>
+                            question_options
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type primary-key">SERIAL PRIMARY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">question_id</span>
+                                <span class="field-type foreign-key">FOREIGN KEY</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">option_text</span>
+                                <span class="field-type text-field">TEXT</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">is_correct</span>
+                                <span class="field-type boolean-field">BOOLEAN</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">option_letter</span>
+                                <span class="field-type text-field">CHAR(1)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Örnek Veri Akışı -->
+        <div class="example-data">
+            <div class="section-title">
+                <i class="bi bi-arrow-repeat"></i>
+                Örnek Veri Akışı
+            </div>
+            <div class="data-flow">
+                <div class="data-step active" data-step="1">
+                    <h4>İlkokul</h4>
+                    <p>Eğitim Seviyesi</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-step" data-step="2">
+                    <h4>5. Sınıf</h4>
+                    <p>Sınıf Seviyesi</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-step" data-step="3">
+                    <h4>Matematik</h4>
+                    <p>Ders</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-step" data-step="4">
+                    <h4>Sayılar</h4>
+                    <p>Konu</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-step" data-step="5">
+                    <h4>Doğal Sayılar</h4>
+                    <p>Alt Konu</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="data-step" data-step="6">
+                    <h4>Soru</h4>
+                    <p>Çoktan Seçmeli</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // İnteraktif özellikler
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hiyerarşi seviyelerine tıklama
+            const hierarchyLevels = document.querySelectorAll('.hierarchy-level');
+            hierarchyLevels.forEach(level => {
+                level.addEventListener('click', function() {
+                    // Önceki seçimleri temizle
+                    hierarchyLevels.forEach(l => l.classList.remove('highlight'));
+                    // Yeni seçimi işaretle
+                    this.classList.add('highlight');
+                    
+                    // İlgili tabloyu vurgula
+                    const levelType = this.dataset.level;
+                    highlightTable(levelType);
+                });
+            });
+
+            // Veri akışı animasyonu
+            const dataSteps = document.querySelectorAll('.data-step');
+            let currentStep = 1;
+
+            function animateDataFlow() {
+                dataSteps.forEach(step => {
+                    step.classList.remove('active');
+                });
+                
+                const activeStep = document.querySelector(`[data-step="${currentStep}"]`);
+                if (activeStep) {
+                    activeStep.classList.add('active');
+                }
+                
+                currentStep = currentStep > 6 ? 1 : currentStep + 1;
+            }
+
+            // Her 3 saniyede bir animasyon
+            setInterval(animateDataFlow, 3000);
+
+            // Tablo vurgulama fonksiyonu
+            function highlightTable(levelType) {
+                const tables = document.querySelectorAll('.table-card');
+                tables.forEach(table => table.style.opacity = '0.5');
+                
+                let targetTable = null;
+                switch(levelType) {
+                    case 'education':
+                        targetTable = document.querySelector('.table-card:nth-child(1)');
+                        break;
+                    case 'grade':
+                        targetTable = document.querySelector('.table-card:nth-child(2)');
+                        break;
+                    case 'subject':
+                        targetTable = document.querySelector('.table-card:nth-child(3)');
+                        break;
+                    case 'question':
+                        targetTable = document.querySelector('.table-card:nth-child(4)');
+                        break;
+                }
+                
+                if (targetTable) {
+                    targetTable.style.opacity = '1';
+                    targetTable.classList.add('highlight');
+                    
+                    // 2 saniye sonra vurgulamayı kaldır
+                    setTimeout(() => {
+                        targetTable.classList.remove('highlight');
+                        tables.forEach(table => table.style.opacity = '1');
+                    }, 2000);
+                }
+            }
+
+            // Tablo kartlarına hover efekti
+            const tableCards = document.querySelectorAll('.table-card');
+            tableCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

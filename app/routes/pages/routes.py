@@ -17,3 +17,14 @@ def about():
 def contact():
     """Render the contact page."""
     return render_template('contact.html', title='Contact')
+
+
+@pages_bp.route('/quiz')
+def quiz():
+    """Render the quiz page."""
+    return render_template('quiz_screen.html', title='Quiz')
+
+@pages_bp.route('/quiz/results')
+def quiz_results():
+    """Render the quiz results page."""
+    return render_template('quiz_results.html', title='Quiz Sonuçları')
