@@ -7,7 +7,11 @@ import os
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
     template_dir = os.path.abspath('app/templates')
-    app = Flask(__name__, template_folder=template_dir)
+    static_dir = os.path.abspath('app/static')
+    app = Flask(__name__, 
+               template_folder=template_dir,
+               static_folder=static_dir,
+               static_url_path='/static')
     app.config.from_object(config_class)
     
     # Ensure the instance folder exists
@@ -49,25 +53,6 @@ def create_app(config_class=Config):
     except Exception as e:
         app.logger.error(f"Failed to register blueprints: {e}")
         raise
-    
-    # Basic error handler
-    @app.errorhandler(404)
-    def not_found_error(error):
-        return render_template('404.html'), 404
-    
-    @app.errorhandler(500)
-    def internal_error(error):
-        app.logger.error(f"Internal server error: {error}")
-        return render_template('500.html'), 500
-    
-    # Close database connection when app context is torn down
-    @app.teardown_appcontext
-    def teardown_db(exception):
-        if 'DB_CONNECTION' in app.config and app.config['DB_CONNECTION']:
-            try:
-                app.config['DB_CONNECTION'].close()
-            except Exception as e:
-                app.logger.error(f"Error closing database connection: {e}")
     
     return app
 

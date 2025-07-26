@@ -1,0 +1,144 @@
+/**
+ * =============================================================================
+ * BASE STYLES (GLOBAL VARIABLES & CORE SETUP)
+ *
+ * Bu dosya projenin temelini oluşturur. Sadece global değişkenleri,
+ * temel reset kodlarını ve <body> stilini içerir.
+ * Bileşen (component) stilleri burada yer almaz.
+ *
+ * Anlamı:
+ * - :root              -> Varsayılan (Açık Tema) değişkenleri
+ * - @media (...)        -> Kullanıcının işletim sistemi tercihine göre
+ * Koyu Tema değişkenlerini ezer.
+ * =============================================================================
+ */
+
+ :root {
+    /* * -------------------------------------------------------------------------
+     * RENK PALETİ (AÇIK TEMA - VARSAYILAN)
+     * Renkleri anlamsal olarak isimlendirmek, temalar arasında geçişi kolaylaştırır.
+     * -------------------------------------------------------------------------
+     */
+    --color-text-primary: #121212;       /* Ana metin rengi */
+    --color-text-secondary: #4a4a4a;     /* İkincil, daha soluk metinler */
+    --color-background-primary: #ffffff; /* Ana arka plan */
+    --color-background-secondary: #f7f7f7; /* Kart, bölüm gibi ikincil arka planlar */
+    --color-accent-primary: #007bff;       /* Vurgu, link ve ana eylem rengi */
+    --color-accent-secondary: #0056b3;     /* Vurgu renginin hover durumu */
+    --color-border: #e1e1e1;            /* Kenarlıklar için kullanılan renk */
+    --color-success: #28a745;            /* Başarı durumları için */
+    --color-error: #dc3545;              /* Hata durumları için */
+    
+
+    /* * -------------------------------------------------------------------------
+     * TİPOGRAFİ
+     * -------------------------------------------------------------------------
+     */
+    --font-family-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-family-monospace: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+
+    /* Font Boyutları (Ölçeklenebilir yapı) */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-md: 1.125rem;   /* 18px */
+    --font-size-lg: 1.25rem;    /* 20px */
+    --font-size-xl: 1.5rem;     /* 24px */
+    --font-size-xxl: 2rem;      /* 32px */
+    --font-size-xxxl: 2.5rem;   /* 40px */
+    
+    /* Font Ağırlıkları */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    /* Satır Yüksekliği */
+    --line-height-base: 1.6;
+    --line-height-heading: 1.3;
+
+
+    /* * -------------------------------------------------------------------------
+     * BOŞLUKLAR (SPACING)
+     * rem birimi kullanarak ölçeklenebilir bir boşluk sistemi.
+     * -------------------------------------------------------------------------
+     */
+    --spacing-1: 0.25rem;  /* 4px */
+    --spacing-2: 0.5rem;   /* 8px */
+    --spacing-3: 1rem;     /* 16px */
+    --spacing-4: 1.5rem;   /* 24px */
+    --spacing-5: 2rem;     /* 32px */
+    --spacing-6: 3rem;     /* 48px */
+
+    /* * -------------------------------------------------------------------------
+     * DİĞER GLOBAL DEĞİŞKENLER
+     * -------------------------------------------------------------------------
+     */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --transition-base: all 0.3s ease-in-out;
+    --max-width-container: 1240px;
+}
+
+/* * =============================================================================
+ * KOYU TEMA
+ * Kullanıcının OS tercihi "dark" ise, :root içindeki renk değişkenlerini
+ * yeniden tanımlayarak tüm siteyi Koyu Tema'ya geçiririz.
+ * Sadece renkleri değiştirmek yeterlidir.
+ * =============================================================================
+ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text-primary: #f0f0f0;
+        --color-text-secondary: #a0a0a0;
+        --color-background-primary: #121212;
+        --color-background-secondary: #1e1e1e;
+        --color-accent-primary: #4dabf7;
+        --color-accent-secondary: #74c0fc;
+        --color-border: #333333;
+    }
+}
+
+
+/* * =============================================================================
+ * TEMEL RESET VE BODY STİLLERİ
+ * Tarayıcı varsayılanlarını sıfırlar ve projenin temelini ayarlar.
+ * =============================================================================
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    /* Daha akıcı kaydırma (scroll) davranışı */
+    scroll-behavior: smooth;
+    /* Font boyutunun kullanıcı ayarlarına göre ölçeklenmesini sağlar */
+    font-size: var(--font-size-base);
+}
+
+body {
+    font-family: var(--font-family-main);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-base);
+
+    /* Renk değişkenleri sayesinde temaya otomatik adapte olur */
+    color: var(--color-text-primary);
+    background-color: var(--color-background-primary);
+    
+    /* Metinlerin daha okunaklı render edilmesini sağlar */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Sayfanın minimum yüksekliğinin ekran kadar olmasını sağlar */
+    min-height: 100vh;
+}
+
+/* * Medya elementlerinin varsayılan davranışlarını iyileştirme
+ */
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}

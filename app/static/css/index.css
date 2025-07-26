@@ -1,0 +1,89 @@
+/* =============================================================================
+ * INDEX.HTML'E ÖZEL STİLLER
+ * ============================================================================= */
+
+/* Hero (Karşılama) Alanı */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-6) var(--spacing-4);
+    background-color: var(--color-background-secondary);
+}
+
+.hero-content {
+    max-width: 800px;
+}
+
+.hero-title {
+    font-size: var(--font-size-xxxl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-heading);
+    margin-bottom: var(--spacing-3);
+}
+
+.hero-subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-4);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-button {
+    display: inline-block;
+    background-color: var(--color-accent-primary);
+    color: white;
+    padding: var(--spacing-3) var(--spacing-5);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    transition: var(--transition-base);
+}
+
+.hero-button:hover {
+    background-color: var(--color-accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Özellikler Alanı */
+.features-section {
+    padding: var(--spacing-6) var(--spacing-4);
+    max-width: var(--max-width-container);
+    margin: 0 auto;
+}
+
+.section-title {
+    text-align: center;
+    font-size: var(--font-size-xxl);
+    margin-bottom: var(--spacing-5);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.feature-card {
+    background-color: var(--color-background-secondary);
+    padding: var(--spacing-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    text-align: center;
+}
+
+.feature-card h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-2);
+}
+
+.feature-card p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+}

@@ -1,0 +1,40 @@
+<!-- base.html şablonunu miras alıyoruz -->
+{% extends "base.html" %}
+
+<!-- Sayfa başlığını değiştiriyoruz -->
+{% block title %}Ana Sayfa - Proje Adı{% endblock %}
+
+<!-- Bu sayfaya özel CSS dosyasını ekliyoruz -->
+{% block head_extra_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+
+<!-- Ana içerik bloğunu dolduruyoruz -->
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Modern Web'e Hoş Geldiniz</h1>
+        <p class="hero-subtitle">Bu, base.css ve şablon miras alma kullanılarak oluşturulmuş temiz ve modüler bir başlangıç sayfasıdır.</p>
+        <a href="#" class="hero-button">Daha Fazla Bilgi</a>
+    </div>
+</div>
+
+<div class="features-section">
+    <h2 class="section-title">Özellikler</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>Modüler CSS</h3>
+            <p>Stiller, base, bileşen ve sayfa bazında ayrılarak yönetimi kolaylaştırır.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Açık & Koyu Tema</h3>
+            <p>Tek bir CSS değişkeni seti ile işletim sistemi tercihine duyarlı temalar.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Flask Uyumlu</h3>
+            <p>Jinja2 şablon motoru ile kolayca entegre edilebilir ve genişletilebilir yapı.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

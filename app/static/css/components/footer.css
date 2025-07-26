@@ -1,0 +1,22 @@
+/* =============================================================================
+ * FOOTER STYLES
+ * ============================================================================= */
+
+ .footer {
+    background-color: var(--color-background-secondary);
+    border-top: 1px solid var(--color-border);
+    padding: var(--spacing-5) 0;
+    margin-top: auto; /* İçerik az olduğunda bile footer'ı sayfanın en altına iter */
+}
+
+.footer-container {
+    max-width: var(--max-width-container);
+    margin: 0 auto;
+    padding: 0 var(--spacing-4);
+    text-align: center;
+}
+
+.footer p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
