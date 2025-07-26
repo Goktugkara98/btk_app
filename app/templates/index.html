@@ -1,17 +1,14 @@
-<!-- base.html şablonunu miras alıyoruz -->
 {% extends "base.html" %}
 
-<!-- Sayfa başlığını değiştiriyoruz -->
 {% block title %}Ana Sayfa - Proje Adı{% endblock %}
 
-<!-- Bu sayfaya özel CSS dosyasını ekliyoruz -->
 {% block head_extra_styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 {% endblock %}
 
 
-<!-- Ana içerik bloğunu dolduruyoruz -->
 {% block content %}
+<!--Content-->
 <div class="hero-section">
     <div class="hero-content">
         <h1 class="hero-title">Modern Web'e Hoş Geldiniz</h1>
@@ -37,4 +34,6 @@
         </div>
     </div>
 </div>
+<!--End Content-->
 {% endblock %}
+

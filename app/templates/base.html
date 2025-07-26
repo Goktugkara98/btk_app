@@ -1,36 +1,30 @@
 <!DOCTYPE html>
-<!-- Dil ayarını Türkçe olarak belirtiyoruz -->
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- 
-      Sayfa başlığı için bir blok oluşturuyoruz. 
-      Miras alan her sayfa bu bloğu doldurabilir.
-      Eğer doldurulmazsa varsayılan başlık kullanılır.
-    -->
+    <!--Title-->
     <title>{% block title %}Proje Adı{% endblock %}</title>
-
-    <!-- Temel CSS dosyamızı bağlıyoruz -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     
-    <!-- Sabit bileşenlerin CSS dosyalarını bağlıyoruz -->
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <!--CSS-->
+    <!---Plugins-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/plugins/bootstrap-grid.css') }}">
+    <!---Base-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <!---Components-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/footer.css') }}">
-
-    <!-- 
-      Her sayfaya özel CSS dosyalarını eklemek için bir blok.
-      Bu, sayfa bazında stil eklemeyi kolaylaştırır.
-    -->
+    <!---Extra Styles-->
     {% block head_extra_styles %}{% endblock %}
 </head>
 <body>
 
-    <!-- ====================================================================== -->
-    <!-- NAVBAR (Gezinti Çubuğu)                                                -->
-    <!-- Bu bölüm tüm sayfalarda aynı kalacak.                                  -->
-    <!-- ====================================================================== -->
+    <!--Navbar-->
     <header class="navbar">
         <div class="navbar-container">
             <a href="/" class="navbar-brand">ProjeLogosu</a>
@@ -41,24 +35,24 @@
             </nav>
         </div>
     </header>
-
-    <!-- ====================================================================== -->
-    <!-- ANA İÇERİK BÖLÜMÜ                                                       -->
-    <!-- Bu blok, her sayfanın kendi içeriği ile doldurulacak.                  -->
-    <!-- ====================================================================== -->
+    <!--Main Content-->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- ====================================================================== -->
-    <!-- FOOTER (Alt Bilgi)                                                     -->
-    <!-- Bu bölüm de tüm sayfalarda aynı kalacak.                               -->
-    <!-- ====================================================================== -->
+    <!--Footer-->
     <footer class="footer">
         <div class="footer-container">
             <p>&copy; 2024 Proje Adı. Tüm hakları saklıdır.</p>
         </div>
     </footer>
 
+    <!--Scripts-->
+    <!---Plugins-->
+    <script src="{{ url_for('static', filename='js/plugins/gsap-core.js') }}"></script>
+    <!---Main-->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!---Components-->
+    {% block body_extra_scripts %}{% endblock %}
 </body>
 </html>
