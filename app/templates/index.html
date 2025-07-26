@@ -1,39 +1,263 @@
 {% extends "base.html" %}
 
-{% block title %}Ana Sayfa - Proje Adı{% endblock %}
+{% block title %}QuizMaster - Akıllı Soru Bankası{% endblock %}
 
 {% block head_extra_styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 {% endblock %}
 
-
 {% block content %}
-<!--Content-->
-<div class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title">Modern Web'e Hoş Geldiniz</h1>
-        <p class="hero-subtitle">Bu, base.css ve şablon miras alma kullanılarak oluşturulmuş temiz ve modüler bir başlangıç sayfasıdır.</p>
-        <a href="#" class="hero-button">Daha Fazla Bilgi</a>
-    </div>
-</div>
+<!-- Hero Section -->
+      <section class="hero">
+          <div class="hero-background">
+              <div class="hero-particles"></div>
+          </div>
+          <div class="container">
+              <div class="hero-content">
+                  <div class="hero-text">
+                      <h1 class="hero-title">
+                          <span class="gradient-text">QuizMaster</span>
+                          <br>AI Destekli Öğrenme
+                      </h1>
+                      <p class="hero-description">
+                          Yapay zeka destekli kişiselleştirilmiş öğrenme deneyimi.
+                          Yanlış cevap verdiğinde AI sana detaylı açıklama yapar.
+                      </p>
+                      <div class="hero-buttons">
+                          <a href="/quiz" class="btn btn-primary">
+                              <i class="bi bi-play-circle"></i>
+                              Tam Quiz Başlat
+                          </a>
+                          <a href="#features" class="btn btn-secondary">
+                              <i class="bi bi-info-circle"></i>
+                              Daha Fazla
+                          </a>
+                      </div>
+                  </div>
+                  <div class="hero-interactive">
+                      <div class="quiz-simulator">
+                          <div class="quiz-panel">
+                              <div class="quiz-header">
+                                  <div class="quiz-info">
+                                      <span class="quiz-subject">Matematik</span>
+                                      <span class="quiz-difficulty">Orta</span>
+                                  </div>
+                                  <div class="quiz-timer">
+                                      <i class="bi bi-clock"></i>
+                                      <span id="demo-timer">01:30</span>
+                                  </div>
+                              </div>
+                              <div class="quiz-question">
+                                  <h3 id="demo-question">Aşağıdaki sayılardan hangisi en büyüktür?</h3>
+                                  <div class="quiz-options" id="demo-options">
+                                      <div class="option" data-correct="true">
+                                          <span class="option-letter">A</span>
+                                          <span class="option-text">1250</span>
+                                      </div>
+                                      <div class="option" data-correct="false">
+                                          <span class="option-letter">B</span>
+                                          <span class="option-text">999</span>
+                                      </div>
+                                      <div class="option" data-correct="false">
+                                          <span class="option-letter">C</span>
+                                          <span class="option-text">850</span>
+                                      </div>
+                                      <div class="option" data-correct="false">
+                                          <span class="option-letter">D</span>
+                                          <span class="option-text">750</span>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="ai-chat-panel">
+                              <div class="chat-header">
+                                  <div class="ai-avatar">
+                                      <i class="bi bi-robot"></i>
+                                  </div>
+                                  <div class="ai-info">
+                                      <h4>QuizMaster AI</h4>
+                                      <span>Yardımcı Asistan</span>
+                                  </div>
+                              </div>
+                              <div class="chat-messages" id="chat-messages">
+                                  <div class="message ai-message">
+                                      <div class="message-content">
+                                          <p>Merhaba! Bu soruyu çözmeye hazır mısın? Hangi seçeneği düşünüyorsun?</p>
+                                      </div>
+                                      <div class="message-time">Şimdi</div>
+                                  </div>
+                              </div>
+                              <div class="chat-input">
+                                  <input type="text" id="chat-input" placeholder="Cevabını yaz veya seçeneğe tıkla..." disabled>
+                                  <button id="send-message" disabled>
+                                      <i class="bi bi-send"></i>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
 
-<div class="features-section">
-    <h2 class="section-title">Özellikler</h2>
-    <div class="features-grid">
-        <div class="feature-card">
-            <h3>Modüler CSS</h3>
-            <p>Stiller, base, bileşen ve sayfa bazında ayrılarak yönetimi kolaylaştırır.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Açık & Koyu Tema</h3>
-            <p>Tek bir CSS değişkeni seti ile işletim sistemi tercihine duyarlı temalar.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Flask Uyumlu</h3>
-            <p>Jinja2 şablon motoru ile kolayca entegre edilebilir ve genişletilebilir yapı.</p>
+<!-- Stats Section -->
+<section class="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-question-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">500+</h3>
+                    <p class="stat-label">Soru</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">1000+</h3>
+                    <p class="stat-label">Kullanıcı</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">95%</h3>
+                    <p class="stat-label">Başarı Oranı</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">24/7</h3>
+                    <p class="stat-label">Erişim</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-<!--End Content-->
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Neden QuizMaster?</h2>
+            <p class="section-subtitle">Öğrenmeyi kolaylaştıran özelliklerimizi keşfedin</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-brain"></i>
+                </div>
+                <h3>Akıllı Öğrenme</h3>
+                <p>Yapay zeka destekli algoritmalar ile kişiselleştirilmiş soru önerileri ve öğrenme yolları.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-speedometer2"></i>
+                </div>
+                <h3>Anlık Geri Bildirim</h3>
+                <p>Her sorudan sonra detaylı açıklamalar ve anlık performans analizi ile öğrenme sürecini hızlandırın.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-bar-chart"></i>
+                </div>
+                <h3>Detaylı Analiz</h3>
+                <p>Güçlü ve zayıf yönlerinizi gösteren kapsamlı raporlar ve gelişim grafikleri.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-phone"></i>
+                </div>
+                <h3>Mobil Uyumlu</h3>
+                <p>Tüm cihazlarda mükemmel çalışan responsive tasarım ile istediğiniz yerden erişim.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3>Güvenli Sistem</h3>
+                <p>Verileriniz güvende, performansınız gizli. En yüksek güvenlik standartları ile korunuyoruz.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <h3>Sürekli Güncelleme</h3>
+                <p>Düzenli olarak eklenen yeni sorular ve özellikler ile her zaman güncel içerik.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Öğrenmeye Başlayın</h2>
+            <p>Hemen ücretsiz hesap oluşturun ve öğrenme yolculuğunuza başlayın.</p>
+            <div class="cta-buttons">
+                <a href="/quiz" class="btn btn-primary btn-large">
+                    <i class="bi bi-rocket"></i>
+                    Hemen Başla
+                </a>
+                <a href="#demo" class="btn btn-outline btn-large">
+                    <i class="bi bi-play"></i>
+                    Demo İzle
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>QuizMaster</h3>
+                <p>Modern öğrenme teknolojileri ile geleceği şekillendiriyoruz.</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Ürün</h4>
+                    <ul>
+                        <li><a href="#features">Özellikler</a></li>
+                        <li><a href="#pricing">Fiyatlandırma</a></li>
+                        <li><a href="#demo">Demo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Destek</h4>
+                    <ul>
+                        <li><a href="#help">Yardım</a></li>
+                        <li><a href="#contact">İletişim</a></li>
+                        <li><a href="#docs">Dokümantasyon</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Şirket</h4>
+                    <ul>
+                        <li><a href="#about">Hakkımızda</a></li>
+                        <li><a href="#careers">Kariyer</a></li>
+                        <li><a href="#privacy">Gizlilik</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 QuizMaster. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+</footer>
 {% endblock %}
 

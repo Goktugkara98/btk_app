@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basit Soru Bankası - Veritabanı Yapısı</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        /* Veritabanı Tabloları */
+        .table-container {
+            margin-bottom: 20px;
+        }
+
+        .table-card {
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-fields {
+            padding: 15px;
+        }
+
+        .field-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .field-item:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .field-type {
+            font-size: 0.8rem;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--secondary-color);
+        }
+
+        /* Örnek Veri */
+        .example-data {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .example-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+
+        .question-example {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .question-text {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .option {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: var(--success-color);
+            color: #155724;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: var(--danger-color);
+            color: #721c24;
+        }
+
+        /* Basit Açıklama */
+        .simple-explanation {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .explanation-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+
+        .explanation-text {
+            color: var(--secondary-color);
+            line-height: 1.7;
+        }
+
+        /* İlişki Gösterimi */
+        .relationship {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .relationship-arrow {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .options-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Başlık -->
+        <div class="header">
+            <h1><i class="bi bi-database"></i> Basit Soru Bankası</h1>
+            <p>Sadece 2 tablo ile soru bankası sistemi</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Veritabanı Yapısı -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="bi bi-table"></i>
+                    Veritabanı Yapısı
+                </div>
+                
+                <div class="simple-explanation">
+                    <div class="explanation-title">🎯 Basit Mantık</div>
+                    <div class="explanation-text">
+                        Sadece 2 tablo kullanıyoruz:<br>
+                        <strong>1. questions</strong> - Soruları saklar<br>
+                        <strong>2. question_options</strong> - Seçenekleri saklar<br><br>
+                        Her sorunun 4 seçeneği var (A, B, C, D)
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-question-circle"></i>
+                            questions (Sorular Tablosu)
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type">NUMARA</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">question_text</span>
+                                <span class="field-type">SORU METNİ</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">explanation</span>
+                                <span class="field-type">AÇIKLAMA</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">difficulty</span>
+                                <span class="field-type">ZORLUK</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">is_active</span>
+                                <span class="field-type">AKTİF Mİ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relationship">
+                        <div class="relationship-arrow">↓</div>
+                        <small>Her sorunun 4 seçeneği var</small>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <i class="bi bi-list-check"></i>
+                            question_options (Seçenekler Tablosu)
+                        </div>
+                        <div class="table-fields">
+                            <div class="field-item">
+                                <span class="field-name">id</span>
+                                <span class="field-type">NUMARA</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">question_id</span>
+                                <span class="field-type">SORU BAĞLANTISI</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">option_text</span>
+                                <span class="field-type">SEÇENEK METNİ</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">is_correct</span>
+                                <span class="field-type">DOĞRU MU</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-name">option_letter</span>
+                                <span class="field-type">HARF (A,B,C,D)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Örnek Veriler -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="bi bi-patch-question"></i>
+                    Örnek Sorular
+                </div>
+                
+                <div class="example-data">
+                    <div class="example-title">📝 Veritabanında Nasıl Saklanır?</div>
+                    
+                    <div class="question-example">
+                        <div class="question-text">
+                            <strong>Soru:</strong> Aşağıdaki sayılardan hangisi en büyüktür?
+                        </div>
+                        <div class="options-list">
+                            <div class="option correct">A) 1250</div>
+                            <div class="option incorrect">B) 999</div>
+                            <div class="option incorrect">C) 850</div>
+                            <div class="option incorrect">D) 750</div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-color);">
+                            <strong>Açıklama:</strong> Sayıları karşılaştırırken basamak sayısına bakılır.
+                        </div>
+                    </div>
+
+                    <div class="question-example">
+                        <div class="question-text">
+                            <strong>Soru:</strong> 1500 sayısının yarısı kaçtır?
+                        </div>
+                        <div class="options-list">
+                            <div class="option incorrect">A) 500</div>
+                            <div class="option correct">B) 750</div>
+                            <div class="option incorrect">C) 1000</div>
+                            <div class="option incorrect">D) 1250</div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-color);">
+                            <strong>Açıklama:</strong> Bir sayının yarısını bulmak için 2'ye böleriz.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simple-explanation">
+                    <div class="explanation-title">💡 Nasıl Çalışır?</div>
+                    <div class="explanation-text">
+                        <strong>1.</strong> Soru metni "questions" tablosuna kaydedilir<br>
+                        <strong>2.</strong> 4 seçenek "question_options" tablosuna kaydedilir<br>
+                        <strong>3.</strong> Sadece 1 seçenek "is_correct = true" olur<br>
+                        <strong>4.</strong> Her seçenek A, B, C, D harfi alır<br><br>
+                        <strong>Sonuç:</strong> Quiz oluştururken bu verilerden sorular çıkarılır
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alt Bilgi -->
+        <div style="background: white; border-radius: var(--border-radius); padding: 25px; text-align: center; box-shadow: var(--shadow);">
+            <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+                <i class="bi bi-lightbulb"></i>
+                Bu Yapı Neden Basit?
+            </h3>
+            <div style="color: var(--secondary-color); line-height: 1.7;">
+                ✅ Sadece 2 tablo var<br>
+                ✅ Sınıf, ders, konu yok (şimdilik)<br>
+                ✅ Her soru 4 seçenekli<br>
+                ✅ Sadece 1 doğru cevap var<br>
+                ✅ Zorluk seviyesi basit (kolay/orta/zor)<br><br>
+                <strong>İleride genişletebiliriz!</strong>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,20 +1,55 @@
 /* =============================================================================
- * NAVBAR STYLES (SIMPLE & ELEGANT)
+ * NAVBAR STYLES (PROFESSIONAL & MODERN)
  * ============================================================================= */
 
- .navbar {
-    background-color: var(--color-background-secondary); /* Arka plan rengi her zaman sabit */
-    border-bottom: 1px solid var(--color-border);
-    padding: var(--spacing-3) 0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    transition: box-shadow 0.3s ease;
+:root {
+    --navbar-height: 70px;
+    --navbar-bg: rgba(255, 255, 255, 0.8); /* Daha transparan */
+    --navbar-bg-dark: rgba(18, 18, 18, 0.8);
+    --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --navbar-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Sayfa kaydırıldığında sadece hafif bir gölge eklenir */
+.navbar {
+    background: var(--navbar-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    box-shadow: var(--navbar-shadow);
+}
+
+/* Koyu tema için navbar */
+@media (prefers-color-scheme: dark) {
+    .navbar {
+        background: var(--navbar-bg-dark);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: var(--navbar-shadow-dark);
+    }
+}
+
+/* Scroll durumunda navbar'ın görünümü */
 body:not([data-scroll-y="0"]) .navbar {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-scroll-y="0"]) .navbar {
+        background: rgba(18, 18, 18, 0.9);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
 }
 
 .navbar-container {
@@ -24,64 +59,143 @@ body:not([data-scroll-y="0"]) .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100%;
+    width: 100%;
 }
 
 .navbar-brand {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
+    font-size: 1.4rem;
+    font-weight: 600;
     color: var(--color-text-primary);
     text-decoration: none;
     transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .navbar-brand:hover {
-    opacity: 0.75;
+    opacity: 0.7;
 }
 
 .navbar-nav {
     display: flex;
-    align-items: center; /* Buton ve linki dikeyde hizalar */
-    gap: var(--spacing-3); /* Elementler arası boşluk */
+    align-items: center;
+    gap: 2rem;
+    height: 100%;
 }
 
-/* --- Sade Navigasyon Linki --- */
+/* --- Minimal Navigasyon Linki --- */
 .nav-link {
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
+    font-size: 0.9rem;
+    font-weight: 500;
     color: var(--color-text-secondary);
     text-decoration: none;
-    padding: var(--spacing-2) var(--spacing-3);
-    border-radius: 6px; /* Hafif yuvarlak kenarlar */
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-/* Üzerine gelince çok hafif bir arka plan rengi değişimi */
-.nav-link:hover {
-    background-color: rgba(0, 0, 0, 0.04); /* Çok belli belirsiz bir gri tonu */
-    color: var(--color-text-primary);
-}
-
-/* Aktif sayfa linki daha belirgin ve kalın */
-.nav-link.active {
-    color: var(--color-text-primary);
-    font-weight: 600; /* semi-bold */
-}
-
-
-/* --- Giriş Yap Butonu --- */
-.nav-button {
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
-    color: #FFFFFF; /* Buton metni beyaz */
-    background-color: var(--color-accent-primary); /* Ana vurgu rengi */
-    text-decoration: none;
-    padding: 10px 20px; /* Daha belirgin iç boşluk */
+    padding: 0.5rem 1rem;
     border-radius: 6px;
-    transition: filter 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-/* Butonun üzerine gelince parlaklığını hafifçe azaltıyoruz */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent-primary);
+    transition: all 0.2s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover {
+    color: var(--color-text-primary);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+.nav-link.active {
+    color: var(--color-accent-primary);
+    font-weight: 600;
+}
+
+.nav-link.active::after {
+    width: 80%;
+}
+
+
+/* --- Minimal Giriş Butonu --- */
+.nav-button {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-accent-primary);
+    background: transparent;
+    text-decoration: none;
+    padding: 0.5rem 1.25rem;
+    border: 1.5px solid var(--color-accent-primary);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
 .nav-button:hover {
-    filter: brightness(90%);
-    transform: translateY(-1px); /* Çok hafif bir yukarı kalkma efekti */
+    background: var(--color-accent-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.nav-button:active {
+    transform: translateY(0);
+}
+
+/* =============================================================================
+ * RESPONSIVE DESIGN
+ * ============================================================================= */
+
+@media (max-width: 768px) {
+    :root {
+        --navbar-height: 60px;
+    }
+    
+    .navbar-container {
+        padding: 0 1rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .navbar-nav {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .nav-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-nav {
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .nav-button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
 }

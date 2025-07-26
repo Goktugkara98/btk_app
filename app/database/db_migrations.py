@@ -1,50 +1,20 @@
 # =============================================================================
-# 1.0. MODÜL BAŞLIĞI VE AÇIKLAMASI
-# =============================================================================
-# Bu modül, veritabanı şemasının (tabloların) oluşturulması ve yönetilmesi
-# için gerekli geçiş işlemlerini yürüten `Migrations` sınıfını içerir.
+# Basit Soru Bankası - Veritabanı Migrations
+# Sadece 2 tablo: questions ve question_options
 # =============================================================================
 
-# =============================================================================
-# 2.0. İÇİNDEKİLER
-# =============================================================================
-# 3.0. GEREKLİ KÜTÜPHANELER
-# 4.0. MIGRATIONS SINIFI
-#   4.1. Başlatma ve Bağlantı Sahipliği
-#     4.1.1. __init__(self, db_connection)
-#   4.2. Dahili Bağlantı Yönetimi
-#     4.2.1. _ensure_connection(self)
-#     4.2.2. _close_if_owned(self)
-#   4.3. Geçiş Metotları (Migration Methods)
-#     4.3.1. create_users_table(self)
-#     4.3.2. create_education_tables(self)
-#     4.3.3. create_question_tables(self)
-#     4.3.4. create_sample_data(self)
-#   4.4. Ana Geçiş Yöneticisi
-#     4.4.1. run_migrations(self)
-# 5.0. DOĞRUDAN ÇALIŞTIRMA BLOĞU
-# =============================================================================
-
-# =============================================================================
-# 3.0. GEREKLİ KÜTÜPHANELER
-# =============================================================================
 from mysql.connector import Error as MySQLError
 from typing import Optional
 from app.database.db_connection import DatabaseConnection
 
-# =============================================================================
-# 4.0. MIGRATIONS SINIFI
-# =============================================================================
-class Migrations:
+class SimpleMigrations:
     """
-    Veritabanı şemasını (tabloları) oluşturmak için geçiş işlemlerini yürütür.
+    Basit soru bankası için veritabanı şemasını oluşturur.
+    Sadece 2 tablo kullanır: questions ve question_options
     """
 
-    # -------------------------------------------------------------------------
-    # 4.1. Başlatma ve Bağlantı Sahipliği
-    # -------------------------------------------------------------------------
     def __init__(self, db_connection: Optional[DatabaseConnection] = None):
-        """4.1.1. Sınıfın kurucu metodu. Harici veya dahili bağlantı kullanır."""
+        """Sınıfın kurucu metodu."""
         if db_connection:
             self.db: DatabaseConnection = db_connection
             self.own_connection: bool = False
@@ -52,211 +22,79 @@ class Migrations:
             self.db: DatabaseConnection = DatabaseConnection()
             self.own_connection: bool = True
 
-    # -------------------------------------------------------------------------
-    # 4.2. Dahili Bağlantı Yönetimi
-    # -------------------------------------------------------------------------
-    def _ensure_connection(self):
-        """4.2.1. Veritabanı bağlantısı kapalıysa yeniden kurar."""
-        self.db._ensure_connection()
-
-    def _close_if_owned(self):
-        """4.2.2. Eğer bağlantı bu sınıf tarafından oluşturulduysa kapatır."""
+    def __del__(self):
+        """Destructor - bağlantıyı temizle."""
         if self.own_connection:
             self.db.close()
 
-    # -------------------------------------------------------------------------
-    # 4.3. Geçiş Metotları (Migration Methods)
-    # -------------------------------------------------------------------------
-    def create_users_table(self):
-        """4.3.1. `users` tablosunu oluşturur veya var olduğunu doğrular."""
-        self._ensure_connection()
+    def drop_existing_tables(self):
+        """Mevcut tabloları temizler."""
         try:
             with self.db as conn:
-                query = """
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        username VARCHAR(50) NOT NULL UNIQUE,
-                        email VARCHAR(100) UNIQUE,
-                        password_hash VARCHAR(255) NOT NULL,
-                        full_name VARCHAR(100),
-                        is_active BOOLEAN DEFAULT true,
-                        role ENUM('student', 'teacher', 'admin') DEFAULT 'student',
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                    )
-                """
-                conn.cursor.execute(query)
+                print("🧹 Mevcut tablolar temizleniyor...")
+                
+                # Foreign key constraint'leri devre dışı bırak
+                conn.cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+                
+                # Mevcut tabloları sil
+                tables_to_drop = [
+                    'question_options',
+                    'questions',
+                    'question_tag_relations',
+                    'question_tags',
+                    'question_media',
+                    'user_answers',
+                    'quiz_attempts',
+                    'user_statistics',
+                    'subtopics',
+                    'topics',
+                    'grade_subjects',
+                    'subjects',
+                    'grade_levels',
+                    'education_levels',
+                    'difficulty_levels',
+                    'question_types',
+                    'users'
+                ]
+                
+                for table in tables_to_drop:
+                    try:
+                        conn.cursor.execute(f"DROP TABLE IF EXISTS {table}")
+                        print(f"   ✅ {table} tablosu silindi")
+                    except Exception as e:
+                        print(f"   ⚠️  {table} tablosu silinemedi: {e}")
+                
+                # Foreign key constraint'leri tekrar etkinleştir
+                conn.cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
                 conn.connection.commit()
-        except MySQLError:
+                
+                print("✅ Tablo temizleme tamamlandı!")
+                
+        except MySQLError as e:
+            print(f"❌ Tablo temizleme hatası: {e}")
             raise
 
-    def create_education_tables(self):
-        """4.3.2. Eğitim hiyerarşisi tablolarını oluşturur."""
-        self._ensure_connection()
+    def create_simple_tables(self):
+        """Basit soru bankası tablolarını oluşturur."""
         try:
             with self.db as conn:
-                # Eğitim seviyeleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS education_levels (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(50) NOT NULL UNIQUE,
-                        short_name VARCHAR(10) NOT NULL UNIQUE,
-                        description TEXT,
-                        is_active BOOLEAN DEFAULT true,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                    )
-                """)
-
-                # Sınıf seviyeleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS grade_levels (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        education_level_id INT NOT NULL,
-                        name VARCHAR(20) NOT NULL,
-                        short_name VARCHAR(10) NOT NULL,
-                        description TEXT,
-                        is_active BOOLEAN DEFAULT true,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (education_level_id) REFERENCES education_levels(id) ON DELETE CASCADE,
-                        UNIQUE KEY unique_grade (education_level_id, name)
-                    )
-                """)
-
-                # Dersler
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS subjects (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(100) NOT NULL UNIQUE,
-                        short_name VARCHAR(20) NOT NULL UNIQUE,
-                        description TEXT,
-                        icon VARCHAR(50),
-                        color VARCHAR(7) DEFAULT '#4a6cf7',
-                        is_active BOOLEAN DEFAULT true,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                    )
-                """)
-
-                # Sınıf-Ders ilişkisi
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS grade_subjects (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        grade_level_id INT NOT NULL,
-                        subject_id INT NOT NULL,
-                        is_active BOOLEAN DEFAULT true,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (grade_level_id) REFERENCES grade_levels(id) ON DELETE CASCADE,
-                        FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-                        UNIQUE KEY unique_grade_subject (grade_level_id, subject_id)
-                    )
-                """)
-
-                # Konular
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS topics (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        subject_id INT NOT NULL,
-                        name VARCHAR(200) NOT NULL,
-                        description TEXT,
-                        is_active BOOLEAN DEFAULT true,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
-                    )
-                """)
-
-                # Alt konular
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS subtopics (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        topic_id INT NOT NULL,
-                        name VARCHAR(200) NOT NULL,
-                        description TEXT,
-                        is_active BOOLEAN DEFAULT true,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
-                    )
-                """)
-
-                conn.connection.commit()
-        except MySQLError:
-            raise
-
-    def create_question_tables(self):
-        """4.3.3. Soru bankası tablolarını oluşturur."""
-        self._ensure_connection()
-        try:
-            with self.db as conn:
-                # Soru tipleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS question_types (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(50) NOT NULL UNIQUE,
-                        short_name VARCHAR(20) NOT NULL UNIQUE,
-                        description TEXT,
-                        is_active BOOLEAN DEFAULT true,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-
-                # Zorluk seviyeleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS difficulty_levels (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(20) NOT NULL UNIQUE,
-                        short_name VARCHAR(10) NOT NULL UNIQUE,
-                        description TEXT,
-                        color VARCHAR(7) DEFAULT '#28a745',
-                        points_multiplier DECIMAL(3,2) DEFAULT 1.00,
-                        is_active BOOLEAN DEFAULT true,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-
-                # Ana soru tablosu
+                print("📋 Questions tablosu oluşturuluyor...")
+                
+                # Questions tablosu
                 conn.cursor.execute("""
                     CREATE TABLE IF NOT EXISTS questions (
                         id INT AUTO_INCREMENT PRIMARY KEY,
-                        grade_level_id INT NOT NULL,
-                        subject_id INT NOT NULL,
-                        topic_id INT NOT NULL,
-                        subtopic_id INT NOT NULL,
-                        question_type_id INT NOT NULL,
-                        difficulty_level_id INT NOT NULL,
                         question_text TEXT NOT NULL,
                         explanation TEXT,
-                        base_points INT DEFAULT 10,
-                        time_limit INT DEFAULT 60,
+                        difficulty ENUM('kolay', 'orta', 'zor') DEFAULT 'orta',
                         is_active BOOLEAN DEFAULT true,
-                        is_approved BOOLEAN DEFAULT false,
-                        is_featured BOOLEAN DEFAULT false,
-                        total_attempts INT DEFAULT 0,
-                        correct_attempts INT DEFAULT 0,
-                        average_time_taken INT DEFAULT 0,
-                        created_by INT,
-                        approved_by INT,
-                        approved_at TIMESTAMP NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (grade_level_id) REFERENCES grade_levels(id) ON DELETE CASCADE,
-                        FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-                        FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE,
-                        FOREIGN KEY (subtopic_id) REFERENCES subtopics(id) ON DELETE CASCADE,
-                        FOREIGN KEY (question_type_id) REFERENCES question_types(id) ON DELETE CASCADE,
-                        FOREIGN KEY (difficulty_level_id) REFERENCES difficulty_levels(id) ON DELETE CASCADE
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
-
-                # Soru seçenekleri
+                
+                print("📋 Question options tablosu oluşturuluyor...")
+                
+                # Question options tablosu
                 conn.cursor.execute("""
                     CREATE TABLE IF NOT EXISTS question_options (
                         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -264,251 +102,144 @@ class Migrations:
                         option_text TEXT NOT NULL,
                         is_correct BOOLEAN DEFAULT false,
                         option_letter CHAR(1) NOT NULL,
-                        sort_order INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
                     )
                 """)
-
-                # Soru etiketleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS question_tags (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(50) NOT NULL UNIQUE,
-                        description TEXT,
-                        color VARCHAR(7) DEFAULT '#6c757d',
-                        is_active BOOLEAN DEFAULT true,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-
-                # Soru-Etiket ilişkisi
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS question_tag_relations (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        question_id INT NOT NULL,
-                        tag_id INT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
-                        FOREIGN KEY (tag_id) REFERENCES question_tags(id) ON DELETE CASCADE,
-                        UNIQUE KEY unique_question_tag (question_id, tag_id)
-                    )
-                """)
-
-                # Soru medya dosyaları
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS question_media (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        question_id INT NOT NULL,
-                        media_type ENUM('image', 'video', 'audio', 'document') NOT NULL,
-                        file_name VARCHAR(255) NOT NULL,
-                        file_path VARCHAR(500) NOT NULL,
-                        file_url VARCHAR(500),
-                        file_size INT,
-                        mime_type VARCHAR(100),
-                        alt_text VARCHAR(200),
-                        caption TEXT,
-                        is_active BOOLEAN DEFAULT true,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
-                    )
-                """)
-
-                # Quiz denemeleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS quiz_attempts (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        user_id INT,
-                        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        completed_at TIMESTAMP NULL,
-                        score INT DEFAULT 0,
-                        max_score INT DEFAULT 0,
-                        percentage DECIMAL(5,2) DEFAULT 0,
-                        time_taken INT DEFAULT 0,
-                        is_passed BOOLEAN DEFAULT false,
-                        attempt_number INT DEFAULT 1,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-                    )
-                """)
-
-                # Kullanıcı cevapları
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS user_answers (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        attempt_id INT NOT NULL,
-                        question_id INT NOT NULL,
-                        selected_options JSON,
-                        is_correct BOOLEAN,
-                        points_earned INT DEFAULT 0,
-                        time_taken INT DEFAULT 0,
-                        hints_used INT DEFAULT 0,
-                        answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
-                        FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
-                    )
-                """)
-
-                # Kullanıcı istatistikleri
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS user_statistics (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        user_id INT NOT NULL,
-                        total_attempts INT DEFAULT 0,
-                        best_score INT DEFAULT 0,
-                        average_score DECIMAL(5,2) DEFAULT 0,
-                        total_time_taken INT DEFAULT 0,
-                        last_attempt_at TIMESTAMP,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                    )
-                """)
-
+                
                 conn.connection.commit()
-        except MySQLError:
+                print("✅ Basit tablolar başarıyla oluşturuldu!")
+                
+        except MySQLError as e:
+            print(f"❌ Tablo oluşturma hatası: {e}")
             raise
 
-    def create_sample_data(self):
-        """4.3.4. Örnek verileri ekler."""
-        self._ensure_connection()
+    def create_sample_questions(self):
+        """Örnek soruları ekler."""
         try:
             with self.db as conn:
-                # Eğitim seviyeleri
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO education_levels (name, short_name, description, sort_order) VALUES
-                    ('İlkokul', 'ilk', 'İlkokul eğitim seviyesi', 1),
-                    ('Ortaokul', 'orta', 'Ortaokul eğitim seviyesi', 2),
-                    ('Lise', 'lise', 'Lise eğitim seviyesi', 3),
-                    ('Üniversite', 'uni', 'Üniversite eğitim seviyesi', 4)
-                """)
-
-                # Sınıf seviyeleri
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO grade_levels (education_level_id, name, short_name, sort_order) VALUES
-                    (1, '1. Sınıf', '1', 1), (1, '2. Sınıf', '2', 2), (1, '3. Sınıf', '3', 3), (1, '4. Sınıf', '4', 4),
-                    (2, '5. Sınıf', '5', 5), (2, '6. Sınıf', '6', 6), (2, '7. Sınıf', '7', 7), (2, '8. Sınıf', '8', 8),
-                    (3, '9. Sınıf', '9', 9), (3, '10. Sınıf', '10', 10), (3, '11. Sınıf', '11', 11), (3, '12. Sınıf', '12', 12)
-                """)
-
-                # Dersler
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO subjects (name, short_name, description, icon, color, sort_order) VALUES
-                    ('Matematik', 'mat', 'Matematik dersi', 'bi-calculator', '#dc3545', 1),
-                    ('Türkçe', 'turk', 'Türkçe dersi', 'bi-book', '#28a745', 2),
-                    ('Fen Bilgisi', 'fen', 'Fen Bilgisi dersi', 'bi-atom', '#17a2b8', 3),
-                    ('Sosyal Bilgiler', 'sos', 'Sosyal Bilgiler dersi', 'bi-globe', '#ffc107', 4),
-                    ('İngilizce', 'ing', 'İngilizce dersi', 'bi-translate', '#6f42c1', 5)
-                """)
-
-                # Sınıf-Ders ilişkileri (5. sınıf için)
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO grade_subjects (grade_level_id, subject_id) VALUES
-                    (5, 1), (5, 2), (5, 3), (5, 4), (5, 5)
-                """)
-
-                # Konular (Matematik için)
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO topics (subject_id, name, sort_order) VALUES
-                    (1, 'Sayılar', 1), (1, 'Geometri', 2), (1, 'Cebir', 3), (1, 'Ölçme', 4)
-                """)
-
-                # Alt konular (Sayılar için)
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO subtopics (topic_id, name, sort_order) VALUES
-                    (1, 'Doğal Sayılar', 1), (1, 'Kesirler', 2), (1, 'Ondalık Sayılar', 3), (1, 'Yüzdeler', 4)
-                """)
-
-                # Soru tipleri
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO question_types (name, short_name, description) VALUES
-                    ('Çoktan Seçmeli', 'multiple_choice', 'Tek doğru cevaplı çoktan seçmeli sorular'),
-                    ('Çoklu Seçim', 'multiple_select', 'Birden fazla doğru cevaplı sorular'),
-                    ('Doğru-Yanlış', 'true_false', 'Doğru veya yanlış soruları'),
-                    ('Boşluk Doldurma', 'fill_blank', 'Boşluk doldurma soruları'),
-                    ('Eşleştirme', 'matching', 'Eşleştirme soruları')
-                """)
-
-                # Zorluk seviyeleri
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO difficulty_levels (name, short_name, description, color, points_multiplier, sort_order) VALUES
-                    ('Kolay', 'easy', 'Kolay seviye sorular', '#28a745', 1.00, 1),
-                    ('Orta', 'medium', 'Orta seviye sorular', '#ffc107', 1.25, 2),
-                    ('Zor', 'hard', 'Zor seviye sorular', '#fd7e14', 1.50, 3),
-                    ('Çok Zor', 'expert', 'Çok zor seviye sorular', '#dc3545', 2.00, 4)
-                """)
-
-                # Örnek soru
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO questions (
-                        grade_level_id, subject_id, topic_id, subtopic_id, 
-                        question_type_id, difficulty_level_id, 
-                        question_text, explanation, base_points
-                    ) VALUES (
-                        5, 1, 1, 1, 1, 1,
-                        'Aşağıdaki sayılardan hangisi en büyüktür?',
-                        'Sayıları karşılaştırırken basamak sayısına ve her basamaktaki rakamın değerine bakılır. 1250 sayısı 4 basamaklı, diğerleri 3 basamaklıdır.',
-                        10
-                    )
-                """)
-
-                # Soru seçenekleri
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO question_options (question_id, option_text, is_correct, option_letter, sort_order) VALUES
-                    (1, '1250', true, 'A', 1),
-                    (1, '999', false, 'B', 2),
-                    (1, '850', false, 'C', 3),
-                    (1, '750', false, 'D', 4)
-                """)
-
-                # Soru etiketleri
-                conn.cursor.execute("""
-                    INSERT IGNORE INTO question_tags (name, description, color) VALUES
-                    ('Temel', 'Temel seviye sorular', '#28a745'),
-                    ('Kritik', 'Kritik konular', '#dc3545'),
-                    ('Sınav', 'Sınav odaklı sorular', '#ffc107'),
-                    ('Günlük Hayat', 'Günlük hayatla ilgili sorular', '#17a2b8'),
-                    ('Problem Çözme', 'Problem çözme becerisi gerektiren sorular', '#6f42c1')
-                """)
-
+                print("📝 Örnek sorular ekleniyor...")
+                
+                # Örnek sorular
+                sample_questions = [
+                    {
+                        'question_text': 'Aşağıdaki sayılardan hangisi en büyüktür?',
+                        'explanation': 'Sayıları karşılaştırırken basamak sayısına bakılır. 1250 sayısı 4 basamaklı, diğerleri 3 basamaklıdır.',
+                        'difficulty': 'kolay',
+                        'options': [
+                            ('1250', True, 'A'),
+                            ('999', False, 'B'),
+                            ('850', False, 'C'),
+                            ('750', False, 'D')
+                        ]
+                    },
+                    {
+                        'question_text': 'Hangi sayı 1000 ile 2000 arasındadır?',
+                        'explanation': '1000 ile 2000 arasındaki sayılar 4 basamaklıdır ve 1 ile başlar.',
+                        'difficulty': 'orta',
+                        'options': [
+                            ('950', False, 'A'),
+                            ('1500', True, 'B'),
+                            ('2100', False, 'C'),
+                            ('800', False, 'D')
+                        ]
+                    },
+                    {
+                        'question_text': '1500 sayısının yarısı kaçtır?',
+                        'explanation': 'Bir sayının yarısını bulmak için 2\'ye böleriz. 1500 ÷ 2 = 750',
+                        'difficulty': 'kolay',
+                        'options': [
+                            ('500', False, 'A'),
+                            ('750', True, 'B'),
+                            ('1000', False, 'C'),
+                            ('1250', False, 'D')
+                        ]
+                    },
+                    {
+                        'question_text': '2000 sayısının çeyreği kaçtır?',
+                        'explanation': 'Bir sayının çeyreğini bulmak için 4\'e böleriz. 2000 ÷ 4 = 500',
+                        'difficulty': 'orta',
+                        'options': [
+                            ('400', False, 'A'),
+                            ('500', True, 'B'),
+                            ('600', False, 'C'),
+                            ('800', False, 'D')
+                        ]
+                    },
+                    {
+                        'question_text': 'Hangi sayı 5000\'den büyüktür?',
+                        'explanation': '5000\'den büyük sayılar 4 basamaklı olabilir ama 5000\'den büyük olmalıdır.',
+                        'difficulty': 'zor',
+                        'options': [
+                            ('4500', False, 'A'),
+                            ('5500', True, 'B'),
+                            ('4000', False, 'C'),
+                            ('3500', False, 'D')
+                        ]
+                    }
+                ]
+                
+                for question_data in sample_questions:
+                    # Ana soru verilerini ekle
+                    conn.cursor.execute("""
+                        INSERT INTO questions (question_text, explanation, difficulty)
+                        VALUES (%s, %s, %s)
+                    """, (question_data['question_text'], question_data['explanation'], question_data['difficulty']))
+                    
+                    question_id = conn.cursor.lastrowid
+                    
+                    # Seçenekleri ekle
+                    for option_text, is_correct, option_letter in question_data['options']:
+                        conn.cursor.execute("""
+                            INSERT INTO question_options (question_id, option_text, is_correct, option_letter)
+                            VALUES (%s, %s, %s, %s)
+                        """, (question_id, option_text, is_correct, option_letter))
+                
                 conn.connection.commit()
-        except MySQLError:
+                print(f"✅ {len(sample_questions)} örnek soru eklendi!")
+                
+        except MySQLError as e:
+            print(f"❌ Örnek veri ekleme hatası: {e}")
             raise
 
-    # -------------------------------------------------------------------------
-    # 4.4. Ana Geçiş Yöneticisi
-    # -------------------------------------------------------------------------
     def run_migrations(self):
-        """4.4.1. Proje için gerekli olan tüm tabloları oluşturur."""
+        """Tüm migration işlemlerini çalıştırır."""
         try:
-            print("Veritabanı geçişleri başlatılıyor...")
+            print("🚀 Basit soru bankası migrations başlatılıyor...")
+            print("=" * 50)
             
-            # Kullanıcı tablosu
-            self.create_users_table()
-            print("- 'users' tablosu başarıyla oluşturuldu veya zaten mevcut.")
+            # 0. Mevcut tabloları temizle
+            self.drop_existing_tables()
             
-            # Eğitim tabloları
-            self.create_education_tables()
-            print("- Eğitim hiyerarşisi tabloları başarıyla oluşturuldu.")
+            # 1. Tabloları oluştur
+            self.create_simple_tables()
             
-            # Soru tabloları
-            self.create_question_tables()
-            print("- Soru bankası tabloları başarıyla oluşturuldu.")
+            # 2. Örnek verileri ekle
+            self.create_sample_questions()
             
-            # Örnek veriler
-            self.create_sample_data()
-            print("- Örnek veriler başarıyla eklendi.")
+            print("=" * 50)
+            print("🎉 Basit soru bankası migrations tamamlandı!")
+            print("📊 Oluşturulan tablolar:")
+            print("   • questions (Sorular)")
+            print("   • question_options (Seçenekler)")
+            print("\n💡 Test etmek için: python test_simple_database.py")
             
-            print("Tüm geçişler başarıyla tamamlandı.")
-        except MySQLError as e:
-            print(f"Geçiş sırasında bir hata oluştu: {e}")
+        except Exception as e:
+            print(f"❌ Migration hatası: {e}")
             raise
-        finally:
-            self._close_if_owned()
 
 # =============================================================================
-# 5.0. DOĞRUDAN ÇALIŞTIRMA BLOĞU
+# Eski Migrations sınıfını korumak için alias
+# =============================================================================
+class Migrations(SimpleMigrations):
+    """
+    Geriye uyumluluk için eski Migrations sınıfı.
+    Artık basit sistem kullanılıyor.
+    """
+    pass
+
+# =============================================================================
+# DOĞRUDAN ÇALIŞTIRMA
 # =============================================================================
 if __name__ == "__main__":
-    migrations = Migrations()
+    migrations = SimpleMigrations()
     migrations.run_migrations()
