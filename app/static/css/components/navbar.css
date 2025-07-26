@@ -1,25 +1,23 @@
 /* =============================================================================
- * NAVBAR STYLES
+ * NAVBAR STYLES (SIMPLE & ELEGANT)
  * ============================================================================= */
 
  .navbar {
-    /* base.css'ten gelen değişkenleri kullanıyoruz */
-    background-color: var(--color-background-secondary);
+    background-color: var(--color-background-secondary); /* Arka plan rengi her zaman sabit */
     border-bottom: 1px solid var(--color-border);
     padding: var(--spacing-3) 0;
     position: sticky;
     top: 0;
     z-index: 1000;
-    transition: var(--transition-base);
+    transition: box-shadow 0.3s ease;
 }
 
-/* Sayfa aşağı kaydırıldığında navbar'a hafif bir gölge ekleyebiliriz */
+/* Sayfa kaydırıldığında sadece hafif bir gölge eklenir */
 body:not([data-scroll-y="0"]) .navbar {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .navbar-container {
-    /* base.css'teki container genişliğini kullanıyoruz */
     max-width: var(--max-width-container);
     margin: 0 auto;
     padding: 0 var(--spacing-4);
@@ -33,25 +31,57 @@ body:not([data-scroll-y="0"]) .navbar {
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.navbar-brand:hover {
+    opacity: 0.75;
 }
 
 .navbar-nav {
     display: flex;
-    gap: var(--spacing-4);
+    align-items: center; /* Buton ve linki dikeyde hizalar */
+    gap: var(--spacing-3); /* Elementler arası boşluk */
 }
 
+/* --- Sade Navigasyon Linki --- */
 .nav-link {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     text-decoration: none;
-    padding-bottom: var(--spacing-1);
-    border-bottom: 2px solid transparent;
-    transition: var(--transition-base);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: 6px; /* Hafif yuvarlak kenarlar */
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.nav-link:hover,
-.nav-link.active { /* Aktif sayfa linkini belirtmek için .active sınıfı */
-    color: var(--color-accent-primary);
-    border-bottom-color: var(--color-accent-primary);
+/* Üzerine gelince çok hafif bir arka plan rengi değişimi */
+.nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.04); /* Çok belli belirsiz bir gri tonu */
+    color: var(--color-text-primary);
+}
+
+/* Aktif sayfa linki daha belirgin ve kalın */
+.nav-link.active {
+    color: var(--color-text-primary);
+    font-weight: 600; /* semi-bold */
+}
+
+
+/* --- Giriş Yap Butonu --- */
+.nav-button {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: #FFFFFF; /* Buton metni beyaz */
+    background-color: var(--color-accent-primary); /* Ana vurgu rengi */
+    text-decoration: none;
+    padding: 10px 20px; /* Daha belirgin iç boşluk */
+    border-radius: 6px;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+/* Butonun üzerine gelince parlaklığını hafifçe azaltıyoruz */
+.nav-button:hover {
+    filter: brightness(90%);
+    transform: translateY(-1px); /* Çok hafif bir yukarı kalkma efekti */
 }
