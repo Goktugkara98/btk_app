@@ -80,13 +80,20 @@ class DatabaseConnection:
     def close(self):
         """5.2.2. Veritabanı bağlantısını ve (varsa) cursor'u kapatır."""
         try:
-            if self.cursor and not self.cursor.is_closed():
-                self.cursor.close()
+            if self.cursor:
+                try:
+                    self.cursor.close()
+                except Exception as e:
+                    # Cursor kapatılırken hata oluşursa yine de devam et
+                    pass
+            self.cursor = None
+            
             if self.connection and self.connection.is_connected():
                 self.connection.close()
-        except MySQLError:
+                self.connection = None
+        except Exception as e:
             # Hata yönetimi
-            raise
+            raise MySQLError(f"Error closing database connection: {e}")
 
     def _ensure_connection(self):
         """5.2.3. Bağlantının aktif olup olmadığını kontrol eder. Değilse, yeniden bağlanır."""

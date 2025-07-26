@@ -1,6 +1,5 @@
-from flask import Blueprint
+# Import the blueprint from routes.py
+from .routes import pages_bp
 
-pages_bp = Blueprint('pages', __name__)
-
-# Import routes after creating blueprint to avoid circular imports
-from app.routes.pages import routes
+# This makes the blueprint available when importing from app.routes.pages
+__all__ = ['pages_bp']

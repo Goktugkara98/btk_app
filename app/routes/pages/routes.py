@@ -1,5 +1,7 @@
-from flask import render_template
-from app.routes.pages import pages_bp
+from flask import Blueprint, render_template
+
+# Create the blueprint
+pages_bp = Blueprint('pages', __name__)
 
 @pages_bp.route('/')
 def index():

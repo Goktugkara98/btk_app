@@ -29,7 +29,7 @@
 # =============================================================================
 from mysql.connector import Error as MySQLError
 from typing import Optional, Dict, List
-from db_connection import DatabaseConnection
+from app.database.db_connection import DatabaseConnection
 
 # =============================================================================
 # 4.0. USERREPOSITORY SINIFI

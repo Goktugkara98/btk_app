@@ -22,10 +22,18 @@
 # =============================================================================
 # 3.0. GEREKLİ KÜTÜPHANELER VE MODÜLLER
 # =============================================================================
-from flask import jsonify, request
-from app.routes.api import api_bp
-from app.services.user_service import UserService # YENİ: Servis import edildi
+from flask import Blueprint, jsonify, request
 from datetime import datetime
+
+# Create the blueprint
+api_bp = Blueprint('api', __name__)
+
+# Import services here to avoid circular imports
+try:
+    from app.services.user_service import UserService
+except ImportError as e:
+    print(f"Warning: Could not import UserService: {e}")
+    UserService = None
 
 # =============================================================================
 # 4.0. SERVİS BAŞLATMA
