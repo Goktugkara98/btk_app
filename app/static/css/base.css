@@ -91,6 +91,23 @@
     --bg-main: #fff;
     --bg-element: #fff;
     --text-on-accent: #fff;
+    
+    /* -------------------------------------------------------------------------
+     * VIEWPORT & SCROLLBAR
+     * JavaScript ile hesaplanacak
+     * ------------------------------------------------------------------------- */
+    --scrollbar-width: 0px;
+    --viewport-width: 100vw;
+    --full-width: 100vw;
+}
+
+/* =============================================================================
+ * CONTAINER OVERRIDE
+ * Bootstrap container'ın padding'ini sıfırla
+ * ============================================================================= */
+.container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* =============================================================================

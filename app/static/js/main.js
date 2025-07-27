@@ -1,9 +1,15 @@
 // NAVBAR COMPONENT
 import { initNavbar } from './components/navbar.js';
+// FOOTER COMPONENT
+import { initFooter } from './components/footer.js';
+// VIEWPORT UTILITIES
+import { initViewportUtils } from './utils/viewport.js';
 
-// Initialize navbar
+// Initialize navbar and footer
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
+    initFooter();
+    initViewportUtils();
 });
 
 // HERO DEMO TIMER (10 saniyelik interaktif demo)

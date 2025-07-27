@@ -6,11 +6,8 @@
 .advantages-section {
   padding: 80px 0 60px 0;
   background: var(--bg-secondary, #f8f9fa);
-  width: 100vw;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  width: var(--full-width);
+  margin-left: calc(calc(-1 * var(--full-width)) / 2 + 50%);
   position: relative;
 }
 

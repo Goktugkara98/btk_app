@@ -63,36 +63,104 @@
     <main class="main-content container">
         {% block content %}{% endblock %}
     </main>
-
-    <!--Footer-->
+        <!--Footer-->
     <footer class="footer">
-        <div class="footer-container wide-container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="/" class="footer-logo">Daima</a>
-                    <p class="footer-desc">Yapay zeka destekli modern öğrenme platformu. Kişiselleştirilmiş quizler, anında analiz ve aktif öğrenme deneyimi.</p>
+        <div class="footer-container">
+            <!-- Main Footer Content -->
+            <div class="footer-main">
+                <div class="footer-brand-section">
+                    <div class="footer-brand">
+                        <a href="/" class="footer-logo">
+                            <span class="logo-text">D<span class="logo-accent">ai</span>ma</span>
+                        </a>
+                        <p class="footer-desc">Yapay zeka destekli modern öğrenme platformu. Kişiselleştirilmiş quizler, anında analiz ve aktif öğrenme deneyimi ile öğrenmeyi yeniden keşfedin.</p>
+                        <div class="footer-social">
+                            <h5>Bizi Takip Edin</h5>
+                            <div class="social-icons">
+                                <a href="#" class="social-icon" aria-label="Twitter">
+                                    <i class="bi bi-twitter-x"></i>
+                                </a>
+                                <a href="#" class="social-icon" aria-label="Instagram">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                                <a href="#" class="social-icon" aria-label="LinkedIn">
+                                    <i class="bi bi-linkedin"></i>
+                                </a>
+                                <a href="#" class="social-icon" aria-label="YouTube">
+                                    <i class="bi bi-youtube"></i>
+                                </a>
+                                <a href="#" class="social-icon" aria-label="GitHub">
+                                    <i class="bi bi-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <h4>Hızlı Linkler</h4>
-                    <ul>
-                        <li><a href="#features">Özellikler</a></li>
-                        <li><a href="#advantages">Bilimsel Avantajlar</a></li>
-                        <li><a href="#about">Hakkımızda</a></li>
-                        <li><a href="#contact">İletişim</a></li>
-                    </ul>
+
+                <div class="footer-links-section">
+                    <div class="footer-links-group">
+                        <h4>Hızlı Linkler</h4>
+                        <ul>
+                            <li><a href="/">Ana Sayfa</a></li>
+                            <li><a href="/quiz">Quiz Başlat</a></li>
+                            <li><a href="/login">Giriş Yap</a></li>
+                            <li><a href="/register">Kaydol</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-links-group">
+                        <h4>Yasal</h4>
+                        <ul>
+                            <li><a href="/privacy">Gizlilik Politikası</a></li>
+                            <li><a href="/terms">Kullanım Şartları</a></li>
+                            <li><a href="/cookies">Çerez Politikası</a></li>
+                            <li><a href="/security">Güvenlik</a></li>
+                            <li><a href="/gdpr">KVKK</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="footer-social">
-                    <h4>Bizi Takip Edin</h4>
-                    <div class="footer-social-icons">
-                        <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+
+                <div class="footer-newsletter-section">
+                    <div class="newsletter-card">
+                        <h4>Güncel Kalın</h4>
+                        <p>En son özellikler ve güncellemeler için bültenimize abone olun.</p>
+                        <form class="newsletter-form" id="newsletter-form">
+                            <div class="input-group">
+                                <input type="email" placeholder="E-posta adresiniz" required>
+                                <button type="submit" class="newsletter-btn">
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <div class="newsletter-success" id="newsletter-success" style="display: none;">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Başarıyla abone oldunuz!</span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Footer Bottom -->
             <div class="footer-bottom">
-                <p>&copy; 2024 Daima. Tüm hakları saklıdır.</p>
+                <div class="footer-bottom-content">
+                    <div class="footer-copyright">
+                        <p>&copy; 2024 Daima. Tüm hakları saklıdır.</p>
+                    </div>
+                    <div class="footer-stats">
+                        <span class="stat-item">
+                            <i class="bi bi-people"></i>
+                            <span>10K+ Kullanıcı</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="bi bi-graph-up"></i>
+                            <span>50K+ Quiz</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="bi bi-star"></i>
+                            <span>4.9/5 Puan</span>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>

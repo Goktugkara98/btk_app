@@ -16,7 +16,7 @@ export function initHeroQuiz() {
         .then(data => {
             new HeroQuiz(data);
         })
-        .catch(() => {
+        .catch((error) => {
             const quizPanel = document.querySelector('.quiz-panel .rotate-inner') || document.querySelector('.quiz-panel');
             if (quizPanel) quizPanel.innerHTML = '<div style="padding:2rem; color:red;">Soru verisi yüklenemedi.</div>';
         });
@@ -37,7 +37,7 @@ export function initHeroQuiz() {
             // Quiz state
             this.currentQuestionIndex = 0;
             this.isAnswered = false;
-            this.timerDuration = 15;
+            this.timerDuration = 20; // 20 saniye
             this.timer = null;
             this.timeLeft = this.timerDuration;
 
@@ -98,7 +98,7 @@ export function initHeroQuiz() {
             questionData.options.forEach((option, index) => {
                 const optionElement = document.createElement('div');
                 optionElement.className = 'option';
-                optionElement.setAttribute('data-correct', option.isCorrect ? 'true' : 'false');
+                optionElement.setAttribute('data-correct', option.correct ? 'true' : 'false');
                 optionElement.innerHTML = `
                     <div class="option-letter">${optionLetters[index]}</div>
                     <div class="option-text">${option.text}</div>
@@ -223,6 +223,7 @@ export function initHeroQuiz() {
         }
 
         startTimer() {
+            this.timeLeft = this.timerDuration; // Timer başlangıcında timeLeft'i set et
             this.updateTimerDisplay();
             this.timer = setInterval(() => {
                 this.timeLeft--;
@@ -233,14 +234,17 @@ export function initHeroQuiz() {
                     if (!this.isAnswered) {
                         // Süre dolduysa doğru cevabı göster
                         const correctOption = this.elements.optionsContainer.querySelector('.option[data-correct="true"]');
+                        
                         if (correctOption) {
                             this.isAnswered = true;
                             correctOption.classList.add('selected', 'correct');
+                            
                             const questionData = this.questions[this.currentQuestionIndex];
                             const correctOptionIndex = Array.from(this.elements.optionsContainer.children).indexOf(correctOption);
                             const correctOptionData = questionData.options[correctOptionIndex];
-                            this.addAIMessage(questionData.correct_explanation || correctOptionData.explanation || 'Doğru cevap budur!', () => {
-                                setTimeout(() => this.nextQuestion(), 500);
+                            
+                            this.addAIMessage(questionData.correct_explanation || correctOptionData.explanation || 'Süre doldu! Doğru cevap budur!', () => {
+                                setTimeout(() => this.nextQuestion(), 2000); // Biraz daha uzun bekle
                             });
                         }
                     }
@@ -249,9 +253,11 @@ export function initHeroQuiz() {
         }
 
         updateTimerDisplay() {
-            const timerElement = document.querySelector('.quiz-timer');
+            const timerElement = document.getElementById('quiz-timer-value');
             if (timerElement) {
-                timerElement.textContent = `${this.timeLeft}s`;
+                const minutes = Math.floor(this.timeLeft / 60);
+                const seconds = this.timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }
         }
 
