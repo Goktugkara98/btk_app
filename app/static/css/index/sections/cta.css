@@ -1,0 +1,50 @@
+/* =============================================================================
+ * CTA SECTION STYLES
+ * ============================================================================= */
+
+/* CTA Section tam genişlik arka plan */
+.cta {
+  padding: 100px 0;
+  background: var(--primary-gradient);
+  color: white;
+  text-align: center;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  position: relative;
+}
+
+.cta h2 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.cta p {
+  font-size: 1.25rem;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta h2 {
+    font-size: 2rem;
+  }
+} 

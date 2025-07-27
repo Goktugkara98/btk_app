@@ -1,3 +1,11 @@
+// NAVBAR COMPONENT
+import { initNavbar } from './components/navbar.js';
+
+// Initialize navbar
+document.addEventListener('DOMContentLoaded', () => {
+    initNavbar();
+});
+
 // HERO DEMO TIMER (10 saniyelik interaktif demo)
 (function() {
     const timerEl = document.getElementById('demo-timer');

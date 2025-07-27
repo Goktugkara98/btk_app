@@ -37,9 +37,10 @@
     /* -------------------------------------------------------------------------
      * TİPOGRAFİ
      * ------------------------------------------------------------------------- */
-    --font-family-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-family-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
     --font-family-monospace: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
     --font-family: 'Inter', sans-serif; /* Modern ek font */
+    --font-family-bruno: 'Bruno Ace SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     /* Font Boyutları */
     --font-size-sm: 0.875rem;   /* 14px */
     --font-size-base: 1rem;     /* 16px */
@@ -151,6 +152,8 @@ body {
     /* Metinlerin daha okunaklı render edilmesini sağlar */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga' 1, 'calt' 1;
 
     /* Sayfanın minimum yüksekliğinin ekran kadar olmasını sağlar */
     min-height: 100vh;

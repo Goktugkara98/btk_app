@@ -3,7 +3,7 @@
 {% block title %}QuizMaster - Akıllı Soru Bankası{% endblock %}
 
 {% block head_extra_styles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index/index.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 {% endblock %}
@@ -105,102 +105,110 @@
           </div>
       </section>
 
-<!-- Stats Section -->
-<section class="stats">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-question-circle"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-number">500+</h3>
-                    <p class="stat-label">Soru</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-people"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-number">1000+</h3>
-                    <p class="stat-label">Kullanıcı</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-graph-up"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-number">95%</h3>
-                    <p class="stat-label">Başarı Oranı</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-clock-history"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-number">24/7</h3>
-                    <p class="stat-label">Erişim</p>
-                </div>
-            </div>
-        </div>
+<!-- Avantajlar / Bilimsel Gerçekler Bölümü -->
+<section class="advantages-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Bilimsel Olarak Kanıtlanmış Öğrenme Avantajları</h2>
+      <p class="section-subtitle">QuizMaster ile öğrenmenin neden daha hızlı, kalıcı ve motive edici olduğunu bilimsel verilerle keşfedin.</p>
     </div>
+    <div class="advantages-grid">
+      <!-- 1. Metabilişsel Farkındalık -->
+      <div class="advantage-card">
+        <div class="advantage-icon" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"><i class="bi bi-lightbulb"></i></div>
+        <div class="advantage-title">2 Kat Daha Hızlı Ustalaşma</div>
+        <div class="advantage-fact">
+          <span class="fact-label">📈 Bilimsel Gerçek</span>
+          <p>Neyi bilip bilmediğinin farkında olan (metabiliş) öğrenciler, sadece ezber yapanlara göre konularda <b>2 kata kadar daha hızlı</b> ustalaşır. Hatanın nedenini anlamak, aynı hatayı tekrarlamayı önler.</p>
+        </div>
+        <div class="advantage-program">
+          <span class="program-label">💡 Programda Nasıl?</span>
+          <p>Yapay zeka, yanlış cevabınızın ardındaki düşünce sürecini analiz eder. Size "Neden yanlış düşündüğünü" göstererek metabilişsel farkındalığınızı artırır ve öğrenme verimliliğinizi katlar.</p>
+        </div>
+      </div>
+      <!-- 2. Test Etkisi -->
+      <div class="advantage-card">
+        <div class="advantage-icon" style="background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);"><i class="bi bi-journal-check"></i></div>
+        <div class="advantage-title">+%50 Daha Fazla Kalıcılık</div>
+        <div class="advantage-fact">
+          <span class="fact-label">📈 Bilimsel Gerçek</span>
+          <p>"Test Etkisi" olarak bilinen prensibe göre, bilgiyi sadece okumak yerine aktif olarak test ederek geri çağırmak, uzun süreli hafızaya kaydını <b>%50'ye varan oranlarda</b> artırır.</p>
+        </div>
+        <div class="advantage-program">
+          <span class="program-label">💡 Programda Nasıl?</span>
+          <p>Programımız sadece bir ölçme aracı değildir, bir öğrenme aracıdır. Her quiz, bilgiyi beyninizden aktif olarak geri çağırmanızı sağlayarak öğrendiklerinizin kalıcı olmasını sağlar.</p>
+        </div>
+      </div>
+      <!-- 3. Aktif Geri Çağırma -->
+      <div class="advantage-card">
+        <div class="advantage-icon" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);"><i class="bi bi-chat-dots"></i></div>
+        <div class="advantage-title">%150 Daha Etkili Öğrenme</div>
+        <div class="advantage-fact">
+          <span class="fact-label">📈 Bilimsel Gerçek</span>
+          <p>Bilgiyi pasif şekilde okumak yerine, onu kendi cümlelerinle açıklamaya çalışmak (Aktif Geri Çağırma), anlama ve hatırlama oranını <b>%150'ye kadar</b> artırır.</p>
+        </div>
+        <div class="advantage-program">
+          <span class="program-label">💡 Programda Nasıl?</span>
+          <p>Anlamadığınız bir konuyu yapay zeka ile sohbet ederek sorma ve tartışma imkanı, bilgiyi aktif olarak işlemeye ve anlamlandırmaya teşvik eder. Bu, öğrenmenin en etkili yollarından biridir.</p>
+        </div>
+      </div>
+      <!-- 4. Kişiselleştirilmiş Yol Haritası -->
+      <div class="advantage-card">
+        <div class="advantage-icon" style="background: linear-gradient(135deg, #ff5858 0%, #f09819 100%);"><i class="bi bi-person-bounding-box"></i></div>
+        <div class="advantage-title">%40 Daha Yüksek Motivasyon</div>
+        <div class="advantage-fact">
+          <span class="fact-label">📈 Bilimsel Gerçek</span>
+          <p>Kendi seviyesine ve ilgi alanına göre düzenlenmiş bir müfredatla öğrenenlerin motivasyon ve bağlılık oranı <b>%40'a kadar</b> artar.</p>
+        </div>
+        <div class="advantage-program">
+          <span class="program-label">💡 Programda Nasıl?</span>
+          <p>Yapay zeka destekli profil analizimiz, güçlü ve zayıf yönlerinize göre kişisel bir öğrenme yol haritası çizer. Gereksiz tekrarlardan kaçınır, doğrudan hedefinize odaklanır ve motivasyonunuzu yüksek tutar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- Features Section -->
 <section id="features" class="features">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Neden QuizMaster?</h2>
-            <p class="section-subtitle">Öğrenmeyi kolaylaştıran özelliklerimizi keşfedin</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="bi bi-brain"></i>
-                </div>
-                <h3>Akıllı Öğrenme</h3>
-                <p>Yapay zeka destekli algoritmalar ile kişiselleştirilmiş soru önerileri ve öğrenme yolları.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="bi bi-speedometer2"></i>
-                </div>
-                <h3>Anlık Geri Bildirim</h3>
-                <p>Her sorudan sonra detaylı açıklamalar ve anlık performans analizi ile öğrenme sürecini hızlandırın.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="bi bi-bar-chart"></i>
-                </div>
-                <h3>Detaylı Analiz</h3>
-                <p>Güçlü ve zayıf yönlerinizi gösteren kapsamlı raporlar ve gelişim grafikleri.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="bi bi-phone"></i>
-                </div>
-                <h3>Mobil Uyumlu</h3>
-                <p>Tüm cihazlarda mükemmel çalışan responsive tasarım ile istediğiniz yerden erişim.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <h3>Güvenli Sistem</h3>
-                <p>Verileriniz güvende, performansınız gizli. En yüksek güvenlik standartları ile korunuyoruz.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="bi bi-arrow-repeat"></i>
-                </div>
-                <h3>Sürekli Güncelleme</h3>
-                <p>Düzenli olarak eklenen yeni sorular ve özellikler ile her zaman güncel içerik.</p>
-            </div>
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">QuizMaster'ın Öne Çıkan Özellikleri</h2>
+      <p class="section-subtitle">Öğrenme deneyiminizi bir üst seviyeye taşıyan güçlü araçlar</p>
     </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+        <h3>Akıllı Quiz Motoru</h3>
+        <p>Her kullanıcıya özel, seviyenize ve ihtiyaçlarınıza göre uyarlanan dinamik soru sistemi.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+        <h3>Anında Geri Bildirim</h3>
+        <p>Her cevap sonrası, doğruya ve yanlışa özel açıklamalar ve öğrenmeyi hızlandıran anlık analizler.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <h3>Kişisel Analiz & Raporlar</h3>
+        <p>Güçlü ve zayıf yönlerinizi gösteren detaylı performans raporları ve gelişim grafikleri.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
+        <h3>Aktif Öğrenme & Sohbet</h3>
+        <p>Yapay zeka ile sohbet ederek anlamadığınız konuları anında sorabilir, aktif öğrenme sağlayabilirsiniz.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-mobile-alt"></i></div>
+        <h3>Esnek & Mobil Uyumlu</h3>
+        <p>Tüm cihazlarda mükemmel çalışan, responsive ve erişilebilir bir kullanıcı deneyimi.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-shield-alt"></i></div>
+        <h3>Güvenli & Gizli Altyapı</h3>
+        <p>Kişisel verileriniz ve performansınız en yüksek güvenlik standartlarıyla korunur.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- CTA Section -->
@@ -222,45 +230,9 @@
         </div>
     </div>
 </section>
+{% endblock %}
 
-<!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>QuizMaster</h3>
-                <p>Modern öğrenme teknolojileri ile geleceği şekillendiriyoruz.</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-section">
-                    <h4>Ürün</h4>
-                    <ul>
-                        <li><a href="#features">Özellikler</a></li>
-                        <li><a href="#pricing">Fiyatlandırma</a></li>
-                        <li><a href="#demo">Demo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Destek</h4>
-                    <ul>
-                        <li><a href="#help">Yardım</a></li>
-                        <li><a href="#contact">İletişim</a></li>
-                        <li><a href="#docs">Dokümantasyon</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Şirket</h4>
-                    <ul>
-                        <li><a href="#about">Hakkımızda</a></li>
-                        <li><a href="#careers">Kariyer</a></li>
-                        <li><a href="#privacy">Gizlilik</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 QuizMaster. Tüm hakları saklıdır.</p>
-        </div>
-    </div>
-</footer>
+{% block page_scripts %}
+    <!-- Index Page Specific Scripts -->
+    <script src="{{ url_for('static', filename='js/index/index.js') }}" type="module"></script>
 {% endblock %}

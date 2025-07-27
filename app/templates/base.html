@@ -22,18 +22,36 @@
     <!---Extra Styles-->
     {% block head_extra_styles %}{% endblock %}
 
-    <!-- Google Fonts: Bruno Ace SC -->
+    <!-- Google Fonts: Bruno Ace SC & Inter - Optimized -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Loading Optimization -->
+    <style>
+        /* Font fallback to prevent FOUT */
+        .font-loading {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* Hide content until font is loaded */
+        .font-loading {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .font-loaded {
+            opacity: 1;
+        }
+    </style>
 </head>
-<body>
+<body class="font-loading">
 
     <!--Navbar-->
     <header class="navbar">
-        <div class="navbar-container">
+        <div class="navbar-container wide-container">
             <a href="/" class="navbar-brand">
-                <span class="logo-black">D</span><span class="logo-purple">a</span><span class="logo-purple">i</span><span class="logo-black">m</span><span class="logo-black">a</span>
+                <span class="logo-black">d</span><span class="logo-purple">a</span><span class="logo-purple">i</span><span class="logo-black">m</span><span class="logo-black">a</span>
             </a>
             <nav class="navbar-nav">
                 <a href="/" class="nav-link active">Ana Sayfa</a>
@@ -42,14 +60,40 @@
         </div>
     </header>
     <!--Main Content-->
-    <main class="main-content">
+    <main class="main-content container">
         {% block content %}{% endblock %}
     </main>
 
     <!--Footer-->
     <footer class="footer">
-        <div class="footer-container">
-            <p>&copy; 2024 Proje Adı. Tüm hakları saklıdır.</p>
+        <div class="footer-container wide-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="footer-logo">Daima</a>
+                    <p class="footer-desc">Yapay zeka destekli modern öğrenme platformu. Kişiselleştirilmiş quizler, anında analiz ve aktif öğrenme deneyimi.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="#features">Özellikler</a></li>
+                        <li><a href="#advantages">Bilimsel Avantajlar</a></li>
+                        <li><a href="#about">Hakkımızda</a></li>
+                        <li><a href="#contact">İletişim</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Bizi Takip Edin</h4>
+                    <div class="footer-social-icons">
+                        <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Daima. Tüm hakları saklıdır.</p>
+            </div>
         </div>
     </footer>
 
@@ -57,11 +101,33 @@
     <!---Plugins-->
     <script src="{{ url_for('static', filename='js/plugins/gsap-core.js') }}"></script>
     <!---Main-->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>
     <!---Components-->
     {% block body_extra_scripts %}{% endblock %}
     
-    <!-- Hero Simulator Script -->
-    <script src="{{ url_for('static', filename='js/hero-simulator.js') }}"></script>
+    <!-- Page Specific Scripts -->
+    {% block page_scripts %}{% endblock %}
+    
+    <!-- Font Loading Script -->
+    <script>
+        // Font loading optimization
+        if ('fonts' in document) {
+            document.fonts.ready.then(function() {
+                document.body.classList.add('font-loaded');
+            });
+        } else {
+            // Fallback for browsers that don't support Font Loading API
+            setTimeout(function() {
+                document.body.classList.add('font-loaded');
+            }, 100);
+        }
+        
+        // Scroll to top on page load
+        window.addEventListener('load', function() {
+            if (window.scrollY > 0) {
+                window.scrollTo(0, 0);
+            }
+        });
+    </script>
 </body>
 </html>

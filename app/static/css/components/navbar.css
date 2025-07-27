@@ -4,7 +4,8 @@
 
 :root {
     --navbar-height: 70px;
-    --navbar-bg: rgba(255, 255, 255, 0.8); /* Daha transparan */
+    --navbar-height-scrolled: 65px;
+    --navbar-bg: rgba(253, 253, 253, 1); /* Daha transparan */
     --navbar-bg-dark: rgba(18, 18, 18, 0.8);
     --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     --navbar-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -24,8 +25,13 @@
     height: var(--navbar-height);
     display: flex;
     align-items: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     box-shadow: var(--navbar-shadow);
+}
+
+/* Scroll durumunda navbar küçülür */
+.navbar.navbar-scrolled {
+    height: var(--navbar-height-scrolled);
 }
 
 /* Koyu tema için navbar */
@@ -39,7 +45,7 @@
 
 /* Scroll durumunda navbar'ın görünümü */
 body:not([data-scroll-y="0"]) .navbar {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(253, 253, 253, 1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -55,7 +61,7 @@ body:not([data-scroll-y="0"]) .navbar {
 .navbar-container {
     max-width: var(--max-width-container);
     margin: 0 auto;
-    padding: 0 var(--spacing-4);
+    padding: 0 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -64,15 +70,21 @@ body:not([data-scroll-y="0"]) .navbar {
 }
 
 .navbar-brand {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     font-weight: 600;
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: opacity 0.2s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Bruno Ace SC', cursive, sans-serif;
+    font-family: var(--font-family-bruno);
+    margin-left: 0.5rem;
+}
+
+/* Scroll durumunda logo küçülür */
+.navbar.navbar-scrolled .navbar-brand {
+    font-size: 1.5rem;
 }
 
 .navbar-brand:hover {
@@ -84,10 +96,12 @@ body:not([data-scroll-y="0"]) .navbar {
     align-items: center;
     gap: 2rem;
     height: 100%;
+    margin-right: 1rem;
 }
 
 /* --- Minimal Navigasyon Linki --- */
 .nav-link {
+    font-family: var(--font-family-main);
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--color-text-secondary);
@@ -131,6 +145,7 @@ body:not([data-scroll-y="0"]) .navbar {
 
 /* --- Minimal Giriş Butonu --- */
 .nav-button {
+    font-family: var(--font-family-main);
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--color-accent-primary);
@@ -167,6 +182,7 @@ body:not([data-scroll-y="0"]) .navbar {
 @media (max-width: 768px) {
     :root {
         --navbar-height: 60px;
+        --navbar-height-scrolled: 58px;
     }
     
     .navbar-container {
@@ -174,11 +190,20 @@ body:not([data-scroll-y="0"]) .navbar {
     }
     
     .navbar-brand {
-        font-size: 1.25rem;
+        margin-left: 0.25rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.4rem;
+    }
+    
+    .navbar.navbar-scrolled .navbar-brand {
+        font-size: 1.35rem;
     }
     
     .navbar-nav {
         gap: 1rem;
+        margin-right: 0.5rem;
     }
     
     .nav-link {
@@ -193,8 +218,25 @@ body:not([data-scroll-y="0"]) .navbar {
 }
 
 @media (max-width: 480px) {
+    .navbar-container {
+        padding: 0 0.75rem;
+    }
+    
+    .navbar-brand {
+        margin-left: 0.15rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+    
+    .navbar.navbar-scrolled .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
     .navbar-nav {
         gap: 0.5rem;
+        margin-right: 0.25rem;
     }
     
     .nav-link {

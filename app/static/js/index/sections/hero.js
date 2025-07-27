@@ -1,14 +1,17 @@
 /**
- * Hero Quiz Simulator
- *
+ * HERO SECTION JAVASCRIPT
+ * 
  * Kullanıcı etkileşimli quiz simülasyonu için modern ve yeniden düzenlenmiş JavaScript kodu.
  * Bu sürüm, daha iyi okunabilirlik, performans ve yönetilebilirlik için
  * olay delegasyonu (event delegation), öğe önbellekleme (element caching) ve
  * daha temiz bir mantık akışı kullanır.
+ * =============================================================================
  */
-document.addEventListener('DOMContentLoaded', () => {
+
+// Hero Quiz Module
+export function initHeroQuiz() {
     // Soruları dışarıdan yükle
-    fetch('static/js/quiz-data.json')
+    fetch('/static/js/quiz-data.json')
         .then(res => res.json())
         .then(data => {
             new HeroQuiz(data);
@@ -40,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.init();
         }
+
         shuffleArray(array) {
             // Fisher-Yates algoritması
             const arr = array.slice();
@@ -72,10 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-
-
-
-
         loadQuestion() {
             this.isAnswered = false;
             const questionData = this.questions[this.currentQuestionIndex];
@@ -98,147 +98,136 @@ document.addEventListener('DOMContentLoaded', () => {
             questionData.options.forEach((option, index) => {
                 const optionElement = document.createElement('div');
                 optionElement.className = 'option';
-                optionElement.dataset.correct = option.correct;
+                optionElement.setAttribute('data-correct', option.isCorrect ? 'true' : 'false');
                 optionElement.innerHTML = `
-                    <span class="option-letter">${optionLetters[index]}</span>
-                    <span class="option-text">${option.text}</span>
+                    <div class="option-letter">${optionLetters[index]}</div>
+                    <div class="option-text">${option.text}</div>
                 `;
                 this.elements.optionsContainer.appendChild(optionElement);
             });
-            // Sohbet geçmişini temizle ve ilk AI mesajını animasyonla göster
-            this.elements.chatMessages.innerHTML = '';
-            this.addAIMessage("Harika, yeni bir soru! Sence doğru cevap hangisi?");
+
+            // Timer'ı başlat
+            this.timeLeft = this.timerDuration;
             this.startTimer();
+
+            // Chat'i sıfırla
+            this.resetChat();
         }
 
-        /**
-         * Kullanıcının cevabını işler
-         * @param {HTMLElement} selectedOption - Kullanıcının tıkladığı seçenek öğesi
-         */
         handleAnswer(selectedOption) {
+            if (this.isAnswered) return;
+
             this.isAnswered = true;
             this.clearTimer();
-            const isCorrect = selectedOption.dataset.correct === 'true';
-            const answerText = selectedOption.querySelector('.option-text').textContent;
 
-            // Kullanıcının seçimini chat'e ekle
-            this.addUserMessage(`Seçimim: ${answerText}`);
-            selectedOption.classList.add('selected');
+            const isCorrect = selectedOption.getAttribute('data-correct') === 'true';
+            this.showResult(isCorrect, selectedOption);
 
-            // AI'ın "düşünme" süresi için kısa bir gecikme
-            setTimeout(() => {
-                this.showResult(isCorrect, selectedOption);
-            }, 800);
-        }
+            // Doğru cevabı da göster
+            const correctOption = this.elements.optionsContainer.querySelector('.option[data-correct="true"]');
+            if (correctOption && !isCorrect) {
+                correctOption.classList.add('correct');
+            }
 
-        /**
-         * Sonucu gösterir ve bir sonraki soruya geçer
-         * @param {boolean} isCorrect - Cevabın doğru olup olmadığı
-         * @param {HTMLElement} selectedOption - Seçilen seçenek
-         */
-        showResult(isCorrect, selectedOption) {
+            // AI mesajını ekle
             const questionData = this.questions[this.currentQuestionIndex];
-            const correctOptionElement = this.elements.optionsContainer.querySelector('[data-correct="true"]');
             const selectedIndex = Array.from(this.elements.optionsContainer.children).indexOf(selectedOption);
             const selectedOptionData = questionData.options[selectedIndex];
 
+            const explanation = isCorrect 
+                ? (questionData.correct_explanation || selectedOptionData.explanation || 'Harika! Doğru cevap!')
+                : (selectedOptionData.explanation || 'Bu cevap yanlış. Doğru cevabı kontrol edin.');
+
+            this.addAIMessage(explanation, () => {
+                setTimeout(() => this.nextQuestion(), 500);
+            });
+        }
+
+        showResult(isCorrect, selectedOption) {
+            selectedOption.classList.add('selected');
             if (isCorrect) {
-                this.addAIMessage(questionData.correct_explanation || selectedOptionData.explanation || 'Tebrikler, doğru cevap!', () => {
-                    setTimeout(() => this.nextQuestion(), 500);
-                });
                 selectedOption.classList.add('correct');
             } else {
-                this.addAIMessage(selectedOptionData.explanation || 'Yanlış cevap.', () => {
-                    setTimeout(() => this.nextQuestion(), 500);
-                });
                 selectedOption.classList.add('incorrect');
-                correctOptionElement.classList.add('correct');
             }
         }
 
-        /**
-         * Bir sonraki soruya geçer
-         */
         nextQuestion() {
-            setTimeout(() => {
-                this.currentQuestionIndex = (this.currentQuestionIndex + 1) % this.questions.length;
-                this.loadQuestion();
-            }, 2000);
+            this.currentQuestionIndex = (this.currentQuestionIndex + 1) % this.questions.length;
+            this.loadQuestion();
         }
-        
-        /**
-         * Chat'i başlangıç durumuna getirir
-         */
+
         resetChat() {
-            this.clearTimer();
-            // Önceki mesajlar silinmesin, sadece yeni mesajlar eklensin
+            this.elements.chatMessages.innerHTML = '';
+            this.addAIMessage('Merhaba! Size bu soru hakkında yardımcı olabilirim. Hangi seçeneği düşünüyorsunuz?');
         }
 
-        /**
-         * Chat'e AI mesajı ekler
-         * @param {string} html - Eklenecek mesaj (HTML içerebilir)
-         */
         addAIMessage(html, cb) {
-            this.addMessageAnimated(html, 'ai-message', cb);
+            this.addMessageAnimated(html, 'ai', cb);
         }
 
-        /**
-         * Chat'e kullanıcı mesajı ekler
-         * @param {string} text - Eklenecek düz metin
-         */
         addUserMessage(text, cb) {
-            this.addMessageAnimated(text, 'user-message', cb);
+            this.addMessageAnimated(text, 'user', cb);
         }
 
-        /**
-         * Chat'e genel mesaj ekleme fonksiyonu
-         * @param {string} content - Mesaj içeriği
-         * @param {string} type - Mesaj tipi ('ai-message' veya 'user-message')
-         */
         addMessageAnimated(content, type, cb) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            const messageContentDiv = document.createElement('div');
-            messageContentDiv.className = 'message-content';
-            const p = document.createElement('p');
-            messageContentDiv.appendChild(p);
-            messageDiv.appendChild(messageContentDiv);
-            const timeDiv = document.createElement('div');
-            timeDiv.className = 'message-time';
-            timeDiv.textContent = 'Şimdi';
-            messageDiv.appendChild(timeDiv);
+            messageDiv.className = `message ${type}-message`;
+            
+            const time = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            
+            if (type === 'ai') {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <p>${content}</p>
+                    </div>
+                    <div class="message-time">${time}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <p>${content}</p>
+                    </div>
+                    <div class="message-time">${time}</div>
+                `;
+            }
+
             this.elements.chatMessages.appendChild(messageDiv);
             this.scrollToBottom();
-            // Typewriter animasyonu
-            let i = 0;
-            const plainText = content.replace(/<[^>]+>/g, ''); // HTML etiketlerini kaldır
-            const typeNext = () => {
-                if (i <= plainText.length) {
-                    p.textContent = plainText.slice(0, i);
-                    i++;
-                    this.scrollToBottom();
-                    setTimeout(typeNext, 18);
-                } else if (cb) {
-                    cb();
-                }
-            };
-            typeNext();
+
+            if (type === 'ai') {
+                // Typewriter efekti
+                const p = messageDiv.querySelector('p');
+                const plainText = p.textContent;
+                p.textContent = '';
+                let i = 0;
+
+                const typeNext = () => {
+                    if (i <= plainText.length) {
+                        p.textContent = plainText.slice(0, i);
+                        i++;
+                        this.scrollToBottom(); // Her karakter eklenirken scroll
+                        setTimeout(typeNext, 18);
+                    } else if (cb) {
+                        cb();
+                    }
+                };
+                typeNext();
+            } else if (cb) {
+                cb();
+            }
         }
 
-        /**
-         * Chat penceresini en alta kaydırır
-         */
         scrollToBottom() {
             this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
         }
 
         startTimer() {
-            this.clearTimer();
-            this.timeLeft = this.timerDuration;
             this.updateTimerDisplay();
             this.timer = setInterval(() => {
                 this.timeLeft--;
                 this.updateTimerDisplay();
+                
                 if (this.timeLeft <= 0) {
                     this.clearTimer();
                     if (!this.isAnswered) {
@@ -258,14 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 1000);
         }
+
         updateTimerDisplay() {
-            const timerValueEl = document.getElementById('quiz-timer-value');
-            if (timerValueEl) {
-                const min = '00';
-                const sec = this.timeLeft < 10 ? '0' + this.timeLeft : this.timeLeft;
-                timerValueEl.textContent = `${min}:${sec}`;
+            const timerElement = document.querySelector('.quiz-timer');
+            if (timerElement) {
+                timerElement.textContent = `${this.timeLeft}s`;
             }
         }
+
         clearTimer() {
             if (this.timer) {
                 clearInterval(this.timer);
@@ -273,7 +262,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    // Sayfa yüklendiğinde quiz'i başlat
-    // new HeroQuiz(); // This line is now handled by the fetch call
-});
+}
