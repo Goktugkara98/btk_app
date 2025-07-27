@@ -1,0 +1,209 @@
+/**
+ * =============================================================================
+ * NAVBAR - TOP NAVBAR STYLES
+ * =============================================================================
+ * 
+ * Bu dosya üst navbar'ın stillerini içerir.
+ * 
+ * Sorumlulukları:
+ * - Üst navbar layout yapısı
+ * - Timer bileşeni stilleri
+ * - Kategori ve ilerleme gösterimi
+ * - Navbar bileşenlerinin responsive tasarımı
+ */
+
+/* =============================================================================
+ * TOP NAVBAR LAYOUT
+ * ============================================================================= */
+
+/* Top Navbar - FULL WIDTH */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw !important;
+    height: var(--nav-height);
+    background-color: var(--quiz-bg-primary);
+    border-bottom: 1px solid var(--quiz-border-light);
+    box-shadow: var(--quiz-shadow-sm);
+    z-index: 1000;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+/* Navbar Container - FULL WIDTH */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 2rem;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+.navbar-left, .navbar-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right {
+    justify-content: flex-end;
+}
+
+.navbar-center {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =============================================================================
+ * NAVBAR COMPONENTS
+ * ============================================================================= */
+
+/* Category Styles */
+.category {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--quiz-border-radius);
+    backdrop-filter: blur(10px);
+}
+
+.category i {
+    color: var(--quiz-primary);
+    font-size: 1rem;
+}
+
+.category-text {
+    color: var(--quiz-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: var(--quiz-font-family);
+}
+
+/* Question Progress Styles */
+.question-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.5rem;
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--quiz-border-radius);
+    backdrop-filter: blur(10px);
+}
+
+.question-progress .progress-text {
+    color: var(--quiz-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: var(--quiz-font-family);
+}
+
+.question-progress .current {
+    color: var(--quiz-primary);
+    font-weight: 700;
+}
+
+.question-progress .total {
+    color: var(--quiz-text-secondary);
+    font-weight: 500;
+}
+
+/* Timer Styles */
+.timer {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: var(--quiz-primary);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--quiz-border-radius);
+}
+
+.timer i {
+    color: var(--quiz-primary);
+    font-size: 1rem;
+}
+
+.timer-text {
+    color: var(--quiz-primary);
+    font-weight: 700;
+    font-family: var(--quiz-font-family);
+    font-size: 0.9rem;
+}
+
+/* =============================================================================
+ * RESPONSIVE DESIGN
+ * ============================================================================= */
+
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 0 1rem;
+    }
+    
+    .category {
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .category-text {
+        font-size: 0.8rem;
+    }
+    
+    .question-progress {
+        padding: 0.4rem 1rem;
+    }
+    
+    .question-progress .progress-text {
+        font-size: 0.8rem;
+    }
+    
+    .timer {
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .timer-text {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-container {
+        padding: 0 0.5rem;
+    }
+    
+    .category {
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .category-text {
+        font-size: 0.75rem;
+    }
+    
+    .question-progress {
+        padding: 0.3rem 0.8rem;
+    }
+    
+    .question-progress .progress-text {
+        font-size: 0.75rem;
+    }
+    
+    .timer {
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .timer-text {
+        font-size: 0.75rem;
+    }
+} 
