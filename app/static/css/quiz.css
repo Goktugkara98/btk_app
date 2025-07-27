@@ -1,26 +1,6 @@
 /* -------------------- */
 /* --- CSS VARIABLES --- */
 /* -------------------- */
-:root {
-    --font-family: 'Inter', sans-serif;
-    --bg-main: #f8f9fa;
-    --bg-element: #ffffff;
-    --text-primary: #212529;
-    --text-secondary: #6c757d;
-    --text-on-accent: #ffffff;
-    --accent-primary: #4a6cf7;
-    --accent-primary-dark: #3a5ce4;
-    --accent-success: #28a745;
-    --accent-danger: #dc3545;
-    --accent-warning: #ffc107;
-    --border-color: #e9ecef;
-    --border-radius: 8px;
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --transition: all 0.25s ease;
-    --nav-height: 60px;
-    --question-nav-height: 70px;
-}
 
 /* -------------------- */
 /* --- BASE STYLES --- */

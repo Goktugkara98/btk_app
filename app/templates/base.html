@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!--Title-->
-    <title>{% block title %}Proje Adı{% endblock %}</title>
+    <title>{% block title %}Daima{% endblock %}</title>
     
     <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
@@ -21,13 +21,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/footer.css') }}">
     <!---Extra Styles-->
     {% block head_extra_styles %}{% endblock %}
+
+    <!-- Google Fonts: Bruno Ace SC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <!--Navbar-->
     <header class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">MarkaLogosu</a>
+            <a href="/" class="navbar-brand">
+                <span class="logo-black">D</span><span class="logo-purple">a</span><span class="logo-purple">i</span><span class="logo-black">m</span><span class="logo-black">a</span>
+            </a>
             <nav class="navbar-nav">
                 <a href="/" class="nav-link active">Ana Sayfa</a>
                 <a href="/login" class="nav-button">Giriş Yap</a>

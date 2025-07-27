@@ -1,43 +1,46 @@
-/**
- * =============================================================================
+/* =============================================================================
  * BASE STYLES (GLOBAL VARIABLES & CORE SETUP)
- *
+ * =============================================================================
  * Bu dosya projenin temelini oluşturur. Sadece global değişkenleri,
  * temel reset kodlarını ve <body> stilini içerir.
  * Bileşen (component) stilleri burada yer almaz.
  *
- * Anlamı:
- * - :root              -> Varsayılan (Açık Tema) değişkenleri
- * - @media (...)        -> Kullanıcının işletim sistemi tercihine göre
- * Koyu Tema değişkenlerini ezer.
+ * Açık Mod: Beyaz arka plan, siyah yazı
+ * Koyu Mod: Siyah arka plan, beyaz yazı
+ * Vurgu (accent) rengi: Mor
  * =============================================================================
  */
 
- :root {
-    /* * -------------------------------------------------------------------------
-     * RENK PALETİ (AÇIK TEMA - VARSAYILAN)
-     * Renkleri anlamsal olarak isimlendirmek, temalar arasında geçişi kolaylaştırır.
-     * -------------------------------------------------------------------------
-     */
-    --color-text-primary: rgba(3, 3, 3, 1);       /* Ana metin rengi */
-    --color-text-secondary: rgba(12, 12, 12, 1);     /* İkincil, daha soluk metinler */
-    --color-background-primary: rgba(253, 253, 253, 1); /* Ana arka plan */
-    --color-background-secondary: rgba(250, 250, 250, 1); /* Kart, bölüm gibi ikincil arka planlar */
-    --color-accent-primary: rgba(0, 123, 255, 1);       /* Vurgu, link ve ana eylem rengi */
-    --color-accent-secondary: rgba(0, 86, 179, 1);     /* Vurgu renginin hover durumu */
-    --color-border: rgba(225, 225, 225, 1);            /* Kenarlıklar için kullanılan renk */
-    --color-success: rgba(40, 167, 69, 1);            /* Başarı durumları için */
-    --color-error: rgba(220, 53, 69, 1);              /* Hata durumları için */
+:root {
+    /* -------------------------------------------------------------------------
+     * RENK PALETİ (AÇIK MOD - VARSAYILAN)
+     * ------------------------------------------------------------------------- */
+    --color-text-primary: #181818;         /* Ana metin rengi (siyah) */
+    --color-text-secondary: #444444;       /* İkincil metin rengi */
+    --color-background-primary: #fff;      /* Ana arka plan (beyaz) */
+    --color-background-secondary: #f7f7fa; /* Kart, bölüm gibi ikincil arka planlar */
+    --color-border: #e2e8f0;               /* Kenarlıklar için kullanılan renk */
+    --color-success: #43e97b;              /* Başarı durumları için */
+    --color-error: #dc3545;                /* Hata durumları için */
+    --color-accent-primary: #7c3aed;       /* Vurgu, link ve ana eylem rengi (mor) */
+    --color-accent-secondary: #a78bfa;     /* Vurgu renginin hover durumu (açık mor) */
+    --text-light: #a0aec0;                 /* Açık metin rengi */
+    --bg-primary: #fff;                    /* Modern arka plan (beyaz) */
+    --bg-secondary: #f7f7fa;               /* Modern ikincil arka plan */
+    --bg-dark: #181818;                    /* Modern koyu arka plan */
+    /* Gradientler */
+    --primary-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    --secondary-gradient: linear-gradient(135deg, #f3e8ff 0%, #a78bfa 100%);
+    --accent-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 
-
-    /* * -------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------
      * TİPOGRAFİ
-     * -------------------------------------------------------------------------
-     */
+     * ------------------------------------------------------------------------- */
     --font-family-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
     --font-family-monospace: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
-
-    /* Font Boyutları (Ölçeklenebilir yapı) */
+    --font-family: 'Inter', sans-serif; /* Modern ek font */
+    /* Font Boyutları */
     --font-size-sm: 0.875rem;   /* 14px */
     --font-size-base: 1rem;     /* 16px */
     --font-size-md: 1.125rem;   /* 18px */
@@ -45,22 +48,17 @@
     --font-size-xl: 1.5rem;     /* 24px */
     --font-size-xxl: 2rem;      /* 32px */
     --font-size-xxxl: 2.5rem;   /* 40px */
-    
     /* Font Ağırlıkları */
     --font-weight-regular: 400;
     --font-weight-medium: 500;
     --font-weight-bold: 700;
-
     /* Satır Yüksekliği */
     --line-height-base: 1.6;
     --line-height-heading: 1.3;
 
-
-    /* * -------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------
      * BOŞLUKLAR (SPACING)
-     * rem birimi kullanarak ölçeklenebilir bir boşluk sistemi.
-     * -------------------------------------------------------------------------
-     */
+     * ------------------------------------------------------------------------- */
     --spacing-1: 0.25rem;  /* 4px */
     --spacing-2: 0.5rem;   /* 8px */
     --spacing-3: 1rem;     /* 16px */
@@ -68,17 +66,33 @@
     --spacing-5: 2rem;     /* 32px */
     --spacing-6: 3rem;     /* 48px */
 
-    /* * -------------------------------------------------------------------------
-     * DİĞER GLOBAL DEĞİŞKENLER
-     * -------------------------------------------------------------------------
-     */
+    /* -------------------------------------------------------------------------
+     * KENARLIK, GÖLGE, GEÇİŞLER
+     * ------------------------------------------------------------------------- */
     --border-radius-sm: 4px;
     --border-radius-md: 8px;
+    --border-radius: 12px;
+    --border-radius-lg: 20px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.1);
     --transition-base: all 0.3s ease-in-out;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* -------------------------------------------------------------------------
+     * LAYOUT & CONTAINER
+     * ------------------------------------------------------------------------- */
     --max-width-container: 1240px;
+    --nav-height: 60px;
+    --question-nav-height: 70px;
+    --bg-main: #fff;
+    --bg-element: #fff;
+    --text-on-accent: #fff;
 }
 
-/* * =============================================================================
+/* =============================================================================
  * KOYU TEMA
  * Kullanıcının OS tercihi "dark" ise, :root içindeki renk değişkenlerini
  * yeniden tanımlayarak tüm siteyi Koyu Tema'ya geçiririz.
@@ -87,18 +101,24 @@
  */
 @media (prefers-color-scheme: dark) {
     :root {
-        --color-text-primary: #f0f0f0;
-        --color-text-secondary: #a0a0a0;
-        --color-background-primary: #121212;
-        --color-background-secondary: #1e1e1e;
-        --color-accent-primary: #4dabf7;
-        --color-accent-secondary: #74c0fc;
-        --color-border: #333333;
+        --color-text-primary: #fff;
+        --color-text-secondary: #e0e0e0;
+        --color-background-primary: #181818;
+        --color-background-secondary: #23232b;
+        --color-border: #333;
+        --color-accent-primary: #a78bfa;
+        --color-accent-secondary: #7c3aed;
+        --bg-primary: #181818;
+        --bg-secondary: #23232b;
+        --bg-dark: #000;
+        --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+        --secondary-gradient: linear-gradient(135deg, #23232b 0%, #7c3aed 100%);
+        --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+        --text-on-accent: #181818;
     }
 }
 
-
-/* * =============================================================================
+/* =============================================================================
  * TEMEL RESET VE BODY STİLLERİ
  * Tarayıcı varsayılanlarını sıfırlar ve projenin temelini ayarlar.
  * =============================================================================
@@ -136,8 +156,7 @@ body {
     min-height: 100vh;
 }
 
-/* * Medya elementlerinin varsayılan davranışlarını iyileştirme
- */
+/* Medya elementlerinin varsayılan davranışlarını iyileştirme */
 img, picture, video, canvas, svg {
     display: block;
     max-width: 100%;

@@ -1,0 +1,506 @@
+[
+  {
+    "question": "Bir odaya girdiğinizde elinizde sadece bir kibrit var. Odada ise bir gaz lambası, bir soba ve bir de mum bulunuyor. İlk önce neyi yakarsınız?",
+    "options": [
+      {
+        "text": "Gaz lambasını",
+        "correct": false,
+        "explanation": "Gaz lambasını yakabilmek için önce kibriti yakmalısınız."
+      },
+      {
+        "text": "Sobayı",
+        "correct": false,
+        "explanation": "Sobayı yakabilmek için önce kibriti yakmalısınız."
+      },
+      {
+        "text": "Mumu",
+        "correct": false,
+        "explanation": "Mumu yakabilmek için önce kibriti yakmalısınız."
+      },
+      {
+        "text": "Kibriti",
+        "correct": true,
+        "explanation": "Tebrikler! Önce kibriti yakmalısınız."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Kibriti'dir. Çünkü diğerlerinden herhangi birini yakabilmek için öncelikle ateş kaynağı olan kibriti yakmanız gerekir. Bu, dikkatinizi ve mantığınızı ölçen eğlenceli bir sorudur.",
+    "subject": "Mantık",
+    "difficulty": "Eğlenceli"
+  },
+  {
+    "question": "Periyodik tabloda 'Au' sembolü ile gösterilen element aşağıdakilerden hangisidir?",
+    "options": [
+      {
+        "text": "Gümüş",
+        "correct": false,
+        "explanation": "'Au' sembolü gümüşe ait değildir. Gümüşün sembolü 'Ag'dir."
+      },
+      {
+        "text": "Altın",
+        "correct": true,
+        "explanation": "Tebrikler! 'Au' sembolü altına aittir."
+      },
+      {
+        "text": "Argon",
+        "correct": false,
+        "explanation": "'Au' sembolü argona ait değildir. Argonun sembolü 'Ar'dır."
+      },
+      {
+        "text": "Alüminyum",
+        "correct": false,
+        "explanation": "'Au' sembolü alüminyuma ait değildir. Alüminyumun sembolü 'Al'dir."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Altın'dır. 'Au' sembolü, altının Latince adı olan 'Aurum' kelimesinden gelmektedir. Bu, temel kimya bilgisini ölçen bir sorudur.",
+    "subject": "Kimya",
+    "difficulty": "Zor"
+  },
+  {
+    "question": "Penguenler hangi kıtada doğal olarak yaşamazlar?",
+    "options": [
+      {
+        "text": "Antarktika",
+        "correct": false,
+        "explanation": "Penguenler Antarktika'da doğal olarak yaşarlar."
+      },
+      {
+        "text": "Avustralya",
+        "correct": false,
+        "explanation": "Bazı penguen türleri Avustralya kıyılarında da yaşar."
+      },
+      {
+        "text": "Kuzey Kutbu",
+        "correct": true,
+        "explanation": "Tebrikler! Penguenler Kuzey Kutbu'nda doğal olarak yaşamazlar."
+      },
+      {
+        "text": "Güney Amerika",
+        "correct": false,
+        "explanation": "Penguenler Güney Amerika'nın güney kıyılarında da yaşar."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Kuzey Kutbu'dur. Penguenler, Güney Yarımküre'de yaşayan uçamayan kuşlardır. Kuzey Kutbu'nda ise kutup ayıları gibi farklı canlılar yaşar.",
+    "subject": "Biyoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "question": "Bir kalemin yere düşmesi hangi temel fizik kanunu ile açıklanır?",
+    "options": [
+      {
+        "text": "Termodinamik",
+        "correct": false,
+        "explanation": "Termodinamik, ısı ve enerji dönüşümlerini inceler. Kalemin düşmesiyle doğrudan ilgili değildir."
+      },
+      {
+        "text": "Optik",
+        "correct": false,
+        "explanation": "Optik, ışığın davranışını inceler. Kalemin düşmesiyle ilgili değildir."
+      },
+      {
+        "text": "Elektromanyetizma",
+        "correct": false,
+        "explanation": "Elektromanyetizma, elektrik ve manyetizma olaylarını inceler. Kalemin düşmesiyle ilgili değildir."
+      },
+      {
+        "text": "Yer Çekimi",
+        "correct": true,
+        "explanation": "Tebrikler! Kalemin yere düşmesi yer çekimi kanunu ile açıklanır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Yer Çekimi'dir. Cisimlerin birbirine kütleleri oranında çekim kuvveti uygulamasını ifade eden yer çekimi kanunu, kalemin yere düşmesinin sebebidir. Bu, temel bir fizik sorusudur.",
+    "subject": "Fizik",
+    "difficulty": "Kolay"
+  },
+  {
+    "question": "Heisenberg'in Belirsizlik İlkesi'ne göre bir parçacığın hangi iki özelliği aynı anda tam bir kesinlikle ölçülemez?",
+    "options": [
+      {
+        "text": "Kütlesi ve hızı",
+        "correct": false,
+        "explanation": "Kütle ve hız, belirsizlik ilkesinin doğrudan konusu değildir."
+      },
+      {
+        "text": "Konumu ve momentumu",
+        "correct": true,
+        "explanation": "Tebrikler! Belirsizlik ilkesine göre bir parçacığın konumu ve momentumu aynı anda kesin olarak ölçülemez."
+      },
+      {
+        "text": "Enerjisi ve kütlesi",
+        "correct": false,
+        "explanation": "Enerji ve kütle, belirsizlik ilkesinin konusu değildir."
+      },
+      {
+        "text": "Yükü ve konumu",
+        "correct": false,
+        "explanation": "Yük ve konum, belirsizlik ilkesinin konusu değildir."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Konumu ve momentumu'dur. Kuantum mekaniğinin temel taşlarından olan Belirsizlik İlkesi, bir parçacığın konumunu ne kadar kesin ölçerseniz, momentumunu (hızını ve yönünü) o kadar belirsiz hale getireceğinizi ve tam tersini ifade eder.",
+    "subject": "Fizik",
+    "difficulty": "Çok Zor"
+  },
+  {
+    "question": "Aşağıdaki cümlelerin hangisinde 'de' bağlacı yanlış yazılmıştır?",
+    "options": [
+      {
+        "text": "Sen de bizimle gelmelisin.",
+        "correct": false,
+        "explanation": "Burada 'de' bağlacı doğru yazılmıştır."
+      },
+      {
+        "text": "Kitap da okumayı severim.",
+        "correct": false,
+        "explanation": "Burada 'de' bağlacı doğru yazılmıştır."
+      },
+      {
+        "text": "Evde kimse yoktu.",
+        "correct": false,
+        "explanation": "Burada 'de' bulunma hal ekidir ve doğru yazılmıştır."
+      },
+      {
+        "text": "Bende seninle aynı fikirdeyim.",
+        "correct": true,
+        "explanation": "Yanlış! 'Ben de' şeklinde ayrı yazılmalıydı."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Bende seninle aynı fikirdeyim.' cümlesidir. Bu cümlede 'de' bağlaçtır ve ayrı yazılması gerekir. 'Ben de' şeklinde olmalıdır.",
+    "subject": "Türkçe",
+    "difficulty": "Kolay"
+  },
+  {
+    "question": "Aşağıdaki atasözlerinden hangisi mecaz anlamlı değildir?",
+    "options": [
+      {
+        "text": "Damlaya damlaya göl olur.",
+        "correct": false,
+        "explanation": "Bu atasözü mecaz anlamlıdır; küçük birikimlerin zamanla büyüyeceğini ifade eder."
+      },
+      {
+        "text": "Bugünün işini yarına bırakma.",
+        "correct": true,
+        "explanation": "Tebrikler! Bu atasözü gerçek anlamlıdır ve yapılması gereken işlerin zamanında yapılması gerektiğini öğütler."
+      },
+      {
+        "text": "Ateş olmayan yerden duman çıkmaz.",
+        "correct": false,
+        "explanation": "Bu atasözü mecaz anlamlıdır; her olayın bir belirtisi veya sebebi olduğunu anlatır."
+      },
+      {
+        "text": "Sakla samanı, gelir zamanı.",
+        "correct": false,
+        "explanation": "Bu atasözü mecaz anlamlıdır; değersiz gibi görünen şeylerin ileride işe yarayabileceğini ifade eder."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Bugünün işini yarına bırakma.' atasözüdür. Bu atasözü, diğerlerinin aksine, doğrudan ve gerçek anlamıyla bir öğüt verir ve mecazi bir anlatım içermez.",
+    "subject": "Türkçe",
+    "difficulty": "Orta"
+  },
+  {
+    "question": "Divan-ı Lügati't-Türk adlı eserin yazarı kimdir?",
+    "options": [
+      {
+        "text": "Yusuf Has Hacip",
+        "correct": false,
+        "explanation": "Yusuf Has Hacip, Kutadgu Bilig'in yazarıdır."
+      },
+      {
+        "text": "Ahmet Yesevi",
+        "correct": false,
+        "explanation": "Ahmet Yesevi, Divan-ı Hikmet'in yazarıdır."
+      },
+      {
+        "text": "Edip Ahmet Yükneki",
+        "correct": false,
+        "explanation": "Edip Ahmet Yükneki, Atabetü'l Hakayık'ın yazarıdır."
+      },
+      {
+        "text": "Kaşgarlı Mahmud",
+        "correct": true,
+        "explanation": "Tebrikler! Divan-ı Lügati't-Türk, Kaşgarlı Mahmud tarafından yazılmıştır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Kaşgarlı Mahmud'dur. 11. yüzyılda yazılan bu eser, Türk dilinin ilk sözlüğü ve ansiklopedisi olarak kabul edilir ve Türk kültür tarihi açısından büyük öneme sahiptir.",
+    "subject": "Türkçe",
+    "difficulty": "Zor"
+  },
+  {
+    "question": "Türkiye Cumhuriyeti'nin ilk cumhurbaşkanı kimdir?",
+    "options": [
+      {
+        "text": "İsmet İnönü",
+        "correct": false,
+        "explanation": "İsmet İnönü, Türkiye'nin ikinci cumhurbaşkanıdır."
+      },
+      {
+        "text": "Celal Bayar",
+        "correct": false,
+        "explanation": "Celal Bayar, Türkiye'nin üçüncü cumhurbaşkanıdır."
+      },
+      {
+        "text": "Mustafa Kemal Atatürk",
+        "correct": true,
+        "explanation": "Tebrikler! Türkiye Cumhuriyeti'nin kurucusu ve ilk cumhurbaşkanı Mustafa Kemal Atatürk'tür."
+      },
+      {
+        "text": "Fevzi Çakmak",
+        "correct": false,
+        "explanation": "Fevzi Çakmak, Türkiye'nin ilk Genelkurmay Başkanıdır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Mustafa Kemal Atatürk'tür. 29 Ekim 1923'te cumhuriyetin ilanıyla birlikte Türkiye Büyük Millet Meclisi tarafından ilk cumhurbaşkanı olarak seçilmiştir.",
+    "subject": "Tarih",
+    "difficulty": "Kolay"
+  },
+  {
+    "question": "Fransız İhtilali hangi yıl başlamıştır?",
+    "options": [
+      {
+        "text": "1453",
+        "correct": false,
+        "explanation": "1453, İstanbul'un Fethi'nin yılıdır."
+      },
+      {
+        "text": "1789",
+        "correct": true,
+        "explanation": "Tebrikler! Fransız İhtilali 1789 yılında başlamıştır."
+      },
+      {
+        "text": "1881",
+        "correct": false,
+        "explanation": "1881, Mustafa Kemal Atatürk'ün doğum yılıdır."
+      },
+      {
+        "text": "1914",
+        "correct": false,
+        "explanation": "1914, Birinci Dünya Savaşı'nın başlangıç yılıdır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap '1789'dur. Bastille Hapishanesi'nin basılmasıyla başlayan Fransız İhtilali, dünya tarihinde önemli bir dönüm noktası olmuş; milliyetçilik, eşitlik ve özgürlük gibi kavramların yayılmasına neden olmuştur.",
+    "subject": "Tarih",
+    "difficulty": "Orta"
+  },
+  {
+    "question": "Malazgirt Meydan Muharebesi hangi iki hükümdar arasında yapılmıştır?",
+    "options": [
+      {
+        "text": "Fatih Sultan Mehmet ve III. Vlad",
+        "correct": false,
+        "explanation": "Bu hükümdarlar Osmanlı döneminde savaşmışlardır."
+      },
+      {
+        "text": "Kanuni Sultan Süleyman ve Şarlken",
+        "correct": false,
+        "explanation": "Bu hükümdarlar 16. yüzyılda mücadele etmişlerdir."
+      },
+      {
+        "text": "Sultan Alparslan ve Romen Diyojen",
+        "correct": true,
+        "explanation": "Tebrikler! Malazgirt Meydan Muharebesi, Büyük Selçuklu Sultanı Alparslan ile Bizans İmparatoru Romen Diyojen arasında yapılmıştır."
+      },
+      {
+        "text": "Osman Gazi ve Andronikos II",
+        "correct": false,
+        "explanation": "Bu hükümdarlar Osmanlı Beyliği'nin kuruluş döneminde savaşmışlardır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Sultan Alparslan ve Romen Diyojen'dir. 1071 yılında gerçekleşen bu savaş, Selçukluların kesin zaferiyle sonuçlanmış ve Anadolu'nun kapılarını Türklere açmıştır.",
+    "subject": "Tarih",
+    "difficulty": "Zor"
+  },
+  {
+    "question": "Bir düzine kalem kaç adettir?",
+    "options": [
+      {
+        "text": "10",
+        "correct": false,
+        "explanation": "Bir deste 10 adettir."
+      },
+      {
+        "text": "12",
+        "correct": true,
+        "explanation": "Tebrikler! Bir düzine 12 adettir."
+      },
+      {
+        "text": "20",
+        "correct": false,
+        "explanation": "Bu sayı bir düzineyi ifade etmez."
+      },
+      {
+        "text": "24",
+        "correct": false,
+        "explanation": "Bu sayı iki düzineyi ifade eder."
+      }
+    ],
+    "correct_explanation": "Doğru cevap '12'dir. Düzine, 12 adetlik birimler için kullanılan bir ölçü birimidir.",
+    "subject": "Matematik",
+    "difficulty": "Kolay"
+  },
+  {
+    "question": "Karekökü 9 olan sayı kaçtır?",
+    "options": [
+      {
+        "text": "3",
+        "correct": false,
+        "explanation": "3'ün karesi 9'dur, ancak 9'un karekökü 3'tür. Soru karekökü 9 olan sayıyı soruyor."
+      },
+      {
+        "text": "18",
+        "correct": false,
+        "explanation": "Bu sayı doğru cevap değildir."
+      },
+      {
+        "text": "81",
+        "correct": true,
+        "explanation": "Tebrikler! 81'in karekökü 9'dur."
+      },
+      {
+        "text": "9",
+        "correct": false,
+        "explanation": "9'un karekökü 3'tür."
+      }
+    ],
+    "correct_explanation": "Doğru cevap '81'dir. Bir sayının karekökü, o sayıyı elde etmek için kendisiyle çarpılması gereken sayıdır. $9 * 9 = 81$ olduğu için 81'in karekökü 9'dur.",
+    "subject": "Matematik",
+    "difficulty": "Orta"
+  },
+  {
+    "question": "Bir torbada 5 kırmızı ve 3 mavi top vardır. Torbadan rastgele çekilen bir topun kırmızı olma olasılığı nedir?",
+    "options": [
+      {
+        "text": "$3/8$",
+        "correct": false,
+        "explanation": "Bu, mavi top çekme olasılığıdır."
+      },
+      {
+        "text": "$5/3$",
+        "correct": false,
+        "explanation": "Olasılık değeri 1'den büyük olamaz."
+      },
+      {
+        "text": "$1/8$",
+        "correct": false,
+        "explanation": "Bu, belirli bir topu çekme olasılığı olabilir, ancak genel kırmızı olasılığı değildir."
+      },
+      {
+        "text": "$5/8$",
+        "correct": true,
+        "explanation": "Tebrikler! Toplam 8 toptan 5'i kırmızı olduğu için olasılık $5/8$'dir."
+      }
+    ],
+    "correct_explanation": "Doğru cevap '$5/8$'dir. Olasılık, istenen durumların sayısının toplam durum sayısına bölünmesiyle bulunur. Toplamda $5 + 3 = 8$ top vardır. Kırmızı top sayısı 5 olduğu için kırmızı gelme olasılığı $5/8$'dir.",
+    "subject": "Matematik",
+    "difficulty": "Zor"
+  },
+  {
+    "question": "Everest Dağı hangi sıradağlar üzerinde yer almaktadır?",
+    "options": [
+      {
+        "text": "And Dağları",
+        "correct": false,
+        "explanation": "And Dağları Güney Amerika'dadır."
+      },
+      {
+        "text": "Alpler",
+        "correct": false,
+        "explanation": "Alpler Avrupa'dadır."
+      },
+      {
+        "text": "Himalayalar",
+        "correct": true,
+        "explanation": "Tebrikler! Dünyanın en yüksek zirvesi olan Everest, Himalayalar'da yer alır."
+      },
+      {
+        "text": "Kayalık Dağlar",
+        "correct": false,
+        "explanation": "Kayalık Dağlar Kuzey Amerika'dadır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Himalayalar'dır. Asya kıtasında bulunan Himalayalar, dünyanın en yüksek dağ silsilesidir ve Everest Dağı da bu silsilenin bir parçasıdır.",
+    "subject": "Genel Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "question": "Mona Lisa tablosu hangi müzede sergilenmektedir?",
+    "options": [
+      {
+        "text": "Prado Müzesi, Madrid",
+        "correct": false,
+        "explanation": "Prado Müzesi İspanya'dadır ve önemli İspanyol sanat eserlerine ev sahipliği yapar."
+      },
+      {
+        "text": "British Museum, Londra",
+        "correct": false,
+        "explanation": "British Museum, dünya kültür ve tarihine odaklanmıştır."
+      },
+      {
+        "text": "Metropolitan Sanat Müzesi, New York",
+        "correct": false,
+        "explanation": "Bu müze, geniş bir sanat koleksiyonuna sahiptir ancak Mona Lisa burada değildir."
+      },
+      {
+        "text": "Louvre Müzesi, Paris",
+        "correct": true,
+        "explanation": "Tebrikler! Leonardo da Vinci'nin ünlü eseri Mona Lisa, Paris'teki Louvre Müzesi'nde sergilenmektedir."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Louvre Müzesi, Paris'tir. Mona Lisa, sanat tarihinin en ikonik eserlerinden biridir ve her yıl milyonlarca ziyaretçi tarafından Paris'teki Louvre Müzesi'nde görülmektedir.",
+    "subject": "Genel Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "question": "2023 yılında Nobel Edebiyat Ödülü'nü kim kazanmıştır?",
+    "options": [
+      {
+        "text": "Orhan Pamuk",
+        "correct": false,
+        "explanation": "Orhan Pamuk bu ödülü 2006 yılında kazanmıştır."
+      },
+      {
+        "text": "Kazuo Ishiguro",
+        "correct": false,
+        "explanation": "Kazuo Ishiguro bu ödülü 2017 yılında kazanmıştır."
+      },
+      {
+        "text": "Jon Fosse",
+        "correct": true,
+        "explanation": "Tebrikler! Norveçli yazar Jon Fosse, 2023 Nobel Edebiyat Ödülü'nü kazanmıştır."
+      },
+      {
+        "text": "Annie Ernaux",
+        "correct": false,
+        "explanation": "Annie Ernaux bu ödülü 2022 yılında kazanmıştır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Jon Fosse'dir. İsveç Akademisi, 2023 Nobel Edebiyat Ödülü'nü, 'söylenemeyeni dile getiren yenilikçi oyunları ve nesirleri' nedeniyle Norveçli yazar Jon Fosse'ye vermiştir.",
+    "subject": "Genel Kültür",
+    "difficulty": "Zor"
+  },
+  {
+    "question": "Türkiye'deki en iyi yapay zeka entegrasyonuna sahip ders uygulaması hangisidir?",
+    "options": [
+      {
+        "text": "Kunduz",
+        "correct": false,
+        "explanation": "Kunduz, soru-cevap üzerine kurulu popüler bir uygulamadır ancak yapay zeka entegrasyonu Daima kadar gelişmiş değildir."
+      },
+      {
+        "text": "EBA",
+        "correct": false,
+        "explanation": "EBA, Milli Eğitim Bakanlığı'nın sunduğu zengin bir içerik platformudur fakat kişiselleştirilmiş yapay zeka deneyimi sunmaz."
+      },
+      {
+        "text": "Raunt",
+        "correct": false,
+        "explanation": "Raunt, üniversite hazırlık sürecinde rehberlik sunar ancak temelinde Daima gibi derin bir yapay zeka çekirdeği bulunmaz."
+      },
+      {
+        "text": "Daima",
+        "correct": true,
+        "explanation": "Tebrikler! Daima, kişiselleştirilmiş öğrenme yolları ve anlık geri bildirimler sunan gelişmiş yapay zeka entegrasyonu ile öne çıkmaktadır."
+      }
+    ],
+    "correct_explanation": "Doğru cevap 'Daima'dır. Diğer uygulamalar belirli alanlarda güçlü olsa da, Daima'nın temelini oluşturan yapay zeka teknolojisi, her öğrencinin öğrenme hızına, tarzına ve eksiklerine göre dinamik olarak adapte olan bir öğrenme deneyimi sunar. Bu, onu yapay zeka entegrasyonu açısından en gelişmiş uygulama yapmaktadır.",
+    "subject": "Teknoloji",
+    "difficulty": "Orta"
+  }
+]
