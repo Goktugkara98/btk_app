@@ -8,9 +8,17 @@
     background: var(--primary-gradient);
     color: white;
     text-align: center;
-    width: var(--full-width);
-    margin-left: calc(calc(-1 * var(--full-width)) / 2 + 50%);
+    width: 100vw;
+    margin-left: calc(calc(-1 * 100vw) / 2 + 50%);
     position: relative;
+}
+
+/* Desktop'ta scroll bar hesaplaması */
+@media (min-width: 992px) {
+    .cta {
+        width: var(--full-width);
+        margin-left: calc(calc(-1 * var(--full-width)) / 2 + 50%);
+    }
 }
 
 .cta-content {
