@@ -50,115 +50,146 @@
     <!--Navbar-->
     <header class="navbar">
         <div class="navbar-container wide-container">
-            <a href="/" class="navbar-brand">
-                <span class="logo-black">d</span><span class="logo-purple">a</span><span class="logo-purple">i</span><span class="logo-black">m</span><span class="logo-black">a</span>
-            </a>
-            <nav class="navbar-nav">
-                <a href="/" class="nav-link active">Ana Sayfa</a>
-                <a href="/login" class="nav-button">Giriş Yap</a>
-            </nav>
-        </div>
-    </header>
-    <!--Main Content-->
-    <main class="main-content container">
-        {% block content %}{% endblock %}
-    </main>
-        <!--Footer-->
-    <footer class="footer">
-        <div class="footer-container">
-            <!-- Main Footer Content -->
-            <div class="footer-main">
-                <div class="footer-brand-section">
-                    <div class="footer-brand">
-                        <a href="/" class="footer-logo">
-                            <span class="logo-text">D<span class="logo-accent">ai</span>ma</span>
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <a href="/" class="navbar-brand">
+                            <span class="logo-black">d</span><span class="logo-purple">a</span><span class="logo-purple">i</span><span class="logo-black">m</span><span class="logo-black">a</span>
                         </a>
-                        <p class="footer-desc">Yapay zeka destekli modern öğrenme platformu. Kişiselleştirilmiş quizler, anında analiz ve aktif öğrenme deneyimi ile öğrenmeyi yeniden keşfedin.</p>
-                        <div class="footer-social">
-                            <h5>Bizi Takip Edin</h5>
-                            <div class="social-icons">
-                                <a href="#" class="social-icon" aria-label="Twitter">
-                                    <i class="bi bi-twitter-x"></i>
-                                </a>
-                                <a href="#" class="social-icon" aria-label="Instagram">
-                                    <i class="bi bi-instagram"></i>
-                                </a>
-                                <a href="#" class="social-icon" aria-label="LinkedIn">
-                                    <i class="bi bi-linkedin"></i>
-                                </a>
-                                <a href="#" class="social-icon" aria-label="YouTube">
-                                    <i class="bi bi-youtube"></i>
-                                </a>
-                                <a href="#" class="social-icon" aria-label="GitHub">
-                                    <i class="bi bi-github"></i>
-                                </a>
-                            </div>
-                        </div>
                     </div>
-                </div>
-
-                <div class="footer-links-section">
-                    <div class="footer-links-group">
-                        <h4>Hızlı Linkler</h4>
-                        <ul>
-                            <li><a href="/">Ana Sayfa</a></li>
-                            <li><a href="/quiz">Quiz Başlat</a></li>
-                            <li><a href="/login">Giriş Yap</a></li>
-                            <li><a href="/register">Kaydol</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-links-group">
-                        <h4>Yasal</h4>
-                        <ul>
-                            <li><a href="/privacy">Gizlilik Politikası</a></li>
-                            <li><a href="/terms">Kullanım Şartları</a></li>
-                            <li><a href="/cookies">Çerez Politikası</a></li>
-                            <li><a href="/security">Güvenlik</a></li>
-                            <li><a href="/gdpr">KVKK</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="footer-newsletter-section">
-                    <div class="newsletter-card">
-                        <h4>Güncel Kalın</h4>
-                        <p>En son özellikler ve güncellemeler için bültenimize abone olun.</p>
-                        <form class="newsletter-form" id="newsletter-form">
-                            <div class="input-group">
-                                <input type="email" placeholder="E-posta adresiniz" required>
-                                <button type="submit" class="newsletter-btn">
-                                    <i class="bi bi-arrow-right"></i>
-                                </button>
-                            </div>
-                        </form>
-                        <div class="newsletter-success" id="newsletter-success" style="display: none;">
-                            <i class="bi bi-check-circle"></i>
-                            <span>Başarıyla abone oldunuz!</span>
-                        </div>
+                    <div class="col">
+                        <nav class="navbar-nav">
+                            <a href="/" class="nav-link active">Ana Sayfa</a>
+                            <a href="/login" class="nav-button">Giriş Yap</a>
+                        </nav>
                     </div>
                 </div>
             </div>
+        </div>
+    </header>
+    
+    <!--Main Content-->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!--Footer-->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="container">
+                <!-- Main Footer Content -->
+                <div class="footer-main">
+                    <div class="row">
+                        <div class="col-12 col-lg-4 mb-4 mb-lg-0">
+                            <div class="footer-brand-section">
+                                <div class="footer-brand">
+                                    <a href="/" class="footer-logo">
+                                        <span class="logo-text">D<span class="logo-accent">ai</span>ma</span>
+                                    </a>
+                                    <p class="footer-desc">Yapay zeka destekli modern öğrenme platformu. Kişiselleştirilmiş quizler, anında analiz ve aktif öğrenme deneyimi ile öğrenmeyi yeniden keşfedin.</p>
+                                    <div class="footer-social">
+                                        <h5>Bizi Takip Edin</h5>
+                                        <div class="social-icons">
+                                            <a href="#" class="social-icon" aria-label="Twitter">
+                                                <i class="bi bi-twitter-x"></i>
+                                            </a>
+                                            <a href="#" class="social-icon" aria-label="Instagram">
+                                                <i class="bi bi-instagram"></i>
+                                            </a>
+                                            <a href="#" class="social-icon" aria-label="LinkedIn">
+                                                <i class="bi bi-linkedin"></i>
+                                            </a>
+                                            <a href="#" class="social-icon" aria-label="YouTube">
+                                                <i class="bi bi-youtube"></i>
+                                            </a>
+                                            <a href="#" class="social-icon" aria-label="GitHub">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-            <!-- Footer Bottom -->
-            <div class="footer-bottom">
-                <div class="footer-bottom-content">
-                    <div class="footer-copyright">
-                        <p>&copy; 2024 Daima. Tüm hakları saklıdır.</p>
+                        <div class="col-12 col-lg-4 mb-4 mb-lg-0">
+                            <div class="footer-links-section">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="footer-links-group">
+                                            <h4>Hızlı Linkler</h4>
+                                            <ul>
+                                                <li><a href="/">Ana Sayfa</a></li>
+                                                <li><a href="/quiz">Quiz Başlat</a></li>
+                                                <li><a href="/login">Giriş Yap</a></li>
+                                                <li><a href="/register">Kaydol</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="footer-links-group">
+                                            <h4>Yasal</h4>
+                                            <ul>
+                                                <li><a href="/privacy">Gizlilik Politikası</a></li>
+                                                <li><a href="/terms">Kullanım Şartları</a></li>
+                                                <li><a href="/cookies">Çerez Politikası</a></li>
+                                                <li><a href="/security">Güvenlik</a></li>
+                                                <li><a href="/gdpr">KVKK</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="footer-newsletter-section">
+                                <div class="newsletter-card">
+                                    <h4>Güncel Kalın</h4>
+                                    <p>En son özellikler ve güncellemeler için bültenimize abone olun.</p>
+                                    <form class="newsletter-form" id="newsletter-form">
+                                        <div class="input-group">
+                                            <input type="email" placeholder="E-posta adresiniz" required>
+                                            <button type="submit" class="newsletter-btn">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <div class="newsletter-success" id="newsletter-success" style="display: none;">
+                                        <i class="bi bi-check-circle"></i>
+                                        <span>Başarıyla abone oldunuz!</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="footer-stats">
-                        <span class="stat-item">
-                            <i class="bi bi-people"></i>
-                            <span>10K+ Kullanıcı</span>
-                        </span>
-                        <span class="stat-item">
-                            <i class="bi bi-graph-up"></i>
-                            <span>50K+ Quiz</span>
-                        </span>
-                        <span class="stat-item">
-                            <i class="bi bi-star"></i>
-                            <span>4.9/5 Puan</span>
-                        </span>
+                </div>
+
+                <!-- Footer Bottom -->
+                <div class="footer-bottom">
+                    <div class="footer-bottom-content">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <div class="footer-copyright">
+                                    <p>&copy; 2024 Daima. Tüm hakları saklıdır.</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="footer-stats">
+                                    <span class="stat-item">
+                                        <i class="bi bi-people"></i>
+                                        <span>10K+ Kullanıcı</span>
+                                    </span>
+                                    <span class="stat-item">
+                                        <i class="bi bi-graph-up"></i>
+                                        <span>50K+ Quiz</span>
+                                    </span>
+                                    <span class="stat-item">
+                                        <i class="bi bi-star"></i>
+                                        <span>4.9/5 Puan</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
