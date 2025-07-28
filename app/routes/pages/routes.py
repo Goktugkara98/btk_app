@@ -28,3 +28,14 @@ def quiz():
 def quiz_results():
     """Render the quiz results page."""
     return render_template('quiz_results.html', title='Quiz Sonuçları')
+
+
+@pages_bp.route('/login')
+def login():
+    """Render the login page."""
+    return render_template('login.html', title='Login')
+
+@pages_bp.route('/register')
+def register():
+    """Render the register page."""
+    return render_template('register.html', title='Register')
