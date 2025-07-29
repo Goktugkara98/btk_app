@@ -23,7 +23,7 @@
 # =============================================================================
 # 3.0. GEREKLİ KÜTÜPHANELER VE MODÜLLER
 # =============================================================================
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from datetime import datetime
 
 # Create the blueprint
@@ -32,6 +32,7 @@ api_bp = Blueprint('api', __name__)
 # Import services here to avoid circular imports
 try:
     from app.services.user_service import UserService
+    from app.utils.auth_utils import logout_user
 except ImportError as e:
     print(f"Warning: Could not import UserService: {e}")
     UserService = None
@@ -124,3 +125,63 @@ def register():
             'message': result.get('message', 'Kayıt işlemi başarısız'),
             'details': result
         }), 400  # 400 Bad Request
+
+@api_bp.route('/login', methods=['POST'])
+def login():
+    """5.2.4. Kullanıcı giriş işlemini gerçekleştirir."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid JSON'}), 400
+
+    # Login iş mantığı servis katmanına devredildi.
+    success, result = user_service.login_user(data)
+
+    if success:
+        # Session'a kullanıcı bilgilerini kaydet
+        session['logged_in'] = True
+        session['user_id'] = result['id']
+        session['username'] = result['username']
+        session['email'] = result['email']
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Giriş başarılı',
+            'data': result
+        }), 200  # 200 OK
+    else:
+        # Hata mesajı servisten geldiği için doğrudan kullanılır.
+        return jsonify({
+            'status': 'error',
+            'message': result.get('message', 'Giriş işlemi başarısız'),
+            'details': result
+        }), 401  # 401 Unauthorized
+
+@api_bp.route('/logout', methods=['POST'])
+def logout():
+    """5.2.5. Kullanıcı çıkış işlemini gerçekleştirir."""
+    # Session'ı temizle
+    logout_user()
+    
+    return jsonify({
+        'status': 'success',
+        'message': 'Çıkış başarılı'
+    }), 200  # 200 OK
+
+@api_bp.route('/check-auth', methods=['GET'])
+def check_auth():
+    """5.2.6. Kullanıcının giriş durumunu kontrol eder."""
+    if session.get('logged_in'):
+        return jsonify({
+            'status': 'success',
+            'logged_in': True,
+            'user': {
+                'id': session.get('user_id'),
+                'username': session.get('username'),
+                'email': session.get('email')
+            }
+        }), 200
+    else:
+        return jsonify({
+            'status': 'success',
+            'logged_in': False
+        }), 200

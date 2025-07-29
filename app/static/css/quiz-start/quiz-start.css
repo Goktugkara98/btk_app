@@ -1,0 +1,43 @@
+/* Quiz Start Page - Main Styles */
+
+/* Quiz Start Page Layout */
+.quiz-start-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+/* Quiz Settings Panel */
+.quiz-settings-panel {
+    width: 100%;
+    max-width: 1200px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    margin: 0 2rem;
+}
+
+.panel-content {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .quiz-settings-panel {
+        margin: 0 1rem;
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .quiz-settings-panel {
+        margin: 0 0.5rem;
+        padding: 1.5rem;
+    }
+} 

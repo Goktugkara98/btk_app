@@ -31,6 +31,11 @@ def quiz():
     """Render the quiz page."""
     return render_template('quiz_screen.html', title='Quiz')
 
+@pages_bp.route('/quiz/start')
+def quiz_start():
+    """Render the quiz start page."""
+    return render_template('quiz_start.html', title='Quiz Başlat')
+
 @pages_bp.route('/quiz/results')
 def quiz_results():
     """Render the quiz results page."""
@@ -46,3 +51,8 @@ def login():
 def register():
     """Render the register page."""
     return render_template('register.html', title='Register')
+
+@pages_bp.route('/profile')
+def profile():
+    """Render the profile page."""
+    return render_template('profile.html', title='Profile')

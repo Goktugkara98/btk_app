@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/footer.css') }}">
     <!---Extra Styles-->
     {% block head_extra_styles %}{% endblock %}
+    {% block extra_css %}{% endblock %}
 
     <!-- Google Fonts: Bruno Ace SC & Inter - Optimized -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,7 +61,16 @@
                     <div class="col">
                         <nav class="navbar-nav">
                             <a href="/" class="nav-link active">Ana Sayfa</a>
-                            <a href="/login" class="nav-button">Giriş Yap</a>
+                            {% if session.get('logged_in') %}
+                                <div class="nav-user-menu">
+                                    <a href="/profile" class="nav-button" data-username>{{ session.get('username', 'Profil') }}</a>
+                                    <button class="nav-logout-btn" data-logout>
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </button>
+                                </div>
+                            {% else %}
+                                <a href="/login" class="nav-button">Giriş Yap</a>
+                            {% endif %}
                         </nav>
                     </div>
                 </div>
@@ -201,6 +211,8 @@
     <script src="{{ url_for('static', filename='js/plugins/gsap-core.js') }}"></script>
     <!---Main-->
     <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>
+    <!---Auth Utils-->
+    <script src="{{ url_for('static', filename='js/utils/auth.js') }}"></script>
     <!---Components-->
     {% block body_extra_scripts %}{% endblock %}
     
@@ -225,6 +237,13 @@
         window.addEventListener('load', function() {
             if (window.scrollY > 0) {
                 window.scrollTo(0, 0);
+            }
+        });
+        
+        // Initialize authentication UI
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.authUtils && window.authUtils.initAuthUI) {
+                window.authUtils.initAuthUI();
             }
         });
     </script>

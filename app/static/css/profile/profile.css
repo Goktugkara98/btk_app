@@ -1,0 +1,16 @@
+/* Profile Page Styles */
+.profile-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-page h1 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.profile-page p {
+    color: #666;
+    line-height: 1.6;
+} 

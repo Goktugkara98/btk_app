@@ -215,14 +215,37 @@ class SimpleMigrations:
             print(f"❌ Örnek veri ekleme hatası: {e}")
             raise
 
+    def check_tables_exist(self):
+        """Tabloların mevcut olup olmadığını kontrol eder."""
+        try:
+            with self.db as conn:
+                # Ana tabloları kontrol et
+                required_tables = ['users', 'questions', 'question_options']
+                
+                for table in required_tables:
+                    conn.cursor.execute(f"SHOW TABLES LIKE '{table}'")
+                    if not conn.cursor.fetchone():
+                        return False
+                
+                return True
+                
+        except MySQLError as e:
+            print(f"❌ Tablo kontrol hatası: {e}")
+            return False
+
     def run_migrations(self):
         """Tüm migration işlemlerini çalıştırır."""
         try:
-            print("🚀 Basit soru bankası migrations başlatılıyor...")
+            print("🚀 Veritabanı kontrol ediliyor...")
             print("=" * 50)
             
-            # 0. Mevcut tabloları temizle
-            self.drop_existing_tables()
+            # Tabloların mevcut olup olmadığını kontrol et
+            if self.check_tables_exist():
+                print("✅ Tablolar zaten mevcut. Migration atlanıyor...")
+                print("=" * 50)
+                return
+            
+            print("📋 Tablolar bulunamadı. Yeni tablolar oluşturuluyor...")
             
             # 1. Tabloları oluştur
             self.create_simple_tables()
@@ -231,12 +254,11 @@ class SimpleMigrations:
             self.create_sample_questions()
             
             print("=" * 50)
-            print("🎉 Basit soru bankası migrations tamamlandı!")
+            print("🎉 Veritabanı başarıyla oluşturuldu!")
             print("📊 Oluşturulan tablolar:")
             print("   • users (Kullanıcılar)")
             print("   • questions (Sorular)")
             print("   • question_options (Seçenekler)")
-            print("\n💡 Test etmek için: python test_simple_database.py")
             
         except Exception as e:
             print(f"❌ Migration hatası: {e}")

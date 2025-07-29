@@ -180,3 +180,46 @@ class UserService:
             print(f"Error in register_user service: {e}")
             return False, {'message': 'Beklenmeyen bir hata oluştu'}
 
+    def login_user(self, login_data: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
+        """
+        4.2.4. Login form verilerini işler ve kullanıcı girişini gerçekleştirir.
+        Login form'da email ve password alanları bulunur.
+        """
+        # 1. Form verilerini kontrol et
+        email = login_data.get('email', '').strip()
+        password = login_data.get('password', '')
+
+        # 2. Gerekli alanların kontrolü
+        if not email:
+            return False, {'message': 'E-posta alanı gereklidir'}
+        if not password:
+            return False, {'message': 'Şifre alanı gereklidir'}
+
+        # 3. Email format kontrolü
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            return False, {'message': 'Geçerli bir e-posta adresi giriniz'}
+
+        try:
+            # 4. Kullanıcıyı e-posta ile bul
+            user = self.user_repo.get_user_by_email(email)
+            
+            if not user:
+                return False, {'message': 'E-posta veya şifre hatalı'}
+
+            # 5. Şifre kontrolü
+            if not check_password_hash(user.get('password'), password):
+                return False, {'message': 'E-posta veya şifre hatalı'}
+
+            # 6. Başarılı giriş - kullanıcı bilgilerini döndür (şifre hariç)
+            return True, {
+                'id': user.get('id'),
+                'username': user.get('username'),
+                'email': user.get('email'),
+                'created_at': user.get('created_at').isoformat() if user.get('created_at') else None
+            }
+
+        except Exception as e:
+            print(f"Error in login_user service: {e}")
+            return False, {'message': 'Beklenmeyen bir hata oluştu'}
+

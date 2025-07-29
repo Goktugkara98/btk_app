@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Başlat - BTK Quiz{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/quiz-start/quiz-start.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="quiz-start-page">
+    <!-- Quiz Settings Panel -->
+    <div class="quiz-settings-panel">
+        <div class="panel-content">
+            <!-- Quiz ayarları buraya gelecek -->
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/quiz-start/quiz-start.js') }}"></script>
+{% endblock %} 

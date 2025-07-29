@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 from config import Config
 from app.database.db_connection import DatabaseConnection
 from app.database.db_migrations import Migrations
 import os
+import secrets
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
@@ -13,6 +14,10 @@ def create_app(config_class=Config):
                static_folder=static_dir,
                static_url_path='/static')
     app.config.from_object(config_class)
+    
+    # Session configuration
+    app.secret_key = secrets.token_hex(16)
+    app.config['SESSION_TYPE'] = 'filesystem'
     
     # Ensure the instance folder exists
     try:
@@ -53,6 +58,11 @@ def create_app(config_class=Config):
     except Exception as e:
         app.logger.error(f"Failed to register blueprints: {e}")
         raise
+    
+    # Context processor to make session data available in all templates
+    @app.context_processor
+    def inject_session_data():
+        return dict(session=session)
     
     return app
 

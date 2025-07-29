@@ -92,6 +92,30 @@
     --bg-element: #fff;
     --text-on-accent: #fff;
     
+    /* Quiz Start Page Variables */
+    --primary-color: #7c3aed;
+    --secondary-color: #a78bfa;
+    --primary-light: #f3e8ff;
+    --white: #ffffff;
+    --text-primary: #181818;
+    
+    /* Profile Page Variables */
+    --primary-rgb: 124, 58, 237;
+    --primary-dark: #6d28d9;
+    --surface-color: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-disabled: #94a3b8;
+    --success-color: #10b981;
+    --success-rgb: 16, 185, 129;
+    --success-dark: #059669;
+    --error-color: #ef4444;
+    --error-rgb: 239, 68, 68;
+    --text-secondary: #444444;
+    --background-light: #f7f7fa;
+    --border-color: #e2e8f0;
+    
     /* -------------------------------------------------------------------------
      * VIEWPORT & SCROLLBAR
      * JavaScript ile hesaplanacak
