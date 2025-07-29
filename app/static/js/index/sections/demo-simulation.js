@@ -69,7 +69,7 @@ export function initIndexDemoSimulation() {
         try {
             // Load scenarios data only once
             if (!scenariosData) {
-                const response = await fetch('/static/js/login/scenarios.json');
+                const response = await fetch('/app/data/demo-scenarios.json');
                 scenariosData = await response.json();
             }
             

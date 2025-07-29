@@ -1,7 +1,14 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, send_from_directory
+import os
 
 # Create the blueprint
 pages_bp = Blueprint('pages', __name__)
+
+@pages_bp.route('/app/data/<filename>')
+def serve_data(filename):
+    """Serve data files from app/data directory."""
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data')
+    return send_from_directory(data_dir, filename)
 
 @pages_bp.route('/')
 def index():

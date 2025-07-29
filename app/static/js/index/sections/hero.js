@@ -11,7 +11,7 @@
 // Hero Quiz Module
 export function initHeroQuiz() {
     // Soruları dışarıdan yükle
-    fetch('/static/js/index/sections/hero_questions.json')
+    fetch('/app/data/hero-questions.json')
         .then(res => res.json())
         .then(data => {
             new HeroQuiz(data);

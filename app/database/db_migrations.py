@@ -1,6 +1,6 @@
 # =============================================================================
 # Basit Soru Bankası - Veritabanı Migrations
-# Sadece 2 tablo: questions ve question_options
+# Tablolar: users, questions ve question_options
 # =============================================================================
 
 from mysql.connector import Error as MySQLError
@@ -10,7 +10,7 @@ from app.database.db_connection import DatabaseConnection
 class SimpleMigrations:
     """
     Basit soru bankası için veritabanı şemasını oluşturur.
-    Sadece 2 tablo kullanır: questions ve question_options
+    Tablolar: users, questions ve question_options
     """
 
     def __init__(self, db_connection: Optional[DatabaseConnection] = None):
@@ -40,6 +40,7 @@ class SimpleMigrations:
                 tables_to_drop = [
                     'question_options',
                     'questions',
+                    'users',
                     'question_tag_relations',
                     'question_tags',
                     'question_media',
@@ -53,8 +54,7 @@ class SimpleMigrations:
                     'grade_levels',
                     'education_levels',
                     'difficulty_levels',
-                    'question_types',
-                    'users'
+                    'question_types'
                 ]
                 
                 for table in tables_to_drop:
@@ -78,6 +78,20 @@ class SimpleMigrations:
         """Basit soru bankası tablolarını oluşturur."""
         try:
             with self.db as conn:
+                print("📋 Users tablosu oluşturuluyor...")
+                
+                # Users tablosu
+                conn.cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        username VARCHAR(50) UNIQUE NOT NULL,
+                        email VARCHAR(100) UNIQUE NOT NULL,
+                        password VARCHAR(255) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    )
+                """)
+                
                 print("📋 Questions tablosu oluşturuluyor...")
                 
                 # Questions tablosu
@@ -219,6 +233,7 @@ class SimpleMigrations:
             print("=" * 50)
             print("🎉 Basit soru bankası migrations tamamlandı!")
             print("📊 Oluşturulan tablolar:")
+            print("   • users (Kullanıcılar)")
             print("   • questions (Sorular)")
             print("   • question_options (Seçenekler)")
             print("\n💡 Test etmek için: python test_simple_database.py")

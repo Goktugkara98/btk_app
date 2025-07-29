@@ -22,6 +22,7 @@
 .login-form-section {
     flex: 1;
     max-width: 400px;
+    margin: 0 auto;
 }
 
 .login-form-card {
@@ -131,6 +132,7 @@
         max-width: 100%;
         width: 100%;
         max-width: 400px;
+        margin: 0 auto;
     }
 }
 

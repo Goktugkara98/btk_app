@@ -1,93 +1,106 @@
 {% extends "base.html" %}
 {% block title %}Kayıt Ol - Daima{% endblock %}
 {% block head_extra_styles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register/register.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 {% endblock %}
 {% block content %}
-<div class="login-page">
-    <div class="login-container">
+<div class="register-page">
+    <div class="register-container">
         <!-- Register Form -->
-        <div class="login-form-section">
+        <div class="register-form-section">
             <div class="register-form-card">
-                <h1 class="login-title">Kayıt Ol</h1>
+                <h1 class="register-title">Kayıt Ol</h1>
+                <p class="register-subtitle">Daima'ya katılın ve öğrenmeyi keşfedin</p>
+                
+                <!-- Message Container for dynamic messages -->
+                <div class="message-container" id="message-container"></div>
+                
                 <form id="register-form">
                     <div class="form-group">
-                        <label for="name">Ad Soyad</label>
-                        <input type="text" id="name" name="name" required autocomplete="name">
+                        <label for="name">
+                            <i class="fas fa-user"></i> Kullanıcı Adı
+                        </label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            required 
+                            autocomplete="username"
+                            placeholder="Kullanıcı adınızı giriniz"
+                            minlength="3"
+                            maxlength="30"
+                        >
+                        <div class="help-text">En az 3 karakter, sadece harf, rakam ve alt çizgi</div>
+                        <div class="error-text" id="name-error"></div>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="email">E-posta</label>
-                        <input type="email" id="email" name="email" required autocomplete="username">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> E-posta Adresi
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            autocomplete="email"
+                            placeholder="ornek@email.com"
+                        >
+                        <div class="help-text">Geçerli bir e-posta adresi giriniz</div>
+                        <div class="error-text" id="email-error"></div>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="password">Şifre</label>
-                        <input type="password" id="password" name="password" required autocomplete="new-password">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Şifre
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            autocomplete="new-password"
+                            placeholder="En az 6 karakter"
+                            minlength="6"
+                        >
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strength-fill"></div>
+                            </div>
+                            <span id="strength-text">Şifre gücü</span>
+                        </div>
+                        <div class="error-text" id="password-error"></div>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="password2">Şifre (Tekrar)</label>
-                        <input type="password" id="password2" name="password2" required autocomplete="new-password">
+                        <label for="password2">
+                            <i class="fas fa-lock"></i> Şifre (Tekrar)
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password2" 
+                            name="password2" 
+                            required 
+                            autocomplete="new-password"
+                            placeholder="Şifrenizi tekrar giriniz"
+                        >
+                        <div class="help-text">Şifrenizi doğrulamak için tekrar giriniz</div>
+                        <div class="error-text" id="password2-error"></div>
                     </div>
-                    <button type="submit" class="login-btn">Kayıt Ol</button>
+                    
+                    <button type="submit" class="register-btn" id="submit-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="btn-text">Kayıt Ol</span>
+                    </button>
                 </form>
-                <div class="login-links">
-                    <a href="/login">Zaten hesabın var mı? Giriş Yap</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Demo Panels -->
-        <div class="demo-panels-section">
-            <!-- Quiz Panel -->
-            <div class="register-demo-panel quiz-panel">
-                <div class="panel-header">
-                    <h3>Quiz</h3>
-                    <div class="quiz-meta">
-                        <span class="subject">Matematik</span>
-                        <span class="difficulty">Orta</span>
-                    </div>
-                </div>
-                <div class="quiz-content">
-                    <h4 id="demo-question">Aşağıdaki sayılardan hangisi en büyüktür?</h4>
-                    <div class="quiz-options" id="demo-options">
-                        <div class="option" data-correct="true">
-                            <span class="option-letter">A</span>
-                            <span class="option-text">1250</span>
-                        </div>
-                        <div class="option" data-correct="false">
-                            <span class="option-letter">B</span>
-                            <span class="option-text">999</span>
-                        </div>
-                        <div class="option" data-correct="false">
-                            <span class="option-letter">C</span>
-                            <span class="option-text">850</span>
-                        </div>
-                        <div class="option" data-correct="false">
-                            <span class="option-letter">D</span>
-                            <span class="option-text">750</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Chat Panel -->
-            <div class="register-demo-panel chat-panel">
-                <div class="panel-header">
-                    <div class="ai-avatar">
-                        <i class="bi bi-robot"></i>
-                    </div>
-                    <div class="ai-info">
-                        <h3>Daima</h3>
-                        <span>AI Asistan</span>
-                    </div>
-                </div>
-                <div class="chat-content">
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="message ai-message">
-                            <p>Merhaba! Bu soruyu çözmeye hazır mısın?</p>
-                        </div>
-                    </div>
+                
+                <div class="register-links">
+                    <a href="/login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Zaten hesabın var mı? Giriş Yap
+                    </a>
                 </div>
             </div>
         </div>
@@ -95,5 +108,5 @@
 </div>
 {% endblock %}
 {% block page_scripts %}
-<script src="{{ url_for('static', filename='js/login/login.js') }}"></script>
+<script src="{{ url_for('static', filename='js/register/register.js') }}"></script>
 {% endblock %} 

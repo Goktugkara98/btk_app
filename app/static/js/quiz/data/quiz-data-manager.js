@@ -24,7 +24,7 @@ export class QuizDataManager {
     async loadQuizData() {
         try {
             // Mock data dosyasından yükle
-            const response = await fetch('/static/js/quiz-data.json');
+            const response = await fetch('/app/data/quiz-data.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

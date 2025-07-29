@@ -17,6 +17,7 @@
 #   5.2. Kullanıcı Rotaları (User Routes)
 #     5.2.1. GET /users
 #     5.2.2. POST /users
+#     5.2.3. POST /register
 # =============================================================================
 
 # =============================================================================
@@ -51,8 +52,6 @@ user_service = UserService()
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     """5.1.1. API'nin çalışır durumda olduğunu kontrol eder."""
-    # Bu rota basit olduğu için doğrudan veritabanına erişebilir veya
-    # servis üzerinden bir "ping" metodu çağırabilir.
     return jsonify({
         'status': 'success',
         'message': 'API is running',
@@ -66,7 +65,7 @@ def health_check():
 def get_users():
     """5.2.1. Tüm kullanıcıları listeler."""
     try:
-        users = user_service.get_all_users() # Servis metodu çağrıldı
+        users = user_service.get_all_users()
         return jsonify({
             'status': 'success',
             'data': users
@@ -99,5 +98,29 @@ def create_user():
         return jsonify({
             'status': 'error',
             'message': result.get('message', 'An error occurred'),
+            'details': result
+        }), 400  # 400 Bad Request
+
+@api_bp.route('/register', methods=['POST'])
+def register():
+    """5.2.3. Kullanıcı kayıt işlemini gerçekleştirir."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid JSON'}), 400
+
+    # Register iş mantığı servis katmanına devredildi.
+    success, result = user_service.register_user(data)
+
+    if success:
+        return jsonify({
+            'status': 'success',
+            'message': 'Kayıt başarıyla tamamlandı',
+            'data': result
+        }), 201  # 201 Created
+    else:
+        # Hata mesajı servisten geldiği için doğrudan kullanılır.
+        return jsonify({
+            'status': 'error',
+            'message': result.get('message', 'Kayıt işlemi başarısız'),
             'details': result
         }), 400  # 400 Bad Request
