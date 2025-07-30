@@ -16,17 +16,21 @@
 #     4.2.1. _ensure_connection(self)
 #     4.2.2. _close_if_owned(self)
 #   4.3. CRUD (Create, Read, Update, Delete) Metotları
-#     4.3.1. create_user(self, username, email, password_hash)
+#     4.3.1. create_user(self, username, email, password_hash, **kwargs)
 #     4.3.2. get_user(self, username)
 #     4.3.3. get_user_by_email(self, email)
 #     4.3.4. get_user_by_id(self, user_id)
 #     4.3.5. get_all_users(self)
-#     4.3.6. update_user(self, user_id, username, email)
+#     4.3.6. update_user(self, user_id, **kwargs)
 #     4.3.7. change_password(self, user_id, new_password_hash)
 #     4.3.8. delete_user(self, user_id)
 #     4.3.9. check_username_exists(self, username)
 #     4.3.10. check_email_exists(self, email)
 #     4.3.11. check_username_or_email_exists(self, username, email)
+#     4.3.12. update_last_login(self, user_id)
+#     4.3.13. update_avatar(self, user_id, avatar_url)
+#     4.3.14. get_user_profile(self, user_id)
+#     4.3.15. search_users(self, search_term)
 # =============================================================================
 
 # =============================================================================
@@ -71,13 +75,29 @@ class UserRepository:
     # -------------------------------------------------------------------------
     # 4.3. CRUD (Create, Read, Update, Delete) Metotları
     # -------------------------------------------------------------------------
-    def create_user(self, username: str, email: str, password_hash: str) -> Optional[int]:
+    def create_user(self, username: str, email: str, password_hash: str, **kwargs) -> Optional[int]:
         """4.3.1. Veritabanına yeni bir kullanıcı ekler."""
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-                conn.cursor.execute(query, (username, email, password_hash))
+                # Temel alanlar
+                fields = ['username', 'email', 'password']
+                values = [username, email, password_hash]
+                
+                # Opsiyonel alanlar
+                optional_fields = [
+                    'first_name', 'last_name', 'phone', 'birth_date', 'gender',
+                    'location', 'school', 'grade_level', 'bio', 'website',
+                    'twitter', 'linkedin', 'github', 'avatar_url'
+                ]
+                
+                for field in optional_fields:
+                    if field in kwargs and kwargs[field] is not None:
+                        fields.append(field)
+                        values.append(kwargs[field])
+                
+                query = f"INSERT INTO users ({', '.join(fields)}) VALUES ({', '.join(['%s'] * len(fields))})"
+                conn.cursor.execute(query, values)
                 conn.connection.commit()
                 return conn.cursor.lastrowid
         except MySQLError as e:
@@ -93,7 +113,13 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "SELECT id, username, email, password FROM users WHERE username = %s"
+                query = """
+                    SELECT id, username, email, password, first_name, last_name, 
+                           phone, birth_date, gender, location, school, grade_level,
+                           bio, website, twitter, linkedin, github, avatar_url,
+                           is_active, last_login, created_at, updated_at
+                    FROM users WHERE username = %s
+                """
                 conn.cursor.execute(query, (username,))
                 return conn.cursor.fetchone()
         except MySQLError:
@@ -106,7 +132,13 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "SELECT id, username, email, password FROM users WHERE email = %s"
+                query = """
+                    SELECT id, username, email, password, first_name, last_name, 
+                           phone, birth_date, gender, location, school, grade_level,
+                           bio, website, twitter, linkedin, github, avatar_url,
+                           is_active, last_login, created_at, updated_at
+                    FROM users WHERE email = %s
+                """
                 conn.cursor.execute(query, (email,))
                 return conn.cursor.fetchone()
         except MySQLError:
@@ -119,7 +151,13 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "SELECT id, username, email, password FROM users WHERE id = %s"
+                query = """
+                    SELECT id, username, email, password, first_name, last_name, 
+                           phone, birth_date, gender, location, school, grade_level,
+                           bio, website, twitter, linkedin, github, avatar_url,
+                           is_active, last_login, created_at, updated_at
+                    FROM users WHERE id = %s
+                """
                 conn.cursor.execute(query, (user_id,))
                 return conn.cursor.fetchone()
         except MySQLError:
@@ -132,7 +170,13 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "SELECT id, username, email, password FROM users"
+                query = """
+                    SELECT id, username, email, password, first_name, last_name, 
+                           phone, birth_date, gender, location, school, grade_level,
+                           bio, website, twitter, linkedin, github, avatar_url,
+                           is_active, last_login, created_at, updated_at
+                    FROM users
+                """
                 conn.cursor.execute(query)
                 return conn.cursor.fetchall()
         except MySQLError:
@@ -140,13 +184,33 @@ class UserRepository:
         finally:
             self._close_if_owned()
 
-    def update_user(self, user_id: int, username: str, email: str) -> bool:
+    def update_user(self, user_id: int, **kwargs) -> bool:
         """4.3.6. Bir kullanıcının bilgilerini günceller."""
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "UPDATE users SET username = %s, email = %s WHERE id = %s"
-                conn.cursor.execute(query, (username, email, user_id))
+                # Güncellenebilir alanlar
+                updatable_fields = [
+                    'username', 'email', 'first_name', 'last_name', 'phone', 
+                    'birth_date', 'gender', 'location', 'school', 'grade_level',
+                    'bio', 'website', 'twitter', 'linkedin', 'github', 'avatar_url'
+                ]
+                
+                # Güncellenecek alanları filtrele
+                update_fields = []
+                update_values = []
+                
+                for field in updatable_fields:
+                    if field in kwargs and kwargs[field] is not None:
+                        update_fields.append(f"{field} = %s")
+                        update_values.append(kwargs[field])
+                
+                if not update_fields:
+                    return False
+                
+                update_values.append(user_id)
+                query = f"UPDATE users SET {', '.join(update_fields)} WHERE id = %s"
+                conn.cursor.execute(query, update_values)
                 conn.connection.commit()
                 return conn.cursor.rowcount > 0
         except MySQLError:
@@ -233,5 +297,75 @@ class UserRepository:
                 return username_exists, email_exists
         except MySQLError:
             return False, False
+        finally:
+            self._close_if_owned()
+
+    def update_last_login(self, user_id: int) -> bool:
+        """4.3.12. Kullanıcının son giriş zamanını günceller."""
+        self._ensure_connection()
+        try:
+            with self.db as conn:
+                query = "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = %s"
+                conn.cursor.execute(query, (user_id,))
+                conn.connection.commit()
+                return conn.cursor.rowcount > 0
+        except MySQLError:
+            conn.connection.rollback()
+            return False
+        finally:
+            self._close_if_owned()
+
+    def update_avatar(self, user_id: int, avatar_url: str) -> bool:
+        """4.3.13. Kullanıcının profil fotoğrafını günceller."""
+        self._ensure_connection()
+        try:
+            with self.db as conn:
+                query = "UPDATE users SET avatar_url = %s WHERE id = %s"
+                conn.cursor.execute(query, (avatar_url, user_id))
+                conn.connection.commit()
+                return conn.cursor.rowcount > 0
+        except MySQLError:
+            conn.connection.rollback()
+            return False
+        finally:
+            self._close_if_owned()
+
+    def get_user_profile(self, user_id: int) -> Optional[Dict]:
+        """4.3.14. Kullanıcının profil bilgilerini getirir (şifre hariç)."""
+        self._ensure_connection()
+        try:
+            with self.db as conn:
+                query = """
+                    SELECT id, username, email, first_name, last_name, 
+                           phone, birth_date, gender, location, school, grade_level,
+                           bio, website, twitter, linkedin, github, avatar_url,
+                           is_active, last_login, created_at, updated_at
+                    FROM users WHERE id = %s
+                """
+                conn.cursor.execute(query, (user_id,))
+                return conn.cursor.fetchone()
+        except MySQLError:
+            return None
+        finally:
+            self._close_if_owned()
+
+    def search_users(self, search_term: str) -> List[Dict]:
+        """4.3.15. Kullanıcıları arama terimine göre arar."""
+        self._ensure_connection()
+        try:
+            with self.db as conn:
+                query = """
+                    SELECT id, username, email, first_name, last_name, 
+                           location, school, grade_level, avatar_url, is_active
+                    FROM users 
+                    WHERE username LIKE %s OR email LIKE %s OR first_name LIKE %s OR last_name LIKE %s
+                    ORDER BY username
+                    LIMIT 50
+                """
+                search_pattern = f"%{search_term}%"
+                conn.cursor.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
+                return conn.cursor.fetchall()
+        except MySQLError:
+            return []
         finally:
             self._close_if_owned()
