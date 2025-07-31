@@ -208,7 +208,7 @@ class UserService:
                 return False, {'message': 'E-posta veya şifre hatalı'}
 
             # 5. Şifre kontrolü
-            if not check_password_hash(user.get('password'), password):
+            if not check_password_hash(user.get('hashed_password'), password):
                 return False, {'message': 'E-posta veya şifre hatalı'}
 
             # 6. Başarılı giriş - kullanıcı bilgilerini döndür (şifre hariç)
@@ -221,5 +221,90 @@ class UserService:
 
         except Exception as e:
             print(f"Error in login_user service: {e}")
+            return False, {'message': 'Beklenmeyen bir hata oluştu'}
+
+    def get_user_profile(self, user_id: int) -> Optional[Dict[str, Any]]:
+        """
+        4.2.5. Kullanıcının profil bilgilerini getirir.
+        Şifre hariç tüm kullanıcı bilgilerini döndürür.
+        """
+        try:
+            user_profile = self.user_repo.get_user_profile(user_id)
+            
+            if not user_profile:
+                return None
+            
+            # Tarih alanlarını string formatına çevir
+            birth_date = user_profile.get('birth_date')
+            if birth_date:
+                if hasattr(birth_date, 'strftime'):
+                    birth_date = birth_date.strftime('%Y-%m-%d')
+            
+            created_at = user_profile.get('created_at')
+            if created_at and hasattr(created_at, 'strftime'):
+                created_at = created_at.strftime('%Y-%m-%d %H:%M:%S')
+                
+            updated_at = user_profile.get('updated_at')
+            if updated_at and hasattr(updated_at, 'strftime'):
+                updated_at = updated_at.strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Şifre hariç tüm bilgileri döndür
+            return {
+                'id': user_profile.get('id'),
+                'username': user_profile.get('username'),
+                'email': user_profile.get('email'),
+                'first_name': user_profile.get('first_name'),
+                'last_name': user_profile.get('last_name'),
+                'phone': user_profile.get('phone'),
+                'birth_date': birth_date,
+                'gender': user_profile.get('gender'),
+                'location': user_profile.get('location'),
+                'school': user_profile.get('school'),
+                'grade_level': user_profile.get('grade_level'),
+                'bio': user_profile.get('bio'),
+                'created_at': created_at,
+                'updated_at': updated_at
+            }
+            
+        except Exception as e:
+            print(f"Error in get_user_profile service: {e}")
+            return None
+
+    def update_user_profile(self, user_id: int, profile_data: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
+        """
+        4.2.6. Kullanıcının profil bilgilerini günceller.
+        """
+        try:
+            # Form alan adlarını veritabanı alan adlarına eşle
+            field_mapping = {
+                'firstName': 'first_name',
+                'lastName': 'last_name',
+                'phone': 'phone',
+                'birthDate': 'birth_date',
+                'gender': 'gender',
+                'location': 'location',
+                'school': 'school',
+                'gradeLevel': 'grade_level',
+                'bio': 'bio'
+            }
+            
+            # Sadece güncellenebilir alanları al
+            update_data = {}
+            for form_field, db_field in field_mapping.items():
+                if form_field in profile_data and profile_data[form_field] is not None:
+                    update_data[db_field] = profile_data[form_field]
+            
+            # Veritabanını güncelle
+            success = self.user_repo.update_user(user_id, **update_data)
+            
+            if success:
+                # Güncellenmiş kullanıcı bilgilerini al
+                updated_user = self.get_user_profile(user_id)
+                return True, updated_user
+            else:
+                return False, {'message': 'Profil güncellenirken bir hata oluştu'}
+                
+        except Exception as e:
+            print(f"Error in update_user_profile service: {e}")
             return False, {'message': 'Beklenmeyen bir hata oluştu'}
 

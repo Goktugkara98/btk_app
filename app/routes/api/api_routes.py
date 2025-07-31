@@ -185,3 +185,34 @@ def check_auth():
             'status': 'success',
             'logged_in': False
         }), 200
+
+@api_bp.route('/profile/update', methods=['POST'])
+def update_profile():
+    """5.2.7. Kullanıcı profil bilgilerini günceller."""
+    if not session.get('logged_in'):
+        return jsonify({
+            'status': 'error',
+            'message': 'Giriş yapmanız gerekiyor'
+        }), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'Invalid JSON'}), 400
+
+    user_id = session.get('user_id')
+    
+    # Profil güncelleme iş mantığı servis katmanına devredildi.
+    success, result = user_service.update_user_profile(user_id, data)
+
+    if success:
+        return jsonify({
+            'status': 'success',
+            'message': 'Profil başarıyla güncellendi',
+            'data': result
+        }), 200
+    else:
+        return jsonify({
+            'status': 'error',
+            'message': result.get('message', 'Profil güncellenirken bir hata oluştu'),
+            'details': result
+        }), 400

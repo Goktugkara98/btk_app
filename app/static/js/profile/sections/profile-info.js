@@ -14,6 +14,8 @@ class ProfileInfoSection {
     init() {
         this.bindEvents();
         this.loadUserData();
+        // Sayfa yüklendiğinde form alanlarını disabled yap (username ve email hariç)
+        this.disableFormFields();
     }
 
     bindEvents() {
@@ -53,35 +55,43 @@ class ProfileInfoSection {
     }
 
     loadUserData() {
-        // Simulate loading user data from server
-        const userData = {
-            username: 'johndoe',
-            email: 'john.doe@example.com',
-            firstName: 'John',
-            lastName: 'Doe',
-            phone: '+90 555 123 4567',
-            birthDate: '1990-05-15',
-            gender: 'male',
-            location: 'İstanbul, Türkiye',
-            bio: 'Yazılım geliştirici ve teknoloji meraklısı. Quiz çözmeyi seviyorum!',
-            website: 'https://johndoe.dev',
-            twitter: '@johndoe',
-            linkedin: 'linkedin.com/in/johndoe',
-            github: 'github.com/johndoe',
-            joinDate: '2024-01-15',
-            lastLogin: '2024-03-20 14:30',
-            status: 'active'
-        };
+        // Form alanlarından mevcut verileri al
+        const userData = this.getCurrentFormData();
+        
+        if (userData) {
+            this.populateForm(userData);
+            this.originalData = { ...userData };
+        }
+    }
 
-        this.populateForm(userData);
-        this.originalData = { ...userData };
+    getCurrentFormData() {
+        // Form alanlarından mevcut verileri topla
+        const form = document.querySelector('.profile-info-form');
+        if (!form) return null;
+
+        const formData = new FormData(form);
+        const data = {};
+        
+        // Form alanlarını kontrol et
+        const fields = [
+            'username', 'email', 'firstName', 'lastName', 'phone',
+            'birthDate', 'gender', 'location', 'bio', 'school', 'gradeLevel'
+        ];
+
+        fields.forEach(field => {
+            const element = form.querySelector(`[name="${field}"]`);
+            if (element) {
+                data[field] = element.value || '';
+            }
+        });
+
+        return data;
     }
 
     populateForm(data) {
         const fields = [
             'username', 'email', 'firstName', 'lastName', 'phone',
-            'birthDate', 'gender', 'location', 'bio', 'website',
-            'twitter', 'linkedin', 'github'
+            'birthDate', 'gender', 'location', 'bio', 'school', 'gradeLevel'
         ];
 
         fields.forEach(field => {
@@ -119,12 +129,13 @@ class ProfileInfoSection {
     toggleEditMode() {
         this.isEditing = !this.isEditing;
         
-        const formFields = document.querySelectorAll('.profile-info-form input, .profile-info-form select, .profile-info-form textarea');
+        // Sadece düzenlenebilir alanları seç (username ve email hariç)
+        const editableFields = document.querySelectorAll('.profile-info-form input:not([name="username"]):not([name="email"]), .profile-info-form select, .profile-info-form textarea');
         const editBtn = document.querySelector('.btn-edit-profile');
         const saveBtn = document.querySelector('.btn-save-profile');
         const cancelBtn = document.querySelector('.btn-cancel-edit');
 
-        formFields.forEach(field => {
+        editableFields.forEach(field => {
             field.disabled = !this.isEditing;
         });
 
@@ -155,8 +166,20 @@ class ProfileInfoSection {
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
             saveBtn.disabled = true;
 
-            // Simulate API call
-            await this.simulateApiCall(formData);
+            // API'ye gönder
+            const response = await fetch('/api/profile/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Güncelleme başarısız');
+            }
 
             // Update original data
             this.originalData = { ...this.originalData, ...formData };
@@ -383,6 +406,15 @@ class ProfileInfoSection {
             // Fallback notification
             alert(message);
         }
+    }
+
+    disableFormFields() {
+        // Sadece düzenlenebilir alanları seç (username ve email hariç)
+        const editableFields = document.querySelectorAll('.profile-info-form input:not([name="username"]):not([name="email"]), .profile-info-form select, .profile-info-form textarea');
+        
+        editableFields.forEach(field => {
+            field.disabled = true;
+        });
     }
 }
 

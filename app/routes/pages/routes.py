@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, send_from_directory
+from flask import Blueprint, render_template, send_from_directory, session, redirect, url_for
 import os
 
 # Create the blueprint
@@ -55,4 +55,28 @@ def register():
 @pages_bp.route('/profile')
 def profile():
     """Render the profile page."""
-    return render_template('profile.html', title='Profile')
+    # Kullanıcının giriş yapmış olup olmadığını kontrol et
+    if not session.get('logged_in'):
+        return redirect(url_for('pages.login'))
+    
+    # Kullanıcı ID'sini al
+    user_id = session.get('user_id')
+    
+    # UserService'i import et ve kullanıcı verilerini al
+    try:
+        from app.services.user_service import UserService
+        user_service = UserService()
+        
+        # Kullanıcı profil bilgilerini al
+        user_profile = user_service.get_user_profile(user_id)
+        
+        if not user_profile:
+            # Kullanıcı bulunamadıysa session'ı temizle ve login'e yönlendir
+            session.clear()
+            return redirect(url_for('pages.login'))
+        
+        return render_template('profile.html', title='Profile', user=user_profile)
+        
+    except Exception as e:
+        print(f"Error loading profile: {e}")
+        return render_template('profile.html', title='Profile', user=None)

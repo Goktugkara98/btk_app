@@ -6,6 +6,7 @@ Users tablosunu güncellemek için script
 
 from app.database.db_migrations import SimpleMigrations
 from app.database.user_repository import UserRepository
+from werkzeug.security import generate_password_hash
 
 def update_users_table():
     """Users tablosunu yeni alanlarla günceller."""
@@ -14,10 +15,19 @@ def update_users_table():
     try:
         # Migration'ı çalıştır
         migrations = SimpleMigrations()
+        
+        # Önce mevcut tabloları temizle
+        print("🧹 Mevcut tablolar temizleniyor...")
+        migrations.drop_existing_tables()
+        
+        # Sonra yeni tabloları oluştur
         migrations.run_migrations()
         
         print("✅ Users tablosu başarıyla güncellendi!")
-        print("\n📋 Eklenen yeni alanlar:")
+        print("\n📋 Güncellenen alanlar:")
+        print("   • username (Kullanıcı adı)")
+        print("   • email (E-posta)")
+        print("   • hashed_password (Şifrelenmiş şifre)")
         print("   • first_name (Ad)")
         print("   • last_name (Soyad)")
         print("   • phone (Telefon)")
@@ -25,15 +35,8 @@ def update_users_table():
         print("   • gender (Cinsiyet)")
         print("   • location (Konum)")
         print("   • school (Okul)")
-        print("   • grade_level (Sınıf)")
+        print("   • grade_level (Kaçıncı sınıf öğrencisi)")
         print("   • bio (Biyografi)")
-        print("   • website (Web sitesi)")
-        print("   • twitter (Twitter)")
-        print("   • linkedin (LinkedIn)")
-        print("   • github (GitHub)")
-        print("   • avatar_url (Profil fotoğrafı)")
-        print("   • is_active (Aktif durum)")
-        print("   • last_login (Son giriş)")
         
         # Test için örnek kullanıcı oluştur
         print("\n🧪 Test kullanıcısı oluşturuluyor...")
@@ -43,7 +46,7 @@ def update_users_table():
         test_user_data = {
             'username': 'test_user',
             'email': 'test@example.com',
-            'password': 'hashed_password_123',
+            'hashed_password': generate_password_hash('test123'),
             'first_name': 'Test',
             'last_name': 'User',
             'phone': '+90 555 123 4567',
@@ -52,43 +55,32 @@ def update_users_table():
             'location': 'İstanbul, Türkiye',
             'school': 'Test Lisesi',
             'grade_level': '12. Sınıf',
-            'bio': 'Test kullanıcısı biyografisi',
-            'website': 'https://example.com',
-            'twitter': '@testuser',
-            'linkedin': 'linkedin.com/in/testuser',
-            'github': 'github.com/testuser'
+            'bio': 'Test kullanıcısı biyografisi'
         }
         
-        # Kullanıcıyı oluştur
+        # Test kullanıcısını oluştur
         user_id = user_repo.create_user(**test_user_data)
         
         if user_id:
-            print(f"✅ Test kullanıcısı oluşturuldu (ID: {user_id})")
+            print(f"✅ Test kullanıcısı başarıyla oluşturuldu! (ID: {user_id})")
             
-            # Kullanıcıyı getir ve bilgileri göster
-            user = user_repo.get_user_by_id(user_id)
-            if user:
-                print("\n📋 Test kullanıcısı bilgileri:")
-                print(f"   • ID: {user['id']}")
-                print(f"   • Kullanıcı Adı: {user['username']}")
-                print(f"   • Email: {user['email']}")
-                print(f"   • Ad: {user['first_name']}")
-                print(f"   • Soyad: {user['last_name']}")
-                print(f"   • Telefon: {user['phone']}")
-                print(f"   • Doğum Tarihi: {user['birth_date']}")
-                print(f"   • Cinsiyet: {user['gender']}")
-                print(f"   • Konum: {user['location']}")
-                print(f"   • Okul: {user['school']}")
-                print(f"   • Sınıf: {user['grade_level']}")
-                print(f"   • Biyografi: {user['bio']}")
-                print(f"   • Web Sitesi: {user['website']}")
-                print(f"   • Twitter: {user['twitter']}")
-                print(f"   • LinkedIn: {user['linkedin']}")
-                print(f"   • GitHub: {user['github']}")
-                print(f"   • Oluşturulma: {user['created_at']}")
-                print(f"   • Güncellenme: {user['updated_at']}")
+            # Oluşturulan kullanıcıyı kontrol et
+            created_user = user_repo.get_user_by_id(user_id)
+            if created_user:
+                print(f"📋 Kullanıcı bilgileri:")
+                print(f"   • Kullanıcı adı: {created_user['username']}")
+                print(f"   • E-posta: {created_user['email']}")
+                print(f"   • Ad: {created_user['first_name']}")
+                print(f"   • Soyad: {created_user['last_name']}")
+                print(f"   • Telefon: {created_user['phone']}")
+                print(f"   • Doğum tarihi: {created_user['birth_date']}")
+                print(f"   • Cinsiyet: {created_user['gender']}")
+                print(f"   • Konum: {created_user['location']}")
+                print(f"   • Okul: {created_user['school']}")
+                print(f"   • Sınıf: {created_user['grade_level']}")
+                print(f"   • Biyografi: {created_user['bio']}")
         else:
-            print("❌ Test kullanıcısı oluşturulamadı")
+            print("❌ Test kullanıcısı oluşturulamadı!")
             
     except Exception as e:
         print(f"❌ Hata: {e}")

@@ -16,7 +16,7 @@
 #     4.2.1. _ensure_connection(self)
 #     4.2.2. _close_if_owned(self)
 #   4.3. CRUD (Create, Read, Update, Delete) Metotları
-#     4.3.1. create_user(self, username, email, password_hash, **kwargs)
+#     4.3.1. create_user(self, username, email, hashed_password, **kwargs)
 #     4.3.2. get_user(self, username)
 #     4.3.3. get_user_by_email(self, email)
 #     4.3.4. get_user_by_id(self, user_id)
@@ -27,10 +27,8 @@
 #     4.3.9. check_username_exists(self, username)
 #     4.3.10. check_email_exists(self, email)
 #     4.3.11. check_username_or_email_exists(self, username, email)
-#     4.3.12. update_last_login(self, user_id)
-#     4.3.13. update_avatar(self, user_id, avatar_url)
-#     4.3.14. get_user_profile(self, user_id)
-#     4.3.15. search_users(self, search_term)
+#     4.3.12. get_user_profile(self, user_id)
+#     4.3.13. search_users(self, search_term)
 # =============================================================================
 
 # =============================================================================
@@ -75,20 +73,19 @@ class UserRepository:
     # -------------------------------------------------------------------------
     # 4.3. CRUD (Create, Read, Update, Delete) Metotları
     # -------------------------------------------------------------------------
-    def create_user(self, username: str, email: str, password_hash: str, **kwargs) -> Optional[int]:
+    def create_user(self, username: str, email: str, hashed_password: str, **kwargs) -> Optional[int]:
         """4.3.1. Veritabanına yeni bir kullanıcı ekler."""
         self._ensure_connection()
         try:
             with self.db as conn:
                 # Temel alanlar
-                fields = ['username', 'email', 'password']
-                values = [username, email, password_hash]
+                fields = ['username', 'email', 'hashed_password']
+                values = [username, email, hashed_password]
                 
                 # Opsiyonel alanlar
                 optional_fields = [
                     'first_name', 'last_name', 'phone', 'birth_date', 'gender',
-                    'location', 'school', 'grade_level', 'bio', 'website',
-                    'twitter', 'linkedin', 'github', 'avatar_url'
+                    'location', 'school', 'grade_level', 'bio'
                 ]
                 
                 for field in optional_fields:
@@ -114,10 +111,9 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, password, first_name, last_name, 
+                    SELECT id, username, email, hashed_password, first_name, last_name, 
                            phone, birth_date, gender, location, school, grade_level,
-                           bio, website, twitter, linkedin, github, avatar_url,
-                           is_active, last_login, created_at, updated_at
+                           bio, created_at, updated_at
                     FROM users WHERE username = %s
                 """
                 conn.cursor.execute(query, (username,))
@@ -133,10 +129,9 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, password, first_name, last_name, 
+                    SELECT id, username, email, hashed_password, first_name, last_name, 
                            phone, birth_date, gender, location, school, grade_level,
-                           bio, website, twitter, linkedin, github, avatar_url,
-                           is_active, last_login, created_at, updated_at
+                           bio, created_at, updated_at
                     FROM users WHERE email = %s
                 """
                 conn.cursor.execute(query, (email,))
@@ -152,10 +147,9 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, password, first_name, last_name, 
+                    SELECT id, username, email, hashed_password, first_name, last_name, 
                            phone, birth_date, gender, location, school, grade_level,
-                           bio, website, twitter, linkedin, github, avatar_url,
-                           is_active, last_login, created_at, updated_at
+                           bio, created_at, updated_at
                     FROM users WHERE id = %s
                 """
                 conn.cursor.execute(query, (user_id,))
@@ -171,10 +165,9 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, password, first_name, last_name, 
+                    SELECT id, username, email, hashed_password, first_name, last_name, 
                            phone, birth_date, gender, location, school, grade_level,
-                           bio, website, twitter, linkedin, github, avatar_url,
-                           is_active, last_login, created_at, updated_at
+                           bio, created_at, updated_at
                     FROM users
                 """
                 conn.cursor.execute(query)
@@ -192,8 +185,7 @@ class UserRepository:
                 # Güncellenebilir alanlar
                 updatable_fields = [
                     'username', 'email', 'first_name', 'last_name', 'phone', 
-                    'birth_date', 'gender', 'location', 'school', 'grade_level',
-                    'bio', 'website', 'twitter', 'linkedin', 'github', 'avatar_url'
+                    'birth_date', 'gender', 'location', 'school', 'grade_level', 'bio'
                 ]
                 
                 # Güncellenecek alanları filtrele
@@ -224,7 +216,7 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "UPDATE users SET password = %s WHERE id = %s"
+                query = "UPDATE users SET hashed_password = %s WHERE id = %s"
                 conn.cursor.execute(query, (new_password_hash, user_id))
                 conn.connection.commit()
                 return conn.cursor.rowcount > 0
@@ -300,46 +292,15 @@ class UserRepository:
         finally:
             self._close_if_owned()
 
-    def update_last_login(self, user_id: int) -> bool:
-        """4.3.12. Kullanıcının son giriş zamanını günceller."""
-        self._ensure_connection()
-        try:
-            with self.db as conn:
-                query = "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = %s"
-                conn.cursor.execute(query, (user_id,))
-                conn.connection.commit()
-                return conn.cursor.rowcount > 0
-        except MySQLError:
-            conn.connection.rollback()
-            return False
-        finally:
-            self._close_if_owned()
-
-    def update_avatar(self, user_id: int, avatar_url: str) -> bool:
-        """4.3.13. Kullanıcının profil fotoğrafını günceller."""
-        self._ensure_connection()
-        try:
-            with self.db as conn:
-                query = "UPDATE users SET avatar_url = %s WHERE id = %s"
-                conn.cursor.execute(query, (avatar_url, user_id))
-                conn.connection.commit()
-                return conn.cursor.rowcount > 0
-        except MySQLError:
-            conn.connection.rollback()
-            return False
-        finally:
-            self._close_if_owned()
-
     def get_user_profile(self, user_id: int) -> Optional[Dict]:
-        """4.3.14. Kullanıcının profil bilgilerini getirir (şifre hariç)."""
+        """4.3.12. Kullanıcının profil bilgilerini getirir (şifre hariç)."""
         self._ensure_connection()
         try:
             with self.db as conn:
                 query = """
                     SELECT id, username, email, first_name, last_name, 
                            phone, birth_date, gender, location, school, grade_level,
-                           bio, website, twitter, linkedin, github, avatar_url,
-                           is_active, last_login, created_at, updated_at
+                           bio, created_at, updated_at
                     FROM users WHERE id = %s
                 """
                 conn.cursor.execute(query, (user_id,))
@@ -350,13 +311,13 @@ class UserRepository:
             self._close_if_owned()
 
     def search_users(self, search_term: str) -> List[Dict]:
-        """4.3.15. Kullanıcıları arama terimine göre arar."""
+        """4.3.13. Kullanıcıları arama terimine göre arar."""
         self._ensure_connection()
         try:
             with self.db as conn:
                 query = """
                     SELECT id, username, email, first_name, last_name, 
-                           location, school, grade_level, avatar_url, is_active
+                           location, school, grade_level
                     FROM users 
                     WHERE username LIKE %s OR email LIKE %s OR first_name LIKE %s OR last_name LIKE %s
                     ORDER BY username

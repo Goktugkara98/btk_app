@@ -18,8 +18,8 @@
                     <i class="fas fa-camera"></i>
                 </div>
             </div>
-            <h2 class="profile-name">Kullanıcı Adı</h2>
-            <p class="profile-email">kullanici@email.com</p>
+            <h2 class="profile-name">{{ user.username if user else 'Kullanıcı Adı' }}</h2>
+            <p class="profile-email">{{ user.email if user else 'kullanici@email.com' }}</p>
         </div>
         
         <nav class="profile-nav">
@@ -83,8 +83,8 @@
                                 <img src="{{ url_for('static', filename='favicon.svg') }}" alt="Profil Avatar" class="avatar-img">
                             </div>
                             <div class="profile-header-text">
-                                <h2>John Doe</h2>
-                                <p>Yazılım geliştirici ve teknoloji meraklısı</p>
+                                <h2>{{ user.first_name + ' ' + user.last_name if user and user.first_name and user.last_name else user.username if user else 'Kullanıcı' }}</h2>
+                                <p>{{ user.bio if user and user.bio else 'Henüz biyografi eklenmemiş' }}</p>
                                 <div class="user-status status-indicator status-active">Aktif</div>
                             </div>
                         </div>
@@ -105,48 +105,58 @@
                              <div class="form-grid">
                                  <div class="form-group">
                                      <label for="username">Kullanıcı Adı *</label>
-                                     <input type="text" id="username" name="username" required disabled>
+                                     <input type="text" id="username" name="username" value="{{ user.username if user else '' }}" required disabled>
                                      <div class="form-help">3-20 karakter, sadece harf, rakam ve alt çizgi</div>
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="email">E-posta Adresi *</label>
-                                     <input type="email" id="email" name="email" required disabled>
+                                     <input type="email" id="email" name="email" value="{{ user.email if user else '' }}" required disabled>
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="firstName">Ad *</label>
-                                     <input type="text" id="firstName" name="firstName" required disabled>
+                                     <input type="text" id="firstName" name="firstName" value="{{ user.first_name if user else '' }}" required>
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="lastName">Soyad *</label>
-                                     <input type="text" id="lastName" name="lastName" required disabled>
+                                     <input type="text" id="lastName" name="lastName" value="{{ user.last_name if user else '' }}" required>
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="phone">Telefon</label>
-                                     <input type="tel" id="phone" name="phone" disabled>
+                                     <input type="tel" id="phone" name="phone" value="{{ user.phone if user else '' }}">
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="birthDate">Doğum Tarihi</label>
-                                     <input type="date" id="birthDate" name="birthDate" disabled>
+                                     <input type="date" id="birthDate" name="birthDate" value="{{ user.birth_date if user and user.birth_date else '' }}">
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="gender">Cinsiyet</label>
-                                     <select id="gender" name="gender" disabled>
+                                     <select id="gender" name="gender">
                                          <option value="">Seçiniz</option>
-                                         <option value="male">Erkek</option>
-                                         <option value="female">Kadın</option>
-                                         <option value="other">Diğer</option>
+                                         <option value="male" {{ 'selected' if user and user.gender == 'male' else '' }}>Erkek</option>
+                                         <option value="female" {{ 'selected' if user and user.gender == 'female' else '' }}>Kadın</option>
+                                         <option value="other" {{ 'selected' if user and user.gender == 'other' else '' }}>Diğer</option>
                                      </select>
                                  </div>
                                  
                                  <div class="form-group">
                                      <label for="location">Konum</label>
-                                     <input type="text" id="location" name="location" placeholder="Şehir, Ülke" disabled>
+                                     <input type="text" id="location" name="location" placeholder="Şehir, Ülke" value="{{ user.location if user else '' }}">
+                                 </div>
+                                 
+                                 <div class="form-group">
+                                     <label for="school">Okul</label>
+                                     <input type="text" id="school" name="school" placeholder="Okul adı" value="{{ user.school if user else '' }}">
+                                 </div>
+                                 
+                                 <div class="form-group">
+                                     <label for="gradeLevel">Sınıf</label>
+                                     <input type="text" id="gradeLevel" name="gradeLevel" placeholder="Kaçıncı sınıf öğrencisi" value="{{ user.grade_level if user else '' }}">
                                  </div>
                              </div>
                              
@@ -161,40 +171,11 @@
                              
                              <div class="form-group full-width">
                                  <label for="bio">Biyografi</label>
-                                 <textarea id="bio" name="bio" rows="3" placeholder="Kendiniz hakkında kısa bir açıklama..." disabled></textarea>
+                                 <textarea id="bio" name="bio" rows="3" placeholder="Kendiniz hakkında kısa bir açıklama...">{{ user.bio if user else '' }}</textarea>
                                  <div class="form-help">Maksimum 500 karakter</div>
                              </div>
                              
-                             <!-- Social Media Section -->
-                             <div class="form-section-header" style="margin-top: 1.5rem;">
-                                 <i class="fas fa-share-alt"></i>
-                                 <div>
-                                     <h3>Sosyal Medya</h3>
-                                     <p>Sosyal medya hesaplarınızı ekleyin</p>
-                                 </div>
-                             </div>
-                             
-                             <div class="form-grid">
-                                 <div class="form-group">
-                                     <label for="website">Kişisel Web Sitesi</label>
-                                     <input type="url" id="website" name="website" placeholder="https://example.com" disabled>
-                                 </div>
-                                 
-                                 <div class="form-group">
-                                     <label for="twitter">Twitter</label>
-                                     <input type="text" id="twitter" name="twitter" placeholder="@kullaniciadi" disabled>
-                                 </div>
-                                 
-                                 <div class="form-group">
-                                     <label for="linkedin">LinkedIn</label>
-                                     <input type="text" id="linkedin" name="linkedin" placeholder="linkedin.com/in/kullaniciadi" disabled>
-                                 </div>
-                                 
-                                 <div class="form-group">
-                                     <label for="github">GitHub</label>
-                                     <input type="text" id="github" name="github" placeholder="github.com/kullaniciadi" disabled>
-                                 </div>
-                             </div>
+
                              
                              <!-- Account Information Section -->
                              <div class="form-section-header" style="margin-top: 1.5rem;">
@@ -208,12 +189,12 @@
                              <div class="form-grid">
                                  <div class="form-group">
                                      <label>Üyelik Tarihi</label>
-                                     <input type="text" value="15 Ocak 2024" readonly>
+                                     <input type="text" value="{{ user.created_at if user and user.created_at else 'Bilinmiyor' }}" readonly>
                                  </div>
                                  
                                  <div class="form-group">
-                                     <label>Son Giriş</label>
-                                     <input type="text" value="20 Mart 2024 14:30" readonly>
+                                     <label>Son Güncelleme</label>
+                                     <input type="text" value="{{ user.updated_at if user and user.updated_at else 'Bilinmiyor' }}" readonly>
                                  </div>
                                  
                                  <div class="form-group">

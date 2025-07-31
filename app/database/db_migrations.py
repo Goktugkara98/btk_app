@@ -79,6 +79,9 @@ class SimpleMigrations:
         try:
             with self.db as conn:
                 print("📋 Users tablosu oluşturuluyor...")
+                print("   • username, email, hashed_password (temel alanlar)")
+                print("   • first_name, last_name, phone, birth_date, gender")
+                print("   • location, school, grade_level, bio")
                 
                 # Users tablosu
                 conn.cursor.execute("""
@@ -86,7 +89,7 @@ class SimpleMigrations:
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         username VARCHAR(50) UNIQUE NOT NULL,
                         email VARCHAR(100) UNIQUE NOT NULL,
-                        password VARCHAR(255) NOT NULL,
+                        hashed_password VARCHAR(255) NOT NULL,
                         first_name VARCHAR(50),
                         last_name VARCHAR(50),
                         phone VARCHAR(20),
@@ -96,13 +99,6 @@ class SimpleMigrations:
                         school VARCHAR(100),
                         grade_level VARCHAR(20),
                         bio TEXT,
-                        website VARCHAR(255),
-                        twitter VARCHAR(100),
-                        linkedin VARCHAR(100),
-                        github VARCHAR(100),
-                        avatar_url VARCHAR(255),
-                        is_active BOOLEAN DEFAULT true,
-                        last_login TIMESTAMP NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                     )
@@ -272,7 +268,7 @@ class SimpleMigrations:
             print("=" * 50)
             print("🎉 Veritabanı başarıyla oluşturuldu!")
             print("📊 Oluşturulan tablolar:")
-            print("   • users (Kullanıcılar)")
+            print("   • users (Kullanıcılar - username, email, hashed_password, first_name, last_name, phone, birth_date, gender, location, school, grade_level, bio)")
             print("   • questions (Sorular)")
             print("   • question_options (Seçenekler)")
             
