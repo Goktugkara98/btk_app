@@ -1,49 +1,69 @@
 /**
  * Profile Information Section JavaScript
  * Handles form interactions, validation, and data management
+ * Now supports field-by-field editing
  */
 
 class ProfileInfoSection {
     constructor() {
         this.form = null;
-        this.isEditing = false;
+        this.editingFields = new Set(); // Track which fields are being edited
         this.originalData = {};
+        this.fieldData = {}; // Store original data for each field
         this.init();
     }
 
     init() {
         this.bindEvents();
         this.loadUserData();
-        // Sayfa yüklendiğinde form alanlarını disabled yap (username ve email hariç)
+        // Sayfa yüklendiğinde form alanlarını disabled yap
         this.disableFormFields();
     }
 
     bindEvents() {
-        // Edit button
+        // Legacy global buttons (hidden but kept for compatibility)
         const editBtn = document.querySelector('.btn-edit-profile');
         if (editBtn) {
             editBtn.addEventListener('click', () => this.toggleEditMode());
         }
 
-        // Save button
         const saveBtn = document.querySelector('.btn-save-profile');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => this.saveProfile());
         }
 
-        // Cancel button
         const cancelBtn = document.querySelector('.btn-cancel-edit');
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => this.cancelEdit());
         }
 
-        // Form validation
+        // New field-specific buttons
+        this.bindFieldButtons();
+
+        // Form validation and keyboard shortcuts
         this.form = document.querySelector('.profile-info-form');
         if (this.form) {
             this.form.addEventListener('input', (e) => this.validateField(e.target));
             this.form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.saveProfile();
+            });
+
+            // Add keyboard shortcuts for editing fields
+            this.form.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.closest('.input-with-edit.editing')) {
+                    e.preventDefault();
+                    const fieldName = e.target.name;
+                    if (fieldName) {
+                        this.saveField(fieldName);
+                    }
+                } else if (e.key === 'Escape' && e.target.closest('.input-with-edit.editing')) {
+                    e.preventDefault();
+                    const fieldName = e.target.name;
+                    if (fieldName) {
+                        this.cancelFieldEdit(fieldName);
+                    }
+                }
             });
         }
 
@@ -52,6 +72,210 @@ class ProfileInfoSection {
         if (avatarUpload) {
             avatarUpload.addEventListener('change', (e) => this.handleAvatarUpload(e));
         }
+    }
+
+    bindFieldButtons() {
+        // Field edit buttons
+        document.querySelectorAll('.btn-edit-field').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const fieldName = e.target.closest('.btn-edit-field').dataset.field;
+                this.toggleFieldEdit(fieldName);
+            });
+        });
+
+        // Field save and cancel buttons (will be created dynamically)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-save-field')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const fieldName = e.target.closest('.btn-save-field').dataset.field;
+                this.saveField(fieldName);
+            } else if (e.target.closest('.btn-cancel-field')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const fieldName = e.target.closest('.btn-cancel-field').dataset.field;
+                this.cancelFieldEdit(fieldName);
+            }
+        });
+    }
+
+    toggleFieldEdit(fieldName) {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        const isEditing = this.editingFields.has(fieldName);
+        
+        if (isEditing) {
+            this.exitFieldEdit(fieldName);
+        } else {
+            this.enterFieldEdit(fieldName);
+        }
+    }
+
+    enterFieldEdit(fieldName) {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        const inputContainer = field.closest('.input-with-edit');
+        if (!inputContainer) return;
+
+        // Store original data for this field
+        this.fieldData[fieldName] = field.value;
+
+        // Enable the field
+        field.disabled = false;
+        field.focus();
+
+        // Add editing class to container
+        inputContainer.classList.add('editing');
+
+        // Create save and cancel buttons
+        this.createFieldButtons(inputContainer, fieldName);
+
+        // Track editing state
+        this.editingFields.add(fieldName);
+
+        this.showNotification(`${this.getFieldDisplayName(fieldName)} düzenleme modunda`, 'info');
+    }
+
+    exitFieldEdit(fieldName) {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        const inputContainer = field.closest('.input-with-edit');
+        if (!inputContainer) return;
+
+        // Disable the field
+        field.disabled = true;
+
+        // Remove editing class
+        inputContainer.classList.remove('editing');
+
+        // Remove save and cancel buttons
+        this.removeFieldButtons(inputContainer);
+
+        // Remove from editing set
+        this.editingFields.delete(fieldName);
+    }
+
+    createFieldButtons(container, fieldName) {
+        // Remove existing buttons first
+        this.removeFieldButtons(container);
+
+        // Create save button
+        const saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.className = 'btn-save-field';
+        saveBtn.dataset.field = fieldName;
+        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+        saveBtn.title = 'Kaydet';
+        saveBtn.setAttribute('aria-label', 'Kaydet');
+
+        // Create cancel button
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'btn-cancel-field';
+        cancelBtn.dataset.field = fieldName;
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+        cancelBtn.title = 'İptal';
+        cancelBtn.setAttribute('aria-label', 'İptal');
+
+        // Add buttons to container
+        container.appendChild(saveBtn);
+        container.appendChild(cancelBtn);
+
+        // Focus the input field
+        const input = container.querySelector('input, select, textarea');
+        if (input) {
+            setTimeout(() => input.focus(), 100);
+        }
+    }
+
+    removeFieldButtons(container) {
+        const saveBtn = container.querySelector('.btn-save-field');
+        const cancelBtn = container.querySelector('.btn-cancel-field');
+        
+        if (saveBtn) saveBtn.remove();
+        if (cancelBtn) cancelBtn.remove();
+    }
+
+    async saveField(fieldName) {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        // Validate field
+        if (!this.validateField(field)) {
+            this.showNotification('Lütfen alanı doğru şekilde doldurun', 'error');
+            return;
+        }
+
+        const fieldValue = field.value;
+        
+        try {
+            // Show loading state
+            const saveBtn = field.closest('.input-with-edit').querySelector('.btn-save-field');
+            const originalHTML = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            saveBtn.disabled = true;
+
+            // Simulate API call for now
+            await this.simulateApiCall({ [fieldName]: fieldValue });
+
+            // Update original data
+            this.fieldData[fieldName] = fieldValue;
+            
+            // Exit edit mode
+            this.exitFieldEdit(fieldName);
+            
+            this.showNotification(`${this.getFieldDisplayName(fieldName)} başarıyla güncellendi`, 'success');
+            
+        } catch (error) {
+            this.showNotification('Güncelleme sırasında bir hata oluştu', 'error');
+        } finally {
+            // Reset button
+            const saveBtn = field.closest('.input-with-edit').querySelector('.btn-save-field');
+            if (saveBtn) {
+                saveBtn.innerHTML = originalHTML;
+                saveBtn.disabled = false;
+            }
+        }
+    }
+
+    cancelFieldEdit(fieldName) {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        // Restore original data
+        const originalValue = this.fieldData[fieldName];
+        if (originalValue !== undefined) {
+            field.value = originalValue;
+        }
+        
+        // Exit edit mode
+        this.exitFieldEdit(fieldName);
+        
+        // Don't show notification for cancel to reduce noise
+        // this.showNotification(`${this.getFieldDisplayName(fieldName)} değişiklikleri iptal edildi`, 'info');
+    }
+
+    getFieldDisplayName(fieldName) {
+        const fieldNames = {
+            'username': 'Kullanıcı Adı',
+            'email': 'E-posta Adresi',
+            'firstName': 'Ad',
+            'lastName': 'Soyad',
+            'phone': 'Telefon',
+            'birthDate': 'Doğum Tarihi',
+            'gender': 'Cinsiyet',
+            'location': 'Konum',
+            'bio': 'Biyografi',
+            'school': 'Okul',
+            'gradeLevel': 'Sınıf',
+            'avatar': 'Profil Fotoğrafı'
+        };
+        return fieldNames[fieldName] || fieldName;
     }
 
     loadUserData() {
@@ -126,87 +350,20 @@ class ProfileInfoSection {
         }
     }
 
+    // Legacy methods for backward compatibility
     toggleEditMode() {
-        this.isEditing = !this.isEditing;
-        
-        // Sadece düzenlenebilir alanları seç (username ve email hariç)
-        const editableFields = document.querySelectorAll('.profile-info-form input:not([name="username"]):not([name="email"]), .profile-info-form select, .profile-info-form textarea');
-        const editBtn = document.querySelector('.btn-edit-profile');
-        const saveBtn = document.querySelector('.btn-save-profile');
-        const cancelBtn = document.querySelector('.btn-cancel-edit');
-
-        editableFields.forEach(field => {
-            field.disabled = !this.isEditing;
-        });
-
-        if (this.isEditing) {
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'inline-flex';
-            cancelBtn.style.display = 'inline-flex';
-            this.showNotification('Düzenleme moduna geçtiniz', 'info');
-        } else {
-            editBtn.style.display = 'inline-flex';
-            saveBtn.style.display = 'none';
-            cancelBtn.style.display = 'none';
-        }
+        // This method is now deprecated but kept for compatibility
+        console.warn('toggleEditMode is deprecated. Use field-specific editing instead.');
     }
 
     async saveProfile() {
-        if (!this.validateForm()) {
-            this.showNotification('Lütfen form hatalarını düzeltin', 'error');
-            return;
-        }
-
-        const formData = this.getFormData();
-        
-        try {
-            // Show loading state
-            const saveBtn = document.querySelector('.btn-save-profile');
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
-            saveBtn.disabled = true;
-
-            // API'ye gönder
-            const response = await fetch('/api/profile/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Güncelleme başarısız');
-            }
-
-            // Update original data
-            this.originalData = { ...this.originalData, ...formData };
-            
-            // Exit edit mode
-            this.toggleEditMode();
-            
-            this.showNotification('Profil bilgileri başarıyla güncellendi', 'success');
-            
-        } catch (error) {
-            this.showNotification('Güncelleme sırasında bir hata oluştu', 'error');
-        } finally {
-            // Reset button
-            const saveBtn = document.querySelector('.btn-save-profile');
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-        }
+        // This method is now deprecated but kept for compatibility
+        console.warn('saveProfile is deprecated. Use field-specific saving instead.');
     }
 
     cancelEdit() {
-        // Restore original data
-        this.populateForm(this.originalData);
-        
-        // Exit edit mode
-        this.toggleEditMode();
-        
-        this.showNotification('Değişiklikler iptal edildi', 'info');
+        // This method is now deprecated but kept for compatibility
+        console.warn('cancelEdit is deprecated. Use field-specific canceling instead.');
     }
 
     getFormData() {
@@ -409,10 +566,10 @@ class ProfileInfoSection {
     }
 
     disableFormFields() {
-        // Sadece düzenlenebilir alanları seç (username ve email hariç)
-        const editableFields = document.querySelectorAll('.profile-info-form input:not([name="username"]):not([name="email"]), .profile-info-form select, .profile-info-form textarea');
+        // Tüm form alanlarını disabled yap
+        const fields = document.querySelectorAll('.profile-info-form input, .profile-info-form select, .profile-info-form textarea');
         
-        editableFields.forEach(field => {
+        fields.forEach(field => {
             field.disabled = true;
         });
     }

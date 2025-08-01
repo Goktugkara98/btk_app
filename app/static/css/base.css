@@ -198,6 +198,10 @@ body {
 
     /* Sayfanın minimum yüksekliğinin ekran kadar olmasını sağlar */
     min-height: 100vh;
+    
+    /* Scroll davranışını iyileştir */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Medya elementlerinin varsayılan davranışlarını iyileştirme */

@@ -4,87 +4,73 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
     padding: 0;
+    overflow-y: auto; /* İçerik scroll edilebilir olsun */
+    scrollbar-width: thin; /* Firefox için */
+    scrollbar-color: rgba(102, 126, 234, 0.3) transparent; /* Firefox için */
 }
 
-/* Profile Header Card */
-.profile-header-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    padding: 1.25rem;
-    color: white;
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
+/* Webkit scrollbar stilleri */
+.profile-info-section::-webkit-scrollbar {
+    width: 6px;
 }
 
-.profile-header-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
+.profile-info-section::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.profile-header-content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+.profile-info-section::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 3px;
 }
 
-.profile-header-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    overflow: hidden;
-    flex-shrink: 0;
+.profile-info-section::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.5);
 }
 
-.profile-header-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
 
-.profile-header-text h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem;
-}
-
-.profile-header-text p {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 0.9rem;
-}
 
 /* Form Sections */
 .form-section {
     background: white;
     border-radius: 12px;
-    padding: 1.25rem;
+    padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Form section scroll edilebilir olsun */
     min-height: 0; /* Flexbox için önemli */
+    scrollbar-width: thin; /* Firefox için */
+    scrollbar-color: rgba(102, 126, 234, 0.3) transparent; /* Firefox için */
+}
+
+/* Form section scrollbar stilleri */
+.form-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-section::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-section::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 3px;
+}
+
+.form-section::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.5);
 }
 
 .form-section-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid #e2e8f0;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Header'ın küçülmesini engelle */
 }
 
 .form-section-header i {
@@ -115,8 +101,9 @@
 /* Form Grid */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group {
@@ -131,10 +118,87 @@
     font-size: 0.875rem;
 }
 
+/* Input with Edit Button Container */
+.input-with-edit {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-edit input,
+.input-with-edit select,
+.input-with-edit textarea {
+    flex: 1;
+    padding: 0.75rem;
+    padding-right: 3.5rem; /* Space for edit button */
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+}
+
+/* Input container border radius adjustment for edit button */
+.input-with-edit input,
+.input-with-edit select {
+    border-radius: 8px 0 0 8px;
+}
+
+.input-with-edit textarea {
+    border-radius: 8px 0 0 8px;
+}
+
+.input-with-edit textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Edit Field Button */
+.btn-edit-field {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    border-left: 1px solid #e2e8f0;
+}
+
+.btn-edit-field:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+    color: #475569;
+}
+
+.btn-edit-field:active {
+    background: linear-gradient(135deg, #cbd5e0 0%, #94a3b8 100%);
+    color: #334155;
+}
+
+.btn-edit-field:disabled {
+    background: #f1f5f9;
+    color: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.btn-edit-field:disabled:hover {
+    background: #f1f5f9;
+    color: #cbd5e0;
+}
+
+/* Legacy form group styles for backward compatibility */
 .form-group input,
 .form-group select,
 .form-group textarea {
-    padding: 0.5rem 0.75rem;
+    padding: 0.75rem;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
     font-size: 0.875rem;
@@ -181,10 +245,10 @@
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
     border-top: 1px solid #e2e8f0;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Buttons'ın küçülmesini engelle */
 }
 
 .btn {
@@ -199,6 +263,12 @@
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
 }
 
 .btn-primary {
@@ -257,23 +327,162 @@
     color: #744210;
 }
 
+/* Editing State Styles */
+.input-with-edit.editing {
+    position: relative;
+}
+
+.input-with-edit.editing input,
+.input-with-edit.editing select,
+.input-with-edit.editing textarea {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    padding-right: 6.5rem; /* Space for save and cancel buttons */
+}
+
+.input-with-edit.editing .btn-edit-field {
+    background: #10b981;
+    animation: pulse 2s infinite;
+}
+
+.input-with-edit.editing .btn-edit-field:hover {
+    background: #059669;
+}
+
+/* Save and Cancel buttons for editing state */
+.input-with-edit.editing .btn-edit-field {
+    display: none;
+}
+
+.input-with-edit.editing::after {
+    content: '';
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 0.25rem;
+}
+
+.input-with-edit.editing .btn-save-field,
+.input-with-edit.editing .btn-cancel-field {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.input-with-edit.editing .btn-save-field {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    right: 50px;
+    border-radius: 0;
+    border-left: 1px solid #e2e8f0;
+}
+
+.input-with-edit.editing .btn-save-field:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: scale(1.02);
+}
+
+.input-with-edit.editing .btn-cancel-field {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 0 8px 8px 0;
+}
+
+.input-with-edit.editing .btn-cancel-field:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: scale(1.02);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 /* Responsive Design */
-@media (max-width: 768px) {
-    .profile-header-content {
-        flex-direction: column;
-        text-align: center;
+@media (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
     }
     
+    .form-section {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
     .form-actions {
         flex-direction: column;
+        gap: 0.75rem;
     }
     
     .btn {
         width: 100%;
         justify-content: center;
+    }
+    
+    .form-section {
+        padding: 1rem;
+    }
+    
+    .form-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .section-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .section-actions .btn {
+        width: auto;
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-info-section {
+        gap: 0.75rem;
+    }
+    
+    .form-section {
+        padding: 0.75rem;
+    }
+    
+    .form-grid {
+        gap: 0.75rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.625rem;
     }
 } 
