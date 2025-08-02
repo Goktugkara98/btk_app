@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, send_from_directory, session, redirect, url_for
+from flask import Blueprint, render_template, send_from_directory, session, redirect, url_for, request, jsonify
 import os
 
 # Create the blueprint
@@ -80,3 +80,5 @@ def profile():
     except Exception as e:
         print(f"Error loading profile: {e}")
         return render_template('profile.html', title='Profile', user=None)
+
+

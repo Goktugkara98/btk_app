@@ -1,0 +1,108 @@
+/* Modal Styles */
+.modal-xl {
+    max-width: 90%;
+}
+
+.modal-content {
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* History Modal */
+.history-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.history-item {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+}
+
+.history-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.history-item .card-body {
+    padding: 0.75rem;
+}
+
+/* News Detail Modal */
+#geminiResponseDetail {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#geminiResponseDetail strong {
+    color: #856404;
+    font-weight: 600;
+}
+
+#geminiResponseDetail em {
+    color: #856404;
+    font-style: italic;
+}
+
+/* Modal Buttons */
+.modal .btn-group .btn {
+    border-radius: 6px;
+    margin: 0 2px;
+}
+
+.modal .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Scrollbars */
+.modal-body::-webkit-scrollbar,
+.history-list::-webkit-scrollbar,
+#geminiResponseDetail::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track,
+#geminiResponseDetail::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb,
+#geminiResponseDetail::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover,
+#geminiResponseDetail::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+} 

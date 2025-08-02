@@ -51,13 +51,26 @@ def create_app(config_class=Config):
         
         app.register_blueprint(api_bp, url_prefix='/api')
         app.register_blueprint(pages_bp)
-        app.logger.info("Blueprints registered successfully")
+        app.logger.info("App blueprints registered successfully")
     except ImportError as e:
-        app.logger.error(f"Failed to import blueprints: {e}")
+        app.logger.error(f"Failed to import app blueprints: {e}")
         raise
     except Exception as e:
-        app.logger.error(f"Failed to register blueprints: {e}")
+        app.logger.error(f"Failed to register app blueprints: {e}")
         raise
+    
+    # Register news editor module
+    try:
+        from news_editor import news_editor_bp
+        
+        app.register_blueprint(news_editor_bp)
+        app.logger.info("News editor module registered successfully")
+    except ImportError as e:
+        app.logger.error(f"Failed to import news editor module: {e}")
+        # Don't raise here, as the main app should still work without the news editor
+    except Exception as e:
+        app.logger.error(f"Failed to register news editor module: {e}")
+        # Don't raise here, as the main app should still work without the news editor
     
     # Context processor to make session data available in all templates
     @app.context_processor

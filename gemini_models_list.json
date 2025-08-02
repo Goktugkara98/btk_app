@@ -1,0 +1,965 @@
+{
+  "list_timestamp": "2025-08-02T15:41:09.616940",
+  "api_key_1": {
+    "key": "AIzaSyDRFV...",
+    "models": [],
+    "status": "success",
+    "message": "Found 37 Gemini models",
+    "total_models": 50,
+    "gemini_models": [
+      {
+        "name": "models/gemini-1.5-pro-latest",
+        "display_name": "Gemini 1.5 Pro Latest",
+        "description": "Alias that points to the most recent production (non-experimental) release of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-pro-002",
+        "display_name": "Gemini 1.5 Pro 002",
+        "description": "Stable version of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens, released in September of 2024.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent"
+        ],
+        "version": "002"
+      },
+      {
+        "name": "models/gemini-1.5-pro",
+        "display_name": "Gemini 1.5 Pro",
+        "description": "Stable version of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens, released in May of 2024.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-latest",
+        "display_name": "Gemini 1.5 Flash Latest",
+        "description": "Alias that points to the most recent production (non-experimental) release of Gemini 1.5 Flash, our fast and versatile multimodal model for scaling across diverse tasks.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash",
+        "display_name": "Gemini 1.5 Flash",
+        "description": "Alias that points to the most recent stable version of Gemini 1.5 Flash, our fast and versatile multimodal model for scaling across diverse tasks.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-002",
+        "display_name": "Gemini 1.5 Flash 002",
+        "description": "Stable version of Gemini 1.5 Flash, our fast and versatile multimodal model for scaling across diverse tasks, released in September of 2024.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent"
+        ],
+        "version": "002"
+      },
+      {
+        "name": "models/gemini-1.5-flash-8b",
+        "display_name": "Gemini 1.5 Flash-8B",
+        "description": "Stable version of Gemini 1.5 Flash-8B, our smallest and most cost effective Flash model, released in October of 2024.",
+        "supported_generation_methods": [
+          "createCachedContent",
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-8b-001",
+        "display_name": "Gemini 1.5 Flash-8B 001",
+        "description": "Stable version of Gemini 1.5 Flash-8B, our smallest and most cost effective Flash model, released in October of 2024.",
+        "supported_generation_methods": [
+          "createCachedContent",
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-8b-latest",
+        "display_name": "Gemini 1.5 Flash-8B Latest",
+        "description": "Alias that points to the most recent production (non-experimental) release of Gemini 1.5 Flash-8B, our smallest and most cost effective Flash model, released in October of 2024.",
+        "supported_generation_methods": [
+          "createCachedContent",
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-03-25",
+        "display_name": "Gemini 2.5 Pro Preview 03-25",
+        "description": "Gemini 2.5 Pro Preview 03-25",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-03-25"
+      },
+      {
+        "name": "models/gemini-2.5-flash-preview-05-20",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.5-flash",
+        "display_name": "Gemini 2.5 Flash",
+        "description": "Stable version of Gemini 2.5 Flash, our mid-size multimodal model that supports up to 1 million tokens, released in June of 2025.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-2.5-flash-lite-preview-06-17",
+        "display_name": "Gemini 2.5 Flash-Lite Preview 06-17",
+        "description": "Preview release (June 11th, 2025) of Gemini 2.5 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-06-17"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-05-06",
+        "display_name": "Gemini 2.5 Pro Preview 05-06",
+        "description": "Preview release (May 6th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-06"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-06-05",
+        "display_name": "Gemini 2.5 Pro Preview",
+        "description": "Preview release (June 5th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-06-05"
+      },
+      {
+        "name": "models/gemini-2.5-pro",
+        "display_name": "Gemini 2.5 Pro",
+        "description": "Stable release (June 17th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5"
+      },
+      {
+        "name": "models/gemini-2.0-flash-exp",
+        "display_name": "Gemini 2.0 Flash Experimental",
+        "description": "Gemini 2.0 Flash Experimental",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "bidiGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash",
+        "display_name": "Gemini 2.0 Flash",
+        "description": "Gemini 2.0 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-001",
+        "display_name": "Gemini 2.0 Flash 001",
+        "description": "Stable version of Gemini 2.0 Flash, our fast and versatile multimodal model for scaling across diverse tasks, released in January of 2025.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-exp-image-generation",
+        "display_name": "Gemini 2.0 Flash (Image Generation) Experimental",
+        "description": "Gemini 2.0 Flash (Image Generation) Experimental",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "bidiGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite-001",
+        "display_name": "Gemini 2.0 Flash-Lite 001",
+        "description": "Stable version of Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite",
+        "display_name": "Gemini 2.0 Flash-Lite",
+        "description": "Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-preview-image-generation",
+        "display_name": "Gemini 2.0 Flash Preview Image Generation",
+        "description": "Gemini 2.0 Flash Preview Image Generation",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite-preview-02-05",
+        "display_name": "Gemini 2.0 Flash-Lite Preview 02-05",
+        "description": "Preview release (February 5th, 2025) of Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "preview-02-05"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite-preview",
+        "display_name": "Gemini 2.0 Flash-Lite Preview",
+        "description": "Preview release (February 5th, 2025) of Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "preview-02-05"
+      },
+      {
+        "name": "models/gemini-2.0-pro-exp",
+        "display_name": "Gemini 2.0 Pro Experimental",
+        "description": "Experimental release (March 25th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-exp-03-25"
+      },
+      {
+        "name": "models/gemini-2.0-pro-exp-02-05",
+        "display_name": "Gemini 2.0 Pro Experimental 02-05",
+        "description": "Experimental release (March 25th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-exp-03-25"
+      },
+      {
+        "name": "models/gemini-exp-1206",
+        "display_name": "Gemini Experimental 1206",
+        "description": "Experimental release (March 25th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-exp-03-25"
+      },
+      {
+        "name": "models/gemini-2.0-flash-thinking-exp-01-21",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.0-flash-thinking-exp",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.0-flash-thinking-exp-1219",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.5-flash-preview-tts",
+        "display_name": "Gemini 2.5 Flash Preview TTS",
+        "description": "Gemini 2.5 Flash Preview TTS",
+        "supported_generation_methods": [
+          "countTokens",
+          "generateContent"
+        ],
+        "version": "gemini-2.5-flash-exp-tts-2025-05-19"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-tts",
+        "display_name": "Gemini 2.5 Pro Preview TTS",
+        "description": "Gemini 2.5 Pro Preview TTS",
+        "supported_generation_methods": [
+          "countTokens",
+          "generateContent"
+        ],
+        "version": "gemini-2.5-pro-preview-tts-2025-05-19"
+      },
+      {
+        "name": "models/gemini-2.5-flash-lite",
+        "display_name": "Gemini 2.5 Flash-Lite",
+        "description": "Stable verion of Gemini 2.5 Flash-Lite, released in July of 2025",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-embedding-exp-03-07",
+        "display_name": "Gemini Embedding Experimental 03-07",
+        "description": "Obtain a distributed representation of a text.",
+        "supported_generation_methods": [
+          "embedContent",
+          "countTextTokens",
+          "countTokens"
+        ],
+        "version": "exp-03-07"
+      },
+      {
+        "name": "models/gemini-embedding-exp",
+        "display_name": "Gemini Embedding Experimental",
+        "description": "Obtain a distributed representation of a text.",
+        "supported_generation_methods": [
+          "embedContent",
+          "countTextTokens",
+          "countTokens"
+        ],
+        "version": "exp-03-07"
+      },
+      {
+        "name": "models/gemini-embedding-001",
+        "display_name": "Gemini Embedding 001",
+        "description": "Obtain a distributed representation of a text.",
+        "supported_generation_methods": [
+          "embedContent",
+          "countTextTokens",
+          "countTokens"
+        ],
+        "version": "001"
+      }
+    ],
+    "all_models": [
+      "models/embedding-gecko-001",
+      "models/gemini-1.5-pro-latest",
+      "models/gemini-1.5-pro-002",
+      "models/gemini-1.5-pro",
+      "models/gemini-1.5-flash-latest",
+      "models/gemini-1.5-flash",
+      "models/gemini-1.5-flash-002",
+      "models/gemini-1.5-flash-8b",
+      "models/gemini-1.5-flash-8b-001",
+      "models/gemini-1.5-flash-8b-latest",
+      "models/gemini-2.5-pro-preview-03-25",
+      "models/gemini-2.5-flash-preview-05-20",
+      "models/gemini-2.5-flash",
+      "models/gemini-2.5-flash-lite-preview-06-17",
+      "models/gemini-2.5-pro-preview-05-06",
+      "models/gemini-2.5-pro-preview-06-05",
+      "models/gemini-2.5-pro",
+      "models/gemini-2.0-flash-exp",
+      "models/gemini-2.0-flash",
+      "models/gemini-2.0-flash-001",
+      "models/gemini-2.0-flash-exp-image-generation",
+      "models/gemini-2.0-flash-lite-001",
+      "models/gemini-2.0-flash-lite",
+      "models/gemini-2.0-flash-preview-image-generation",
+      "models/gemini-2.0-flash-lite-preview-02-05",
+      "models/gemini-2.0-flash-lite-preview",
+      "models/gemini-2.0-pro-exp",
+      "models/gemini-2.0-pro-exp-02-05",
+      "models/gemini-exp-1206",
+      "models/gemini-2.0-flash-thinking-exp-01-21",
+      "models/gemini-2.0-flash-thinking-exp",
+      "models/gemini-2.0-flash-thinking-exp-1219",
+      "models/gemini-2.5-flash-preview-tts",
+      "models/gemini-2.5-pro-preview-tts",
+      "models/learnlm-2.0-flash-experimental",
+      "models/gemma-3-1b-it",
+      "models/gemma-3-4b-it",
+      "models/gemma-3-12b-it",
+      "models/gemma-3-27b-it",
+      "models/gemma-3n-e4b-it",
+      "models/gemma-3n-e2b-it",
+      "models/gemini-2.5-flash-lite",
+      "models/embedding-001",
+      "models/text-embedding-004",
+      "models/gemini-embedding-exp-03-07",
+      "models/gemini-embedding-exp",
+      "models/gemini-embedding-001",
+      "models/aqa",
+      "models/imagen-3.0-generate-002",
+      "models/imagen-4.0-generate-preview-06-06"
+    ]
+  },
+  "api_key_2": {
+    "key": "AIzaSyDTDG...",
+    "models": [],
+    "status": "success",
+    "message": "Found 37 Gemini models",
+    "total_models": 50,
+    "gemini_models": [
+      {
+        "name": "models/gemini-1.5-pro-latest",
+        "display_name": "Gemini 1.5 Pro Latest",
+        "description": "Alias that points to the most recent production (non-experimental) release of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-pro-002",
+        "display_name": "Gemini 1.5 Pro 002",
+        "description": "Stable version of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens, released in September of 2024.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent"
+        ],
+        "version": "002"
+      },
+      {
+        "name": "models/gemini-1.5-pro",
+        "display_name": "Gemini 1.5 Pro",
+        "description": "Stable version of Gemini 1.5 Pro, our mid-size multimodal model that supports up to 2 million tokens, released in May of 2024.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-latest",
+        "display_name": "Gemini 1.5 Flash Latest",
+        "description": "Alias that points to the most recent production (non-experimental) release of Gemini 1.5 Flash, our fast and versatile multimodal model for scaling across diverse tasks.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash",
+        "display_name": "Gemini 1.5 Flash",
+        "description": "Alias that points to the most recent stable version of Gemini 1.5 Flash, our fast and versatile multimodal model for scaling across diverse tasks.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-002",
+        "display_name": "Gemini 1.5 Flash 002",
+        "description": "Stable version of Gemini 1.5 Flash, our fast and versatile multimodal model for scaling across diverse tasks, released in September of 2024.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent"
+        ],
+        "version": "002"
+      },
+      {
+        "name": "models/gemini-1.5-flash-8b",
+        "display_name": "Gemini 1.5 Flash-8B",
+        "description": "Stable version of Gemini 1.5 Flash-8B, our smallest and most cost effective Flash model, released in October of 2024.",
+        "supported_generation_methods": [
+          "createCachedContent",
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-8b-001",
+        "display_name": "Gemini 1.5 Flash-8B 001",
+        "description": "Stable version of Gemini 1.5 Flash-8B, our smallest and most cost effective Flash model, released in October of 2024.",
+        "supported_generation_methods": [
+          "createCachedContent",
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-1.5-flash-8b-latest",
+        "display_name": "Gemini 1.5 Flash-8B Latest",
+        "description": "Alias that points to the most recent production (non-experimental) release of Gemini 1.5 Flash-8B, our smallest and most cost effective Flash model, released in October of 2024.",
+        "supported_generation_methods": [
+          "createCachedContent",
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-03-25",
+        "display_name": "Gemini 2.5 Pro Preview 03-25",
+        "description": "Gemini 2.5 Pro Preview 03-25",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-03-25"
+      },
+      {
+        "name": "models/gemini-2.5-flash-preview-05-20",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.5-flash",
+        "display_name": "Gemini 2.5 Flash",
+        "description": "Stable version of Gemini 2.5 Flash, our mid-size multimodal model that supports up to 1 million tokens, released in June of 2025.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-2.5-flash-lite-preview-06-17",
+        "display_name": "Gemini 2.5 Flash-Lite Preview 06-17",
+        "description": "Preview release (June 11th, 2025) of Gemini 2.5 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-06-17"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-05-06",
+        "display_name": "Gemini 2.5 Pro Preview 05-06",
+        "description": "Preview release (May 6th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-06"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-06-05",
+        "display_name": "Gemini 2.5 Pro Preview",
+        "description": "Preview release (June 5th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-06-05"
+      },
+      {
+        "name": "models/gemini-2.5-pro",
+        "display_name": "Gemini 2.5 Pro",
+        "description": "Stable release (June 17th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5"
+      },
+      {
+        "name": "models/gemini-2.0-flash-exp",
+        "display_name": "Gemini 2.0 Flash Experimental",
+        "description": "Gemini 2.0 Flash Experimental",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "bidiGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash",
+        "display_name": "Gemini 2.0 Flash",
+        "description": "Gemini 2.0 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-001",
+        "display_name": "Gemini 2.0 Flash 001",
+        "description": "Stable version of Gemini 2.0 Flash, our fast and versatile multimodal model for scaling across diverse tasks, released in January of 2025.",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-exp-image-generation",
+        "display_name": "Gemini 2.0 Flash (Image Generation) Experimental",
+        "description": "Gemini 2.0 Flash (Image Generation) Experimental",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "bidiGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite-001",
+        "display_name": "Gemini 2.0 Flash-Lite 001",
+        "description": "Stable version of Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite",
+        "display_name": "Gemini 2.0 Flash-Lite",
+        "description": "Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-preview-image-generation",
+        "display_name": "Gemini 2.0 Flash Preview Image Generation",
+        "description": "Gemini 2.0 Flash Preview Image Generation",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens"
+        ],
+        "version": "2.0"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite-preview-02-05",
+        "display_name": "Gemini 2.0 Flash-Lite Preview 02-05",
+        "description": "Preview release (February 5th, 2025) of Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "preview-02-05"
+      },
+      {
+        "name": "models/gemini-2.0-flash-lite-preview",
+        "display_name": "Gemini 2.0 Flash-Lite Preview",
+        "description": "Preview release (February 5th, 2025) of Gemini 2.0 Flash-Lite",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "preview-02-05"
+      },
+      {
+        "name": "models/gemini-2.0-pro-exp",
+        "display_name": "Gemini 2.0 Pro Experimental",
+        "description": "Experimental release (March 25th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-exp-03-25"
+      },
+      {
+        "name": "models/gemini-2.0-pro-exp-02-05",
+        "display_name": "Gemini 2.0 Pro Experimental 02-05",
+        "description": "Experimental release (March 25th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-exp-03-25"
+      },
+      {
+        "name": "models/gemini-exp-1206",
+        "display_name": "Gemini Experimental 1206",
+        "description": "Experimental release (March 25th, 2025) of Gemini 2.5 Pro",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-exp-03-25"
+      },
+      {
+        "name": "models/gemini-2.0-flash-thinking-exp-01-21",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.0-flash-thinking-exp",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.0-flash-thinking-exp-1219",
+        "display_name": "Gemini 2.5 Flash Preview 05-20",
+        "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "2.5-preview-05-20"
+      },
+      {
+        "name": "models/gemini-2.5-flash-preview-tts",
+        "display_name": "Gemini 2.5 Flash Preview TTS",
+        "description": "Gemini 2.5 Flash Preview TTS",
+        "supported_generation_methods": [
+          "countTokens",
+          "generateContent"
+        ],
+        "version": "gemini-2.5-flash-exp-tts-2025-05-19"
+      },
+      {
+        "name": "models/gemini-2.5-pro-preview-tts",
+        "display_name": "Gemini 2.5 Pro Preview TTS",
+        "description": "Gemini 2.5 Pro Preview TTS",
+        "supported_generation_methods": [
+          "countTokens",
+          "generateContent"
+        ],
+        "version": "gemini-2.5-pro-preview-tts-2025-05-19"
+      },
+      {
+        "name": "models/gemini-2.5-flash-lite",
+        "display_name": "Gemini 2.5 Flash-Lite",
+        "description": "Stable verion of Gemini 2.5 Flash-Lite, released in July of 2025",
+        "supported_generation_methods": [
+          "generateContent",
+          "countTokens",
+          "createCachedContent",
+          "batchGenerateContent"
+        ],
+        "version": "001"
+      },
+      {
+        "name": "models/gemini-embedding-exp-03-07",
+        "display_name": "Gemini Embedding Experimental 03-07",
+        "description": "Obtain a distributed representation of a text.",
+        "supported_generation_methods": [
+          "embedContent",
+          "countTextTokens",
+          "countTokens"
+        ],
+        "version": "exp-03-07"
+      },
+      {
+        "name": "models/gemini-embedding-exp",
+        "display_name": "Gemini Embedding Experimental",
+        "description": "Obtain a distributed representation of a text.",
+        "supported_generation_methods": [
+          "embedContent",
+          "countTextTokens",
+          "countTokens"
+        ],
+        "version": "exp-03-07"
+      },
+      {
+        "name": "models/gemini-embedding-001",
+        "display_name": "Gemini Embedding 001",
+        "description": "Obtain a distributed representation of a text.",
+        "supported_generation_methods": [
+          "embedContent",
+          "countTextTokens",
+          "countTokens"
+        ],
+        "version": "001"
+      }
+    ],
+    "all_models": [
+      "models/embedding-gecko-001",
+      "models/gemini-1.5-pro-latest",
+      "models/gemini-1.5-pro-002",
+      "models/gemini-1.5-pro",
+      "models/gemini-1.5-flash-latest",
+      "models/gemini-1.5-flash",
+      "models/gemini-1.5-flash-002",
+      "models/gemini-1.5-flash-8b",
+      "models/gemini-1.5-flash-8b-001",
+      "models/gemini-1.5-flash-8b-latest",
+      "models/gemini-2.5-pro-preview-03-25",
+      "models/gemini-2.5-flash-preview-05-20",
+      "models/gemini-2.5-flash",
+      "models/gemini-2.5-flash-lite-preview-06-17",
+      "models/gemini-2.5-pro-preview-05-06",
+      "models/gemini-2.5-pro-preview-06-05",
+      "models/gemini-2.5-pro",
+      "models/gemini-2.0-flash-exp",
+      "models/gemini-2.0-flash",
+      "models/gemini-2.0-flash-001",
+      "models/gemini-2.0-flash-exp-image-generation",
+      "models/gemini-2.0-flash-lite-001",
+      "models/gemini-2.0-flash-lite",
+      "models/gemini-2.0-flash-preview-image-generation",
+      "models/gemini-2.0-flash-lite-preview-02-05",
+      "models/gemini-2.0-flash-lite-preview",
+      "models/gemini-2.0-pro-exp",
+      "models/gemini-2.0-pro-exp-02-05",
+      "models/gemini-exp-1206",
+      "models/gemini-2.0-flash-thinking-exp-01-21",
+      "models/gemini-2.0-flash-thinking-exp",
+      "models/gemini-2.0-flash-thinking-exp-1219",
+      "models/gemini-2.5-flash-preview-tts",
+      "models/gemini-2.5-pro-preview-tts",
+      "models/learnlm-2.0-flash-experimental",
+      "models/gemma-3-1b-it",
+      "models/gemma-3-4b-it",
+      "models/gemma-3-12b-it",
+      "models/gemma-3-27b-it",
+      "models/gemma-3n-e4b-it",
+      "models/gemma-3n-e2b-it",
+      "models/gemini-2.5-flash-lite",
+      "models/embedding-001",
+      "models/text-embedding-004",
+      "models/gemini-embedding-exp-03-07",
+      "models/gemini-embedding-exp",
+      "models/gemini-embedding-001",
+      "models/aqa",
+      "models/imagen-3.0-generate-002",
+      "models/imagen-4.0-generate-preview-06-06"
+    ]
+  }
+}
