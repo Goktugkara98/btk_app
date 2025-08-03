@@ -13,7 +13,7 @@
     <aside class="profile-sidebar">
         <div class="profile-header">
             <div class="profile-avatar">
-                <img src="{{ url_for('static', filename='favicon.svg') }}" alt="Profil Avatar" class="avatar-img">
+                <img src="{{ user.avatar_url if user and user.avatar_url else url_for('static', filename='favicon.svg') }}" alt="Profil Avatar" class="avatar-img">
                 <div class="avatar-edit">
                     <i class="fas fa-camera"></i>
                 </div>
@@ -179,7 +179,17 @@
                                   <div class="form-group">
                                       <label for="gradeLevel">Sınıf</label>
                                       <div class="input-with-edit">
-                                          <input type="text" id="gradeLevel" name="gradeLevel" placeholder="Kaçıncı sınıf öğrencisi" value="{{ user.grade_level if user else '' }}" disabled>
+                                          <select id="gradeLevel" name="gradeLevel" disabled>
+                                              <option value="">Sınıf seçiniz</option>
+                                              <option value="5" {{ 'selected' if user and user.grade_level == '5' else '' }}>5. Sınıf</option>
+                                              <option value="6" {{ 'selected' if user and user.grade_level == '6' else '' }}>6. Sınıf</option>
+                                              <option value="7" {{ 'selected' if user and user.grade_level == '7' else '' }}>7. Sınıf</option>
+                                              <option value="8" {{ 'selected' if user and user.grade_level == '8' else '' }}>8. Sınıf</option>
+                                              <option value="9" {{ 'selected' if user and user.grade_level == '9' else '' }}>9. Sınıf</option>
+                                              <option value="10" {{ 'selected' if user and user.grade_level == '10' else '' }}>10. Sınıf</option>
+                                              <option value="11" {{ 'selected' if user and user.grade_level == '11' else '' }}>11. Sınıf</option>
+                                              <option value="12" {{ 'selected' if user and user.grade_level == '12' else '' }}>12. Sınıf</option>
+                                          </select>
                                           <button type="button" class="btn-edit-field" data-field="gradeLevel">
                                               <i class="fas fa-edit"></i>
                                           </button>

@@ -220,19 +220,32 @@ class ProfileInfoSection {
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             saveBtn.disabled = true;
 
-            // Simulate API call for now
-            await this.simulateApiCall({ [fieldName]: fieldValue });
+            // Make real API call to update profile
+            const response = await fetch('/api/profile/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ [fieldName]: fieldValue })
+            });
 
-            // Update original data
-            this.fieldData[fieldName] = fieldValue;
-            
-            // Exit edit mode
-            this.exitFieldEdit(fieldName);
-            
-            this.showNotification(`${this.getFieldDisplayName(fieldName)} başarıyla güncellendi`, 'success');
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Update original data
+                this.fieldData[fieldName] = fieldValue;
+                
+                // Exit edit mode
+                this.exitFieldEdit(fieldName);
+                
+                this.showNotification(`${this.getFieldDisplayName(fieldName)} başarıyla güncellendi`, 'success');
+            } else {
+                throw new Error(result.message || 'Güncelleme başarısız');
+            }
             
         } catch (error) {
-            this.showNotification('Güncelleme sırasında bir hata oluştu', 'error');
+            console.error('Profile update error:', error);
+            this.showNotification(error.message || 'Güncelleme sırasında bir hata oluştu', 'error');
         } finally {
             // Reset button
             const saveBtn = field.closest('.input-with-edit').querySelector('.btn-save-field');
@@ -447,6 +460,15 @@ class ProfileInfoSection {
             }
         }
 
+        // Grade level validation
+        if (fieldName === 'gradeLevel' && value) {
+            const validGrades = ['5', '6', '7', '8', '9', '10', '11', '12'];
+            if (!validGrades.includes(value)) {
+                isValid = false;
+                errorMessage = 'Geçerli bir sınıf seçiniz';
+            }
+        }
+
         // Show error if invalid
         if (!isValid) {
             this.showFieldError(field, errorMessage);
@@ -498,12 +520,34 @@ class ProfileInfoSection {
             };
             reader.readAsDataURL(file);
 
-            // Simulate upload
-            await this.simulateAvatarUpload(file);
-            this.showNotification('Profil fotoğrafı başarıyla güncellendi', 'success');
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            // Make real API call to upload avatar
+            const response = await fetch('/api/profile/avatar', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Update avatar image with the new URL
+                if (result.data && result.data.avatar_url) {
+                    const avatarElements = document.querySelectorAll('.avatar-img');
+                    avatarElements.forEach(avatar => {
+                        avatar.src = result.data.avatar_url;
+                    });
+                }
+                this.showNotification('Profil fotoğrafı başarıyla güncellendi', 'success');
+            } else {
+                throw new Error(result.message || 'Fotoğraf yükleme başarısız');
+            }
 
         } catch (error) {
-            this.showNotification('Fotoğraf yüklenirken bir hata oluştu', 'error');
+            console.error('Avatar upload error:', error);
+            this.showNotification(error.message || 'Fotoğraf yüklenirken bir hata oluştu', 'error');
         }
     }
 
@@ -537,23 +581,7 @@ class ProfileInfoSection {
         return statusMap[status] || status;
     }
 
-    async simulateApiCall(data) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('Profile data saved:', data);
-                resolve(data);
-            }, 1500);
-        });
-    }
 
-    async simulateAvatarUpload(file) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('Avatar uploaded:', file.name);
-                resolve();
-            }, 1000);
-        });
-    }
 
     showNotification(message, type = 'info') {
         // Use the notification system from main profile.js

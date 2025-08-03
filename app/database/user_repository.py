@@ -185,7 +185,7 @@ class UserRepository:
                 # Güncellenebilir alanlar
                 updatable_fields = [
                     'username', 'email', 'first_name', 'last_name', 'phone', 
-                    'birth_date', 'gender', 'location', 'school', 'grade_level', 'bio'
+                    'birth_date', 'gender', 'location', 'school', 'grade_level', 'bio', 'avatar_url'
                 ]
                 
                 # Güncellenecek alanları filtrele

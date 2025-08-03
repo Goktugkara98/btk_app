@@ -127,9 +127,9 @@
 
 /* =============================================================================
  * CONTAINER OVERRIDE
- * Bootstrap container'ın padding'ini sıfırla
+ * Bootstrap container'ın padding'ini sıfırla (navbar hariç)
  * ============================================================================= */
-.container {
+.container:not(.navbar-container .container) {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }

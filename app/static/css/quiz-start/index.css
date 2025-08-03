@@ -1,9 +1,0 @@
-/* Quiz Start Page - CSS Index */
-
-/* Import main quiz start styles */
-@import url('./quiz-start.css');
-
-/* Import section-specific styles */
-@import url('./sections/hero.css');
-@import url('./sections/options.css');
-@import url('./sections/summary.css'); 

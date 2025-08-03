@@ -216,3 +216,64 @@ def update_profile():
             'message': result.get('message', 'Profil güncellenirken bir hata oluştu'),
             'details': result
         }), 400
+
+@api_bp.route('/profile/avatar', methods=['POST'])
+def upload_avatar():
+    """5.2.8. Kullanıcı profil fotoğrafını yükler."""
+    if not session.get('logged_in'):
+        return jsonify({
+            'status': 'error',
+            'message': 'Giriş yapmanız gerekiyor'
+        }), 401
+
+    # Check if file was uploaded
+    if 'avatar' not in request.files:
+        return jsonify({
+            'status': 'error',
+            'message': 'Dosya seçilmedi'
+        }), 400
+
+    file = request.files['avatar']
+    
+    # Check if file is empty
+    if file.filename == '':
+        return jsonify({
+            'status': 'error',
+            'message': 'Dosya seçilmedi'
+        }), 400
+
+    # Check file type
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+    if not file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+        return jsonify({
+            'status': 'error',
+            'message': 'Sadece PNG, JPG, JPEG ve GIF dosyaları kabul edilir'
+        }), 400
+
+    # Check file size (max 5MB)
+    if len(file.read()) > 5 * 1024 * 1024:
+        file.seek(0)  # Reset file pointer
+        return jsonify({
+            'status': 'error',
+            'message': 'Dosya boyutu 5MB\'dan küçük olmalıdır'
+        }), 400
+
+    file.seek(0)  # Reset file pointer for processing
+
+    user_id = session.get('user_id')
+    
+    # Avatar yükleme iş mantığı servis katmanına devredildi.
+    success, result = user_service.upload_avatar(user_id, file)
+
+    if success:
+        return jsonify({
+            'status': 'success',
+            'message': 'Profil fotoğrafı başarıyla yüklendi',
+            'data': result
+        }), 200
+    else:
+        return jsonify({
+            'status': 'error',
+            'message': result.get('message', 'Fotoğraf yüklenirken bir hata oluştu'),
+            'details': result
+        }), 400

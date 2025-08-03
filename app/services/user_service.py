@@ -27,6 +27,7 @@ from app.database.user_repository import UserRepository
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Dict, Any, List, Tuple, Optional
 import re
+from datetime import datetime
 
 # =============================================================================
 # 4.0. USERSERVICE SINIFI
@@ -262,6 +263,7 @@ class UserService:
                 'school': user_profile.get('school'),
                 'grade_level': user_profile.get('grade_level'),
                 'bio': user_profile.get('bio'),
+                'avatar_url': user_profile.get('avatar_url'),
                 'created_at': created_at,
                 'updated_at': updated_at
             }
@@ -306,5 +308,42 @@ class UserService:
                 
         except Exception as e:
             print(f"Error in update_user_profile service: {e}")
+            return False, {'message': 'Beklenmeyen bir hata oluştu'}
+
+    def upload_avatar(self, user_id: int, file) -> Tuple[bool, Dict[str, Any]]:
+        """
+        4.2.7. Kullanıcının profil fotoğrafını yükler.
+        """
+        try:
+            import os
+            from werkzeug.utils import secure_filename
+            
+            # Create uploads directory if it doesn't exist
+            upload_dir = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'avatars')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Generate unique filename
+            filename = secure_filename(file.filename)
+            file_extension = os.path.splitext(filename)[1]
+            unique_filename = f"avatar_{user_id}_{int(datetime.now().timestamp())}{file_extension}"
+            file_path = os.path.join(upload_dir, unique_filename)
+            
+            # Save file
+            file.save(file_path)
+            
+            # Update user's avatar path in database
+            avatar_url = f"/static/uploads/avatars/{unique_filename}"
+            success = self.user_repo.update_user(user_id, avatar_url=avatar_url)
+            
+            if success:
+                return True, {'avatar_url': avatar_url}
+            else:
+                # Remove file if database update failed
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                return False, {'message': 'Avatar güncellenirken bir hata oluştu'}
+                
+        except Exception as e:
+            print(f"Error in upload_avatar service: {e}")
             return False, {'message': 'Beklenmeyen bir hata oluştu'}
 
