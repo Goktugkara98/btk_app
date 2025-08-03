@@ -1,0 +1,209 @@
+[
+    {
+      "gradeLevel": 8,
+      "gradeName": "8. Sınıf",
+      "subjects": [
+        {
+          "subjectId": "turkish",
+          "subjectName": "Türkçe",
+          "units": [
+            {
+              "unitId": "verbals",
+              "unitName": "Fiilimsiler",
+              "topics": ["Sıfat-fiil", "Zarf-fiil", "İsim-fiil"]
+            },
+            {
+              "unitId": "sentenceElements",
+              "unitName": "Cümlenin Öğeleri",
+              "topics": ["Temel ve yardımcı öğeler"]
+            },
+            {
+              "unitId": "sentenceEmphasis",
+              "unitName": "Cümle Vurgusu",
+              "topics": []
+            },
+            {
+              "unitId": "parentheticalClause",
+              "unitName": "Ara Söz / Ara Cümle",
+              "topics": []
+            },
+            {
+              "unitId": "sentenceTypes",
+              "unitName": "Cümle Türleri",
+              "topics": ["Anlamına göre", "Yapısına göre", "Yüklemin türüne göre", "Öğelerin dizilişine göre"]
+            },
+            {
+              "unitId": "solecism",
+              "unitName": "Anlatım Bozuklukları",
+              "topics": ["Anlamsal bozukluklar", "Yapısal bozukluklar"]
+            },
+            {
+              "unitId": "writingRules",
+              "unitName": "Yazım Kuralları",
+              "topics": []
+            },
+            {
+              "unitId": "punctuation",
+              "unitName": "Noktalama İşaretleri",
+              "topics": []
+            },
+            {
+              "unitId": "figuresOfSpeech",
+              "unitName": "Söz Sanatları",
+              "topics": []
+            },
+            {
+              "unitId": "textTypes",
+              "unitName": "Metin Türleri",
+              "topics": ["Deneme", "Fıkra", "Makale", "Sohbet"]
+            },
+            {
+              "unitId": "lexicalSemantics",
+              "unitName": "Sözcükte Anlam",
+              "topics": ["Gerçek-mecaz-terim anlam", "Çok anlamlılık"]
+            },
+            {
+              "unitId": "sentenceSemantics",
+              "unitName": "Cümlede Anlam",
+              "topics": ["Amaç-sonuç", "Neden-sonuç", "Koşul-sonuç", "Karşılaştırma"]
+            },
+            {
+              "unitId": "paragraphSemantics",
+              "unitName": "Paragrafta Anlam",
+              "topics": ["Ana fikir", "Konu", "Yardımcı fikirler", "Paragraf yapısı"]
+            }
+          ]
+        },
+        {
+          "subjectId": "mathematics",
+          "subjectName": "Matematik",
+          "units": [
+            {
+              "unitId": "factorsAndMultiples",
+              "unitName": "Çarpanlar ve Katlar",
+              "topics": ["EBOB-EKOK"]
+            },
+            {
+              "unitId": "exponentialExpressions",
+              "unitName": "Üslü İfadeler",
+              "topics": []
+            },
+            {
+              "unitId": "squareRootExpressions",
+              "unitName": "Kareköklü İfadeler",
+              "topics": []
+            },
+            {
+              "unitId": "dataAnalysis",
+              "unitName": "Veri Analizi",
+              "topics": ["Sütun grafiği", "Daire grafiği", "Çizgi grafiği"]
+            },
+            {
+              "unitId": "probability",
+              "unitName": "Basit Olayların Olma Olasılığı",
+              "topics": []
+            },
+            {
+              "unitId": "algebraicExpressions",
+              "unitName": "Cebirsel İfadeler ve Özdeşlikler",
+              "topics": []
+            },
+            {
+              "unitId": "linearEquations",
+              "unitName": "Doğrusal Denklemler",
+              "topics": ["Bir bilinmeyenli denklemler", "İki bilinmeyenli denklemler"]
+            },
+            {
+              "unitId": "systemsOfLinearEquations",
+              "unitName": "Doğrusal Denklem Sistemleri",
+              "topics": []
+            },
+            {
+              "unitId": "inequalities",
+              "unitName": "Eşitsizlikler",
+              "topics": []
+            },
+            {
+              "unitId": "triangles",
+              "unitName": "Üçgenler",
+              "topics": ["Yardımcı elemanlar", "Üçgen eşitsizliği", "Pisagor bağıntısı"]
+            },
+            {
+              "unitId": "congruenceAndSimilarity",
+              "unitName": "Eşlik ve Benzerlik",
+              "topics": []
+            },
+            {
+              "unitId": "transformationGeometry",
+              "unitName": "Dönüşüm Geometrisi",
+              "topics": ["Öteleme", "Yansıma", "Dönme"]
+            },
+            {
+              "unitId": "geometricSolids",
+              "unitName": "Geometrik Cisimler",
+              "topics": ["Dik prizmalar", "Dik dairesel silindir", "Dik piramit", "Dik koni"]
+            }
+          ]
+        },
+        {
+          "subjectId": "science",
+          "subjectName": "Fen Bilimleri",
+          "units": [
+            {
+              "unitId": "seasonsAndClimate",
+              "unitName": "Mevsimler ve İklim",
+              "topics": ["Dünya'nın hareketleri", "İklim ve hava olayları"]
+            },
+            {
+              "unitId": "dnaAndGeneticCode",
+              "unitName": "DNA ve Genetik Kod",
+              "topics": ["Kalıtım", "Mutasyon", "Modifikasyon", "Adaptasyon", "Biyoteknoloji"]
+            },
+            {
+              "unitId": "pressure",
+              "unitName": "Basınç",
+              "topics": ["Katı basıncı", "Sıvı basıncı", "Gaz basıncı"]
+            },
+            {
+              "unitId": "matterAndIndustry",
+              "unitName": "Madde ve Endüstri",
+              "topics": ["Periyodik sistem", "Fiziksel ve kimyasal değişimler", "Kimyasal tepkimeler", "Asitler ve bazlar"]
+            },
+            {
+              "unitId": "simpleMachines",
+              "unitName": "Basit Makineler",
+              "topics": ["Makaralar", "Kaldıraçlar", "Eğik düzlem", "Çıkrık", "Dişli çarklar"]
+            },
+            {
+              "unitId": "energyInLivingThings",
+              "unitName": "Canlılar ve Enerji İlişkileri",
+              "topics": ["Besin zinciri ve enerji akışı", "Madde döngüleri"]
+            },
+            {
+              "unitId": "electricalChargesAndEnergy",
+              "unitName": "Elektrik Yükleri ve Elektrik Enerjisi",
+              "topics": ["Elektriklenme", "Enerji dönüşümleri", "Elektrikli araçlar"]
+            },
+            {
+              "unitId": "sound",
+              "unitName": "Ses",
+              "topics": ["Sesin yayılması", "Sürati ve maddeyle etkileşimi"]
+            }
+          ]
+        },
+        {
+          "subjectId": "historyOfRevolution",
+          "subjectName": "T.C. İnkılap Tarihi ve Atatürkçülük",
+          "units": [
+            { "unitId": "aHeroIsBorn", "unitName": "Bir Kahraman Doğuyor", "topics": [] },
+            { "unitId": "nationalAwakening", "unitName": "Milli Uyanış: Bağımsızlık Yolunda Atılan Adımlar", "topics": [] },
+            { "unitId": "nationalSaga", "unitName": "Milli Bir Destan: Ya İstiklal Ya Ölüm!", "topics": [] },
+            { "unitId": "kemalismAndModernizingTurkey", "unitName": "Atatürkçülük ve Çağdaşlaşan Türkiye", "topics": [] },
+            { "unitId": "democratizationEfforts", "unitName": "Demokratikleşme Çabaları", "topics": [] },
+            { "unitId": "turkishForeignPolicy", "unitName": "Atatürk Dönemi Türk Dış Politikası", "topics": [] },
+            { "unitId": "ataturksDeathAndAfter", "unitName": "Atatürk'ün Ölümü ve Sonrası", "topics": [] }
+          ]
+        }
+      ]
+    }
+]

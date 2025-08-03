@@ -75,17 +75,18 @@ class UserRepository:
     # -------------------------------------------------------------------------
     def create_user(self, username: str, email: str, hashed_password: str, **kwargs) -> Optional[int]:
         """4.3.1. Veritabanına yeni bir kullanıcı ekler."""
+        print(f"Creating user: username={username}, email={email}")  # Debug log
         self._ensure_connection()
         try:
             with self.db as conn:
                 # Temel alanlar
-                fields = ['username', 'email', 'hashed_password']
+                fields = ['username', 'email', 'password_hash']
                 values = [username, email, hashed_password]
                 
                 # Opsiyonel alanlar
                 optional_fields = [
                     'first_name', 'last_name', 'phone', 'birth_date', 'gender',
-                    'location', 'school', 'grade_level', 'bio'
+                    'school', 'grade_level_id', 'bio'
                 ]
                 
                 for field in optional_fields:
@@ -94,13 +95,19 @@ class UserRepository:
                         values.append(kwargs[field])
                 
                 query = f"INSERT INTO users ({', '.join(fields)}) VALUES ({', '.join(['%s'] * len(fields))})"
+                print(f"Executing query: {query}")  # Debug log
+                print(f"With values: {values}")  # Debug log
                 conn.cursor.execute(query, values)
                 conn.connection.commit()
-                return conn.cursor.lastrowid
+                user_id = conn.cursor.lastrowid
+                print(f"Created user with ID: {user_id}")  # Debug log
+                return user_id
         except MySQLError as e:
+            print(f"MySQL error in create_user: {e}")  # Debug log
             if e.errno == 1062: # Duplicate entry
+                print(f"Duplicate entry error: {e}")
                 return None
-            conn.connection.rollback()
+            print(f"Other MySQL error: {e}")
             return None
         finally:
             self._close_if_owned()
@@ -111,10 +118,11 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, hashed_password, first_name, last_name, 
-                           phone, birth_date, gender, location, school, grade_level,
-                           bio, created_at, updated_at
-                    FROM users WHERE username = %s
+                    SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
+                           u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
+                           u.bio, u.created_at, u.updated_at
+                    FROM users u
+                    WHERE u.username = %s
                 """
                 conn.cursor.execute(query, (username,))
                 return conn.cursor.fetchone()
@@ -129,10 +137,11 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, hashed_password, first_name, last_name, 
-                           phone, birth_date, gender, location, school, grade_level,
-                           bio, created_at, updated_at
-                    FROM users WHERE email = %s
+                    SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
+                           u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
+                           u.bio, u.created_at, u.updated_at
+                    FROM users u
+                    WHERE u.email = %s
                 """
                 conn.cursor.execute(query, (email,))
                 return conn.cursor.fetchone()
@@ -143,18 +152,23 @@ class UserRepository:
 
     def get_user_by_id(self, user_id: int) -> Optional[Dict]:
         """4.3.4. ID'ye göre bir kullanıcıyı getirir."""
+        print(f"Getting user by ID: {user_id}")  # Debug log
         self._ensure_connection()
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, hashed_password, first_name, last_name, 
-                           phone, birth_date, gender, location, school, grade_level,
-                           bio, created_at, updated_at
-                    FROM users WHERE id = %s
+                    SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
+                           u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
+                           u.bio, u.created_at, u.updated_at
+                    FROM users u
+                    WHERE u.id = %s
                 """
                 conn.cursor.execute(query, (user_id,))
-                return conn.cursor.fetchone()
-        except MySQLError:
+                result = conn.cursor.fetchone()
+                print(f"Query result: {result}")  # Debug log
+                return result
+        except MySQLError as e:
+            print(f"MySQL error in get_user_by_id: {e}")  # Debug log
             return None
         finally:
             self._close_if_owned()
@@ -165,10 +179,11 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, hashed_password, first_name, last_name, 
-                           phone, birth_date, gender, location, school, grade_level,
-                           bio, created_at, updated_at
-                    FROM users
+                    SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
+                           u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
+                           u.bio, u.created_at, u.updated_at
+                    FROM users u
+                    ORDER BY u.created_at DESC
                 """
                 conn.cursor.execute(query)
                 return conn.cursor.fetchall()
@@ -185,7 +200,7 @@ class UserRepository:
                 # Güncellenebilir alanlar
                 updatable_fields = [
                     'username', 'email', 'first_name', 'last_name', 'phone', 
-                    'birth_date', 'gender', 'location', 'school', 'grade_level', 'bio', 'avatar_url'
+                    'birth_date', 'gender', 'school', 'grade_level_id', 'bio', 'avatar_url'
                 ]
                 
                 # Güncellenecek alanları filtrele
@@ -216,7 +231,7 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                query = "UPDATE users SET hashed_password = %s WHERE id = %s"
+                query = "UPDATE users SET password_hash = %s WHERE id = %s"
                 conn.cursor.execute(query, (new_password_hash, user_id))
                 conn.connection.commit()
                 return conn.cursor.rowcount > 0
@@ -271,6 +286,7 @@ class UserRepository:
 
     def check_username_or_email_exists(self, username: str, email: str) -> Tuple[bool, bool]:
         """4.3.11. Hem kullanıcı adı hem de email'in var olup olmadığını kontrol eder."""
+        print(f"Checking username/email exists: username={username}, email={email}")  # Debug log
         self._ensure_connection()
         try:
             with self.db as conn:
@@ -286,8 +302,10 @@ class UserRepository:
                 email_result = conn.cursor.fetchone()
                 email_exists = email_result['count'] > 0
 
+                print(f"Username exists: {username_exists}, Email exists: {email_exists}")  # Debug log
                 return username_exists, email_exists
-        except MySQLError:
+        except MySQLError as e:
+            print(f"MySQL error in check_username_or_email_exists: {e}")  # Debug log
             return False, False
         finally:
             self._close_if_owned()
@@ -299,9 +317,10 @@ class UserRepository:
             with self.db as conn:
                 query = """
                     SELECT id, username, email, first_name, last_name, 
-                           phone, birth_date, gender, location, school, grade_level,
+                           phone, birth_date, gender, school, grade_level_id,
                            bio, created_at, updated_at
-                    FROM users WHERE id = %s
+                    FROM users u
+                    WHERE u.id = %s
                 """
                 conn.cursor.execute(query, (user_id,))
                 return conn.cursor.fetchone()
@@ -316,11 +335,11 @@ class UserRepository:
         try:
             with self.db as conn:
                 query = """
-                    SELECT id, username, email, first_name, last_name, 
-                           location, school, grade_level
-                    FROM users 
-                    WHERE username LIKE %s OR email LIKE %s OR first_name LIKE %s OR last_name LIKE %s
-                    ORDER BY username
+                    SELECT u.id, u.username, u.email, u.first_name, u.last_name, 
+                           u.school, u.grade_level_id
+                    FROM users u
+                    WHERE u.username LIKE %s OR u.email LIKE %s OR u.first_name LIKE %s OR u.last_name LIKE %s
+                    ORDER BY u.username
                     LIMIT 50
                 """
                 search_pattern = f"%{search_term}%"

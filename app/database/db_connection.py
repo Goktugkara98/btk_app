@@ -59,6 +59,7 @@ class DatabaseConnection:
         self.connection: Optional[mysql.connector.MySQLConnection] = None
         self.cursor: Optional[mysql.connector.cursor.MySQLCursor] = None
         self.db_config: Dict[str, Any] = DB_CONFIG
+        # Bağlantıyı hemen kur
         self.connect()
 
     # -------------------------------------------------------------------------
@@ -68,14 +69,17 @@ class DatabaseConnection:
         """5.2.1. Yapılandırma dosyasındaki bilgileri kullanarak veritabanına bağlanır."""
         try:
             if self.connection and self.connection.is_connected():
-                return
+                return True
             self.connection = mysql.connector.connect(**self.db_config)
-            # cursor'u burada yeniden oluşturmak yerine, gerektiğinde oluşturmak daha güvenlidir.
-            # Ancak başlangıçta bir cursor oluşturma mantığı da geçerlidir.
-            # self.cursor = self.connection.cursor(dictionary=True) # İsteğe bağlı
+            # Cursor'ı da oluştur
+            if not self.cursor:
+                self.cursor = self.connection.cursor(dictionary=True)
+            return True
         except MySQLError as e:
-            # Hata yönetimi burada daha detaylı yapılabilir (logging vb.)
-            raise
+            print(f"Veritabanı bağlantı hatası: {e}")
+            self.connection = None
+            self.cursor = None
+            return False
 
     def close(self):
         """5.2.2. Veritabanı bağlantısını ve (varsa) cursor'u kapatır."""
@@ -98,7 +102,8 @@ class DatabaseConnection:
     def _ensure_connection(self):
         """5.2.3. Bağlantının aktif olup olmadığını kontrol eder. Değilse, yeniden bağlanır."""
         if not self.connection or not self.connection.is_connected():
-            self.connect()
+            if not self.connect():
+                raise MySQLError("Veritabanına bağlanılamadı")
 
     # -------------------------------------------------------------------------
     # 5.3. Context Manager Metotları
@@ -107,16 +112,28 @@ class DatabaseConnection:
         """5.3.1. 'with' bloğu için giriş metodu. Bağlantıyı sağlar ve yeni bir cursor döner."""
         self._ensure_connection()
         # Her 'with' bloğu için yeni bir cursor oluşturmak, izolasyon sağlar.
-        self.cursor = self.connection.cursor(dictionary=True)
+        if not self.cursor:
+            self.cursor = self.connection.cursor(dictionary=True)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """5.3.2. 'with' bloğundan çıkıldığında cursor'u ve bağlantıyı kapatır."""
-        # 'with' bloğu sonunda bağlantıyı kapatmak yerine sadece cursor'u kapatıp
-        # commit/rollback yapmak daha performanslı olabilir. Bu yapı, her 'with'
-        # bloğunda yeni bağlantı açıp kapatır.
-        # Örneğin:
-        # if exc_type: self.connection.rollback()
-        # else: self.connection.commit()
-        # if self.cursor: self.cursor.close()
-        self.close()
+        """5.3.2. 'with' bloğundan çıkıldığında sadece cursor'u kapatır, bağlantıyı korur."""
+        # Sadece cursor'u kapat, bağlantıyı koru
+        if self.cursor:
+            try:
+                self.cursor.close()
+            except Exception as e:
+                pass
+        self.cursor = None
+        
+        # Hata durumunda rollback, başarılı durumda commit
+        if exc_type and self.connection:
+            try:
+                self.connection.rollback()
+            except Exception as e:
+                pass
+        elif self.connection:
+            try:
+                self.connection.commit()
+            except Exception as e:
+                pass

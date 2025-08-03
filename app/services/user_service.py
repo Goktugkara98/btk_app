@@ -113,64 +113,91 @@ class UserService:
         4.2.3. Register form verilerini işler ve yeni kullanıcı oluşturur.
         Register form'da name (username), email, password, password2 alanları bulunur.
         """
+        print(f"Register user called with data: {register_data}")  # Debug log
+        
         # 1. Form verilerini kontrol et
         username = register_data.get('name', '').strip()
         email = register_data.get('email', '').strip()
         password = register_data.get('password', '')
         password2 = register_data.get('password2', '')
+        
+        print(f"Extracted values: username='{username}', email='{email}', password='{password}', password2='{password2}'")  # Debug log
 
         # 2. Gerekli alanların kontrolü
         if not username:
+            print(f"Validation failed: username is empty")  # Debug log
             return False, {'message': 'Kullanıcı adı gereklidir'}
         if not email:
+            print(f"Validation failed: email is empty")  # Debug log
             return False, {'message': 'E-posta alanı gereklidir'}
         if not password:
+            print(f"Validation failed: password is empty")  # Debug log
             return False, {'message': 'Şifre alanı gereklidir'}
         if not password2:
+            print(f"Validation failed: password2 is empty")  # Debug log
             return False, {'message': 'Şifre tekrar alanı gereklidir'}
 
         # 3. Kullanıcı adı format kontrolü
         username_pattern = r'^[a-zA-Z0-9_]+$'
         if not re.match(username_pattern, username):
+            print(f"Validation failed: username format invalid: {username}")  # Debug log
             return False, {'message': 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir'}
         if len(username) < 3:
+            print(f"Validation failed: username too short: {len(username)}")  # Debug log
             return False, {'message': 'Kullanıcı adı en az 3 karakter olmalıdır'}
         if len(username) > 30:
+            print(f"Validation failed: username too long: {len(username)}")  # Debug log
             return False, {'message': 'Kullanıcı adı en fazla 30 karakter olabilir'}
 
         # 4. Şifre eşleşme kontrolü
         if password != password2:
+            print(f"Validation failed: passwords don't match")  # Debug log
             return False, {'message': 'Şifreler eşleşmiyor'}
 
         # 5. Şifre uzunluk kontrolü
         if len(password) < 6:
+            print(f"Validation failed: password too short: {len(password)}")  # Debug log
             return False, {'message': 'Şifre en az 6 karakter olmalıdır'}
 
         # 6. Email format kontrolü
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_pattern, email):
+            print(f"Validation failed: email format invalid: {email}")  # Debug log
             return False, {'message': 'Geçerli bir e-posta adresi giriniz'}
 
+        print(f"All validations passed, proceeding with user creation...")  # Debug log
+
         # 7. Kullanıcı adı ve email kontrolü
+        print(f"Checking if username/email already exists...")  # Debug log
         username_exists, email_exists = self.user_repo.check_username_or_email_exists(username, email)
+        print(f"Check result: username_exists={username_exists}, email_exists={email_exists}")  # Debug log
         
         if username_exists:
+            print(f"Username already exists: {username}")  # Debug log
             return False, {'message': 'Bu kullanıcı adı zaten kullanılıyor'}
         if email_exists:
+            print(f"Email already exists: {email}")  # Debug log
             return False, {'message': 'Bu e-posta adresi zaten kullanılıyor'}
 
         try:
             # 8. Şifreyi hash'le
             password_hash = generate_password_hash(password)
+            print(f"Password hashed successfully")  # Debug log
 
             # 9. Yeni kullanıcıyı oluştur
+            print(f"Creating user in database...")  # Debug log
             new_user_id = self.user_repo.create_user(username, email, password_hash)
+            print(f"User creation result: new_user_id={new_user_id}")  # Debug log
 
             if not new_user_id:
+                print(f"User creation failed - no user ID returned")  # Debug log
                 return False, {'message': 'Kullanıcı oluşturulurken bir hata oluştu'}
 
             # 10. Başarılı sonuç dön
             created_user = self.user_repo.get_user_by_id(new_user_id)
+            if not created_user:
+                return False, {'message': 'Kullanıcı oluşturuldu ancak bilgileri alınamadı'}
+            
             return True, {
                 'id': created_user.get('id'),
                 'username': created_user.get('username'),
@@ -209,7 +236,7 @@ class UserService:
                 return False, {'message': 'E-posta veya şifre hatalı'}
 
             # 5. Şifre kontrolü
-            if not check_password_hash(user.get('hashed_password'), password):
+            if not check_password_hash(user.get('password_hash'), password):
                 return False, {'message': 'E-posta veya şifre hatalı'}
 
             # 6. Başarılı giriş - kullanıcı bilgilerini döndür (şifre hariç)
@@ -259,9 +286,9 @@ class UserService:
                 'phone': user_profile.get('phone'),
                 'birth_date': birth_date,
                 'gender': user_profile.get('gender'),
-                'location': user_profile.get('location'),
+
                 'school': user_profile.get('school'),
-                'grade_level': user_profile.get('grade_level'),
+                'grade_level': user_profile.get('grade_level_id'),
                 'bio': user_profile.get('bio'),
                 'avatar_url': user_profile.get('avatar_url'),
                 'created_at': created_at,
@@ -276,6 +303,7 @@ class UserService:
         """
         4.2.6. Kullanıcının profil bilgilerini günceller.
         """
+        print(f"Updating user profile: user_id={user_id}, data={profile_data}")  # Debug log
         try:
             # Form alan adlarını veritabanı alan adlarına eşle
             field_mapping = {
@@ -284,9 +312,9 @@ class UserService:
                 'phone': 'phone',
                 'birthDate': 'birth_date',
                 'gender': 'gender',
-                'location': 'location',
+
                 'school': 'school',
-                'gradeLevel': 'grade_level',
+                'gradeLevel': 'grade_level_id',
                 'bio': 'bio'
             }
             
@@ -294,9 +322,20 @@ class UserService:
             update_data = {}
             for form_field, db_field in field_mapping.items():
                 if form_field in profile_data and profile_data[form_field] is not None:
-                    update_data[db_field] = profile_data[form_field]
+                    # gradeLevel için integer dönüşümü yap
+                    if form_field == 'gradeLevel':
+                        print(f"Processing gradeLevel: {profile_data[form_field]}")  # Debug log
+                        try:
+                            update_data[db_field] = int(profile_data[form_field])
+                            print(f"Converted gradeLevel to: {update_data[db_field]}")  # Debug log
+                        except (ValueError, TypeError):
+                            print(f"Failed to convert gradeLevel: {profile_data[form_field]}")  # Debug log
+                            return False, {'message': 'Geçersiz sınıf değeri'}
+                    else:
+                        update_data[db_field] = profile_data[form_field]
             
             # Veritabanını güncelle
+            print(f"Final update_data: {update_data}")  # Debug log
             success = self.user_repo.update_user(user_id, **update_data)
             
             if success:

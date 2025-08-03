@@ -108,6 +108,26 @@ export class NavigationUI {
         }
     }
 
+    disableNavigation() {
+        if (this.elements.prevButton) {
+            this.elements.prevButton.disabled = true;
+        }
+        if (this.elements.nextButton) {
+            this.elements.nextButton.disabled = true;
+        }
+        console.log('🚫 Navigation disabled');
+    }
+
+    enableNavigation() {
+        if (this.elements.prevButton) {
+            this.elements.prevButton.disabled = false;
+        }
+        if (this.elements.nextButton) {
+            this.elements.nextButton.disabled = false;
+        }
+        console.log('✅ Navigation enabled');
+    }
+
     previousQuestion() {
         this.core.previousQuestion();
     }

@@ -12,3 +12,6 @@ Jinja2==3.1.2
 
 # Development
 python-dotenv==1.0.0
+
+# System monitoring
+psutil==5.9.6

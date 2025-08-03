@@ -1,16 +1,36 @@
 # =============================================================================
-# Basit Soru Bankası - Veritabanı Migrations
-# Tablolar: users, questions ve question_options
+# Veritabanı Migrations - Python Schema Tabanlı Yapı
+# =============================================================================
+# Bu modül, veritabanı tablolarını oluşturmak için kullanılır.
+# Python şemaları app/database/schemas/ klasöründe tutulur.
+# JSON verileri app/data/lessons/ klasöründen dinamik olarak yüklenir.
 # =============================================================================
 
 from mysql.connector import Error as MySQLError
-from typing import Optional
-from app.database.db_connection import DatabaseConnection
+from typing import Optional, Dict, List
+import sys
+import os
 
-class SimpleMigrations:
+# Add the parent directory to the path so we can import app modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+from app.database.db_connection import DatabaseConnection
+from app.database.json_data_loader import JSONDataLoader
+from app.database.schemas import (
+    GRADES_TABLE_SQL, GRADES_SAMPLE_DATA,
+    SUBJECTS_TABLE_SQL, SUBJECTS_SAMPLE_DATA,
+    UNITS_TABLE_SQL, UNITS_SAMPLE_DATA,
+    TOPICS_TABLE_SQL, TOPICS_SAMPLE_DATA,
+    QUESTIONS_TABLE_SQL, QUESTIONS_SAMPLE_DATA,
+    QUESTION_OPTIONS_TABLE_SQL, QUESTION_OPTIONS_SAMPLE_DATA,
+    USERS_TABLE_SQL, USERS_SAMPLE_DATA
+)
+
+class DatabaseMigrations:
     """
-    Basit soru bankası için veritabanı şemasını oluşturur.
-    Tablolar: users, questions ve question_options
+    Python schema tabanlı veritabanı migration sınıfı.
+    Python şemalarını kullanarak tabloları oluşturur.
+    JSON dosyalarından dinamik veri yükler.
     """
 
     def __init__(self, db_connection: Optional[DatabaseConnection] = None):
@@ -21,274 +41,313 @@ class SimpleMigrations:
         else:
             self.db: DatabaseConnection = DatabaseConnection()
             self.own_connection: bool = True
+        
+        # JSON veri yükleyici
+        self.json_loader = JSONDataLoader()
+        
+        # Tablo şemaları ve örnek veriler
+        self.table_schemas = {
+            'grades': (GRADES_TABLE_SQL, ""),  # JSON'dan doldurulacak
+            'subjects': (SUBJECTS_TABLE_SQL, ""),  # JSON'dan doldurulacak
+            'units': (UNITS_TABLE_SQL, ""),  # JSON'dan doldurulacak
+            'topics': (TOPICS_TABLE_SQL, ""),  # JSON'dan doldurulacak
+            'questions': (QUESTIONS_TABLE_SQL, QUESTIONS_SAMPLE_DATA),
+            'question_options': (QUESTION_OPTIONS_TABLE_SQL, QUESTION_OPTIONS_SAMPLE_DATA),
+            'users': (USERS_TABLE_SQL, USERS_SAMPLE_DATA)
+        }
+        
+        # Tablo oluşturma sırası (foreign key bağımlılıklarına göre)
+        self.table_order = ['grades', 'subjects', 'units', 'topics', 'questions', 'question_options', 'users']
 
     def __del__(self):
         """Destructor - bağlantıyı temizle."""
         if self.own_connection:
             self.db.close()
 
-    def drop_existing_tables(self):
-        """Mevcut tabloları temizler."""
+    def _execute_sql(self, sql: str, params: tuple = None) -> bool:
+        """SQL komutunu çalıştırır."""
         try:
             with self.db as conn:
-                print("🧹 Mevcut tablolar temizleniyor...")
-                
-                # Foreign key constraint'leri devre dışı bırak
-                conn.cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
-                
-                # Mevcut tabloları sil
-                tables_to_drop = [
-                    'question_options',
-                    'questions',
-                    'users',
-                    'question_tag_relations',
-                    'question_tags',
-                    'question_media',
-                    'user_answers',
-                    'quiz_attempts',
-                    'user_statistics',
-                    'subtopics',
-                    'topics',
-                    'grade_subjects',
-                    'subjects',
-                    'grade_levels',
-                    'education_levels',
-                    'difficulty_levels',
-                    'question_types'
-                ]
-                
-                for table in tables_to_drop:
-                    try:
-                        conn.cursor.execute(f"DROP TABLE IF EXISTS {table}")
-                        print(f"   ✅ {table} tablosu silindi")
-                    except Exception as e:
-                        print(f"   ⚠️  {table} tablosu silinemedi: {e}")
-                
-                # Foreign key constraint'leri tekrar etkinleştir
-                conn.cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+                if params:
+                    conn.cursor.execute(sql, params)
+                else:
+                    conn.cursor.execute(sql)
                 conn.connection.commit()
-                
-                print("✅ Tablo temizleme tamamlandı!")
-                
+                return True
+        except MySQLError as e:
+            print(f"❌ SQL hatası: {e}")
+            return False
+
+    def _create_table(self, table_name: str, table_sql: str, sample_data: str) -> bool:
+        """Tabloyu oluşturur ve örnek verileri ekler."""
+        try:
+            # Tabloyu oluştur
+            if not self._execute_sql(table_sql):
+                return False
+            
+            # Örnek verileri ekle (eğer varsa)
+            if sample_data:
+                if not self._execute_sql(sample_data):
+                    print(f"   ⚠️  {table_name} için örnek veriler eklenemedi")
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ {table_name} tablosu oluşturma hatası: {e}")
+            return False
+
+    def _drop_table(self, table_name: str) -> bool:
+        """Tabloyu siler."""
+        return self._execute_sql(f"DROP TABLE IF EXISTS {table_name}")
+
+    def _populate_from_json(self):
+        """JSON dosyalarından verileri yükler ve tablolara ekler."""
+        try:
+            print("📚 JSON verileri işleniyor...")
+            
+            # JSON verilerini işle
+            grades_sql, subjects_sql, units_sql, topics_sql = self.json_loader.process_all_data()
+            
+            # Grades tablosunu doldur
+            if grades_sql:
+                print("📋 Grades tablosu JSON verileriyle dolduruluyor...")
+                if not self._execute_sql(grades_sql):
+                    print("❌ Grades tablosu doldurulamadı!")
+                    return False
+                print("   ✅ Grades tablosu başarıyla dolduruldu")
+            
+            # Subjects tablosunu doldur (grade_id_map gerektirir)
+            print("📋 Subjects tablosu JSON verileriyle dolduruluyor...")
+            grade_id_map = self.json_loader.get_grade_id_map(self.db)
+            
+            if grade_id_map:
+                subjects_sql = self.json_loader.generate_subjects_sql(grade_id_map)
+                if subjects_sql:
+                    if not self._execute_sql(subjects_sql):
+                        print("❌ Subjects tablosu doldurulamadı!")
+                        return False
+                    print("   ✅ Subjects tablosu başarıyla dolduruldu")
+                else:
+                    print("   ⚠️  Subjects için veri bulunamadı")
+            else:
+                print("   ⚠️  Grade ID map oluşturulamadı")
+                return False
+            
+            # Units tablosunu doldur (subject_id_map gerektirir)
+            print("📋 Units tablosu JSON verileriyle dolduruluyor...")
+            subject_id_map = self.json_loader.get_subject_id_map(self.db)
+            
+            if subject_id_map:
+                units_sql = self.json_loader.generate_units_sql(subject_id_map)
+                if units_sql:
+                    if not self._execute_sql(units_sql):
+                        print("❌ Units tablosu doldurulamadı!")
+                        return False
+                    print("   ✅ Units tablosu başarıyla dolduruldu")
+                else:
+                    print("   ⚠️  Units için veri bulunamadı")
+            else:
+                print("   ⚠️  Subject ID map oluşturulamadı")
+                return False
+            
+            # Topics tablosunu doldur (unit_id_map gerektirir)
+            print("📋 Topics tablosu JSON verileriyle dolduruluyor...")
+            unit_id_map = self.json_loader.get_unit_id_map(self.db)
+            
+            if unit_id_map:
+                topics_sql = self.json_loader.generate_topics_sql(unit_id_map)
+                if topics_sql:
+                    if not self._execute_sql(topics_sql):
+                        print("❌ Topics tablosu doldurulamadı!")
+                        return False
+                    print("   ✅ Topics tablosu başarıyla dolduruldu")
+                else:
+                    print("   ⚠️  Topics için veri bulunamadı")
+            else:
+                print("   ⚠️  Unit ID map oluşturulamadı")
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ JSON veri yükleme hatası: {e}")
+            return False
+
+    def drop_all_tables(self):
+        """Tüm tabloları temizler."""
+        try:
+            print("🧹 Tüm tablolar temizleniyor...")
+            
+            # Foreign key constraint'leri devre dışı bırak
+            self._execute_sql("SET FOREIGN_KEY_CHECKS = 0")
+            
+            # Tabloları sil (child tablolar önce)
+            tables = [
+                'question_options',
+                'questions', 
+                'topics',
+                'units',
+                'subjects',
+                'grades',
+                'users'
+            ]
+            
+            for table in tables:
+                if self._drop_table(table):
+                    print(f"   ✅ {table} tablosu silindi")
+                else:
+                    print(f"   ⚠️  {table} tablosu silinemedi")
+            
+            # Foreign key constraint'leri tekrar etkinleştir
+            self._execute_sql("SET FOREIGN_KEY_CHECKS = 1")
+            
+            print("✅ Tablo temizleme tamamlandı!")
+            
         except MySQLError as e:
             print(f"❌ Tablo temizleme hatası: {e}")
             raise
 
-    def create_simple_tables(self):
-        """Basit soru bankası tablolarını oluşturur."""
+    def create_tables(self):
+        """Tüm tabloları oluşturur."""
         try:
-            with self.db as conn:
-                print("📋 Users tablosu oluşturuluyor...")
-                print("   • username, email, hashed_password (temel alanlar)")
-                print("   • first_name, last_name, phone, birth_date, gender")
-                print("   • location, school, grade_level, bio")
+            print("🚀 Veritabanı tabloları oluşturuluyor...")
+            
+            # Tabloları sırayla oluştur
+            table_descriptions = {
+                'grades': 'Grades (Sınıflar)',
+                'subjects': 'Subjects (Dersler)',
+                'units': 'Units (Üniteler)',
+                'topics': 'Topics (Konular)',
+                'questions': 'Questions (Sorular)',
+                'question_options': 'Question Options (Soru Seçenekleri)',
+                'users': 'Users (Kullanıcılar)'
+            }
+            
+            for table_name in self.table_order:
+                if table_name not in self.table_schemas:
+                    print(f"❌ {table_name} şeması bulunamadı!")
+                    return False
                 
-                # Users tablosu
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        username VARCHAR(50) UNIQUE NOT NULL,
-                        email VARCHAR(100) UNIQUE NOT NULL,
-                        hashed_password VARCHAR(255) NOT NULL,
-                        first_name VARCHAR(50),
-                        last_name VARCHAR(50),
-                        phone VARCHAR(20),
-                        birth_date DATE,
-                        gender ENUM('male', 'female', 'other'),
-                        location VARCHAR(100),
-                        school VARCHAR(100),
-                        grade_level VARCHAR(20),
-                        bio TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-                    )
-                """)
+                table_sql, sample_data = self.table_schemas[table_name]
+                description = table_descriptions.get(table_name, table_name)
                 
-                print("📋 Questions tablosu oluşturuluyor...")
-                
-                # Questions tablosu
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS questions (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        question_text TEXT NOT NULL,
-                        explanation TEXT,
-                        difficulty ENUM('kolay', 'orta', 'zor') DEFAULT 'orta',
-                        is_active BOOLEAN DEFAULT true,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-                
-                print("📋 Question options tablosu oluşturuluyor...")
-                
-                # Question options tablosu
-                conn.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS question_options (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        question_id INT NOT NULL,
-                        option_text TEXT NOT NULL,
-                        is_correct BOOLEAN DEFAULT false,
-                        option_letter CHAR(1) NOT NULL,
-                        FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
-                    )
-                """)
-                
-                conn.connection.commit()
-                print("✅ Basit tablolar başarıyla oluşturuldu!")
-                
+                print(f"📋 {description} oluşturuluyor...")
+                if not self._create_table(table_name, table_sql, sample_data):
+                    print(f"❌ {description} tablosu oluşturulamadı!")
+                    return False
+                print(f"   ✅ {description} başarıyla oluşturuldu")
+
+            # JSON verilerini yükle
+            if not self._populate_from_json():
+                print("❌ JSON verileri yüklenemedi!")
+                return False
+
+            print("✅ Tüm tablolar başarıyla oluşturuldu!")
+            return True
+            
         except MySQLError as e:
             print(f"❌ Tablo oluşturma hatası: {e}")
-            raise
+            return False
 
-    def create_sample_questions(self):
-        """Örnek soruları ekler."""
-        try:
-            with self.db as conn:
-                print("📝 Örnek sorular ekleniyor...")
-                
-                # Örnek sorular
-                sample_questions = [
-                    {
-                        'question_text': 'Aşağıdaki sayılardan hangisi en büyüktür?',
-                        'explanation': 'Sayıları karşılaştırırken basamak sayısına bakılır. 1250 sayısı 4 basamaklı, diğerleri 3 basamaklıdır.',
-                        'difficulty': 'kolay',
-                        'options': [
-                            ('1250', True, 'A'),
-                            ('999', False, 'B'),
-                            ('850', False, 'C'),
-                            ('750', False, 'D')
-                        ]
-                    },
-                    {
-                        'question_text': 'Hangi sayı 1000 ile 2000 arasındadır?',
-                        'explanation': '1000 ile 2000 arasındaki sayılar 4 basamaklıdır ve 1 ile başlar.',
-                        'difficulty': 'orta',
-                        'options': [
-                            ('950', False, 'A'),
-                            ('1500', True, 'B'),
-                            ('2100', False, 'C'),
-                            ('800', False, 'D')
-                        ]
-                    },
-                    {
-                        'question_text': '1500 sayısının yarısı kaçtır?',
-                        'explanation': 'Bir sayının yarısını bulmak için 2\'ye böleriz. 1500 ÷ 2 = 750',
-                        'difficulty': 'kolay',
-                        'options': [
-                            ('500', False, 'A'),
-                            ('750', True, 'B'),
-                            ('1000', False, 'C'),
-                            ('1250', False, 'D')
-                        ]
-                    },
-                    {
-                        'question_text': '2000 sayısının çeyreği kaçtır?',
-                        'explanation': 'Bir sayının çeyreğini bulmak için 4\'e böleriz. 2000 ÷ 4 = 500',
-                        'difficulty': 'orta',
-                        'options': [
-                            ('400', False, 'A'),
-                            ('500', True, 'B'),
-                            ('600', False, 'C'),
-                            ('800', False, 'D')
-                        ]
-                    },
-                    {
-                        'question_text': 'Hangi sayı 5000\'den büyüktür?',
-                        'explanation': '5000\'den büyük sayılar 4 basamaklı olabilir ama 5000\'den büyük olmalıdır.',
-                        'difficulty': 'zor',
-                        'options': [
-                            ('4500', False, 'A'),
-                            ('5500', True, 'B'),
-                            ('4000', False, 'C'),
-                            ('3500', False, 'D')
-                        ]
-                    }
-                ]
-                
-                for question_data in sample_questions:
-                    # Ana soru verilerini ekle
-                    conn.cursor.execute("""
-                        INSERT INTO questions (question_text, explanation, difficulty)
-                        VALUES (%s, %s, %s)
-                    """, (question_data['question_text'], question_data['explanation'], question_data['difficulty']))
-                    
-                    question_id = conn.cursor.lastrowid
-                    
-                    # Seçenekleri ekle
-                    for option_text, is_correct, option_letter in question_data['options']:
-                        conn.cursor.execute("""
-                            INSERT INTO question_options (question_id, option_text, is_correct, option_letter)
-                            VALUES (%s, %s, %s, %s)
-                        """, (question_id, option_text, is_correct, option_letter))
-                
-                conn.connection.commit()
-                print(f"✅ {len(sample_questions)} örnek soru eklendi!")
-                
-        except MySQLError as e:
-            print(f"❌ Örnek veri ekleme hatası: {e}")
-            raise
-
-    def check_tables_exist(self):
+    def check_tables_exist(self) -> bool:
         """Tabloların mevcut olup olmadığını kontrol eder."""
         try:
-            with self.db as conn:
-                # Ana tabloları kontrol et
-                required_tables = ['users', 'questions', 'question_options']
-                
-                for table in required_tables:
+            required_tables = [
+                'grades', 'subjects', 'units', 'topics', 'questions', 
+                'question_options', 'users'
+            ]
+            
+            for table in required_tables:
+                with self.db as conn:
                     conn.cursor.execute(f"SHOW TABLES LIKE '{table}'")
                     if not conn.cursor.fetchone():
                         return False
-                
-                return True
-                
+            
+            return True
+            
         except MySQLError as e:
             print(f"❌ Tablo kontrol hatası: {e}")
             return False
 
     def run_migrations(self):
-        """Tüm migration işlemlerini çalıştırır."""
+        """Ana migration işlemini çalıştırır."""
         try:
-            print("🚀 Veritabanı kontrol ediliyor...")
-            print("=" * 50)
+            print("🚀 Veritabanı migration başlatılıyor...")
+            print("=" * 60)
             
             # Tabloların mevcut olup olmadığını kontrol et
             if self.check_tables_exist():
                 print("✅ Tablolar zaten mevcut. Migration atlanıyor...")
-                print("=" * 50)
+                print("   💡 Eğer tabloları yeniden oluşturmak istiyorsanız:")
+                print("   💡 migrations.force_recreate() metodunu kullanın.")
+                print("=" * 60)
                 return
             
             print("📋 Tablolar bulunamadı. Yeni tablolar oluşturuluyor...")
             
             # 1. Tabloları oluştur
-            self.create_simple_tables()
+            if not self.create_tables():
+                raise Exception("Tablolar oluşturulamadı!")
             
-            # 2. Örnek verileri ekle
-            self.create_sample_questions()
-            
-            print("=" * 50)
+            print("=" * 60)
             print("🎉 Veritabanı başarıyla oluşturuldu!")
             print("📊 Oluşturulan tablolar:")
-            print("   • users (Kullanıcılar - username, email, hashed_password, first_name, last_name, phone, birth_date, gender, location, school, grade_level, bio)")
+            print("   • grades (Sınıflar) - JSON'dan dinamik")
+            print("   • subjects (Dersler) - JSON'dan dinamik")
+            print("   • units (Üniteler) - JSON'dan dinamik")
+            print("   • topics (Konular) - JSON'dan dinamik")
             print("   • questions (Sorular)")
-            print("   • question_options (Seçenekler)")
+            print("   • question_options (Soru Seçenekleri)")
+            print("   • users (Kullanıcılar)")
+            print("\n📚 Hiyerarşik yapı:")
+            print("   Grade → Subject → Unit → Topic → Question → Question Options")
             
         except Exception as e:
             print(f"❌ Migration hatası: {e}")
             raise
 
-# =============================================================================
-# Eski Migrations sınıfını korumak için alias
-# =============================================================================
-class Migrations(SimpleMigrations):
-    """
-    Geriye uyumluluk için eski Migrations sınıfı.
-    Artık basit sistem kullanılıyor.
-    """
-    pass
+    def force_recreate(self):
+        """Tabloları zorla yeniden oluşturur."""
+        try:
+            print("🚀 Veritabanı zorla yeniden oluşturuluyor...")
+            print("⚠️  TÜM VERİLER SİLİNECEK!")
+            print("=" * 60)
+            
+            # Tabloları sil
+            self.drop_all_tables()
+            
+            # Yeni tabloları oluştur
+            if not self.create_tables():
+                raise Exception("Tablolar oluşturulamadı!")
+            
+            print("=" * 60)
+            print("🎉 Veritabanı başarıyla yeniden oluşturuldu!")
+            
+        except Exception as e:
+            print(f"❌ Yeniden oluşturma hatası: {e}")
+            raise
+
+    def get_table_info(self) -> Dict[str, int]:
+        """Tablolardaki kayıt sayılarını döner."""
+        try:
+            table_counts = {}
+            with self.db as conn:
+                for table_name in self.table_order:
+                    try:
+                        conn.cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+                        count = conn.cursor.fetchone()[0]
+                        table_counts[table_name] = count
+                    except MySQLError:
+                        table_counts[table_name] = 0
+            
+            return table_counts
+            
+        except Exception as e:
+            print(f"❌ Tablo bilgisi alma hatası: {e}")
+            return {}
 
 # =============================================================================
 # DOĞRUDAN ÇALIŞTIRMA
 # =============================================================================
 if __name__ == "__main__":
-    migrations = SimpleMigrations()
+    migrations = DatabaseMigrations()
     migrations.run_migrations()

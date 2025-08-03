@@ -13,6 +13,9 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Base CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 
@@ -29,18 +32,18 @@
             <div class="navbar-left">
                 <div class="category">
                     <i class="bi bi-tags-fill"></i>
-                    <span class="category-text">Genel Kültür</span>
+                    <span class="category-text" id="quiz-category">Yükleniyor...</span>
                 </div>
             </div>
             <div class="navbar-center">
                 <div class="question-progress">
-                    <span class="progress-text">Soru <span class="current">1</span>/<span class="total">10</span></span>
+                    <span class="progress-text">Soru <span class="current" id="current-question">-</span>/<span class="total" id="total-questions">-</span></span>
                 </div>
             </div>
             <div class="navbar-right">
-                <div class="timer">
+                <div class="timer" id="timer-container">
                     <i class="bi bi-clock"></i>
-                    <span class="timer-text">00:20</span>
+                    <span class="timer-text" id="timer-display">--:--</span>
                 </div>
             </div>
         </div>
@@ -50,11 +53,87 @@
     <main class="quiz-main">
         <div class="quiz-container">
             <div class="quiz-content">
-                <!-- Quiz içeriği buraya gelecek -->
-                <div class="question-container">
-                    <h2 class="question-text">Soru yükleniyor...</h2>
-                    <div class="options-container">
+                <!-- Loading State -->
+                <div class="loading-state" id="loading-state">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>Soru yükleniyor...</p>
+                </div>
+
+                <!-- Question Container -->
+                <div class="question-container" id="question-container" style="display: none;">
+                    <h2 class="question-text" id="question-text">Soru yükleniyor...</h2>
+                    <div class="options-container" id="options-container">
                         <!-- Seçenekler buraya gelecek -->
+                    </div>
+                </div>
+
+                <!-- Answer Feedback -->
+                <div class="answer-feedback" id="answer-feedback" style="display: none;">
+                    <div class="feedback-content">
+                        <div class="feedback-icon" id="feedback-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="feedback-title" id="feedback-title">Doğru!</h3>
+                        <p class="feedback-explanation" id="feedback-explanation">Açıklama yükleniyor...</p>
+                        <button class="btn btn-primary" id="next-question-btn">
+                            <i class="fas fa-arrow-right"></i>
+                            Sonraki Soru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Completed -->
+                <div class="quiz-completed" id="quiz-completed" style="display: none;">
+                    <div class="completion-content">
+                        <div class="completion-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h2 class="completion-title">Quiz Tamamlandı!</h2>
+                        <div class="completion-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Doğru Cevap:</span>
+                                <span class="stat-value" id="correct-answers">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Toplam Soru:</span>
+                                <span class="stat-value" id="total-questions-final">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Başarı Oranı:</span>
+                                <span class="stat-value" id="success-rate">-%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Geçen Süre:</span>
+                                <span class="stat-value" id="time-taken">-</span>
+                            </div>
+                        </div>
+                        <div class="completion-actions">
+                            <button class="btn btn-primary" id="view-results-btn">
+                                <i class="fas fa-chart-bar"></i>
+                                Sonuçları Görüntüle
+                            </button>
+                            <button class="btn btn-secondary" id="new-quiz-btn">
+                                <i class="fas fa-plus"></i>
+                                Yeni Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div class="error-state" id="error-state" style="display: none;">
+                    <div class="error-content">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3 class="error-title">Bir Hata Oluştu</h3>
+                        <p class="error-message" id="error-message">Quiz yüklenirken bir hata oluştu.</p>
+                        <button class="btn btn-primary" id="retry-btn">
+                            <i class="fas fa-redo"></i>
+                            Tekrar Dene
+                        </button>
                     </div>
                 </div>
             </div>
@@ -65,22 +144,33 @@
     <nav class="bottom-navbar">
         <div class="navbar-container">
             <div class="navbar-left">
-                <button class="nav-btn prev-btn" disabled>
+                <button class="nav-btn prev-btn" id="prev-btn" disabled>
                     <i class="bi bi-chevron-left"></i>
                     <span>Önceki</span>
                 </button>
             </div>
             <div class="navbar-center">
-                <!-- Boş alan - soru sayısı kaldırıldı -->
+                <!-- Progress bar -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
             </div>
             <div class="navbar-right">
-                <button class="nav-btn next-btn" disabled>
+                <button class="nav-btn next-btn" id="next-btn" disabled>
                     <span>Sonraki</span>
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
         </div>
     </nav>
+
+    <!-- Session ID for JavaScript -->
+    <script>
+        window.QUIZ_SESSION_ID = '{{ session_id }}';
+    </script>
 
     <!-- JavaScript - Modular Structure -->
     <script type="module" src="{{ url_for('static', filename='js/quiz/quiz-app.js') }}"></script>

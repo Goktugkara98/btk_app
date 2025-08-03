@@ -67,34 +67,49 @@ export class QuizUI {
         });
     }
 
-    displayQuestion(question, index) {
+    displayQuestion(questionData, index) {
         if (!this.elements.questionText || !this.elements.optionsContainer) {
             console.error('❌ Question elements not found');
             return;
         }
 
+        // Debug: Log the question object
+        console.log('📋 Question object:', JSON.stringify(questionData, null, 2));
+
+        // Safety check for question structure
+        if (!questionData || !questionData.question || !questionData.question.text) {
+            console.error('❌ Invalid question structure:', questionData);
+            return;
+        }
+
         // Update question text
-        this.elements.questionText.textContent = question.text;
-        console.log(`📝 Question ${index + 1}: ${question.text}`);
+        this.elements.questionText.textContent = questionData.question.text;
+        console.log(`📝 Question ${questionData.question_number || 1}: ${questionData.question.text}`);
 
         // Clear previous options
         this.elements.optionsContainer.innerHTML = '';
         this.elements.options = [];
 
+        // Safety check for options
+        if (!questionData.question.options || !Array.isArray(questionData.question.options)) {
+            console.error('❌ Invalid options structure:', questionData.question.options);
+            return;
+        }
+
         // Create option elements
-        question.options.forEach((option, optionIndex) => {
-            const optionElement = this.createOptionElement(option, optionIndex, index);
+        questionData.question.options.forEach((option, optionIndex) => {
+            const optionElement = this.createOptionElement(option.option_text, optionIndex, questionData.question_number - 1);
             this.elements.optionsContainer.appendChild(optionElement);
             this.elements.options.push(optionElement);
         });
 
         // Show current answer if exists
         const currentAnswer = this.core.getCurrentAnswer();
-        if (currentAnswer !== undefined) {
-            this.updateAnswerUI(index, currentAnswer);
+        if (currentAnswer !== undefined && currentAnswer !== null) {
+            this.updateAnswerUI(questionData.question_number - 1, currentAnswer);
         }
 
-        console.log(`📋 Created ${question.options.length} options`);
+        console.log(`📋 Created ${questionData.question.options.length} options`);
     }
 
     createOptionElement(option, optionIndex, questionIndex) {

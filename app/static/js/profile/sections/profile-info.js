@@ -213,12 +213,21 @@ class ProfileInfoSection {
 
         const fieldValue = field.value;
         
+        // Debug log for gradeLevel
+        if (fieldName === 'gradeLevel') {
+            console.log('Saving gradeLevel:', fieldValue, 'Type:', typeof fieldValue);
+        }
+        
+        // Get the save button and store original HTML
+        const saveBtn = field.closest('.input-with-edit').querySelector('.btn-save-field');
+        const originalHTML = saveBtn ? saveBtn.innerHTML : '';
+        
         try {
             // Show loading state
-            const saveBtn = field.closest('.input-with-edit').querySelector('.btn-save-field');
-            const originalHTML = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            saveBtn.disabled = true;
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                saveBtn.disabled = true;
+            }
 
             // Make real API call to update profile
             const response = await fetch('/api/profile/update', {
@@ -282,7 +291,7 @@ class ProfileInfoSection {
             'phone': 'Telefon',
             'birthDate': 'Doğum Tarihi',
             'gender': 'Cinsiyet',
-            'location': 'Konum',
+
             'bio': 'Biyografi',
             'school': 'Okul',
             'gradeLevel': 'Sınıf',
@@ -312,7 +321,7 @@ class ProfileInfoSection {
         // Form alanlarını kontrol et
         const fields = [
             'username', 'email', 'firstName', 'lastName', 'phone',
-            'birthDate', 'gender', 'location', 'bio', 'school', 'gradeLevel'
+            'birthDate', 'gender', 'bio', 'school', 'gradeLevel'
         ];
 
         fields.forEach(field => {
@@ -328,7 +337,7 @@ class ProfileInfoSection {
     populateForm(data) {
         const fields = [
             'username', 'email', 'firstName', 'lastName', 'phone',
-            'birthDate', 'gender', 'location', 'bio', 'school', 'gradeLevel'
+            'birthDate', 'gender', 'bio', 'school', 'gradeLevel'
         ];
 
         fields.forEach(field => {
@@ -462,7 +471,7 @@ class ProfileInfoSection {
 
         // Grade level validation
         if (fieldName === 'gradeLevel' && value) {
-            const validGrades = ['5', '6', '7', '8', '9', '10', '11', '12'];
+            const validGrades = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
             if (!validGrades.includes(value)) {
                 isValid = false;
                 errorMessage = 'Geçerli bir sınıf seçiniz';

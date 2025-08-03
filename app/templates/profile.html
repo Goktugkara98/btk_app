@@ -156,15 +156,7 @@
                                       </div>
                                   </div>
                                   
-                                  <div class="form-group">
-                                      <label for="location">Konum</label>
-                                      <div class="input-with-edit">
-                                          <input type="text" id="location" name="location" placeholder="Şehir, Ülke" value="{{ user.location if user else '' }}" disabled>
-                                          <button type="button" class="btn-edit-field" data-field="location">
-                                              <i class="fas fa-edit"></i>
-                                          </button>
-                                      </div>
-                                  </div>
+
                                   
                                   <div class="form-group">
                                       <label for="school">Okul</label>
@@ -181,14 +173,18 @@
                                       <div class="input-with-edit">
                                           <select id="gradeLevel" name="gradeLevel" disabled>
                                               <option value="">Sınıf seçiniz</option>
-                                              <option value="5" {{ 'selected' if user and user.grade_level == '5' else '' }}>5. Sınıf</option>
-                                              <option value="6" {{ 'selected' if user and user.grade_level == '6' else '' }}>6. Sınıf</option>
-                                              <option value="7" {{ 'selected' if user and user.grade_level == '7' else '' }}>7. Sınıf</option>
-                                              <option value="8" {{ 'selected' if user and user.grade_level == '8' else '' }}>8. Sınıf</option>
-                                              <option value="9" {{ 'selected' if user and user.grade_level == '9' else '' }}>9. Sınıf</option>
-                                              <option value="10" {{ 'selected' if user and user.grade_level == '10' else '' }}>10. Sınıf</option>
-                                              <option value="11" {{ 'selected' if user and user.grade_level == '11' else '' }}>11. Sınıf</option>
-                                              <option value="12" {{ 'selected' if user and user.grade_level == '12' else '' }}>12. Sınıf</option>
+                                              <option value="1" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 1 else '' }}>1. Sınıf</option>
+                                              <option value="2" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 2 else '' }}>2. Sınıf</option>
+                                              <option value="3" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 3 else '' }}>3. Sınıf</option>
+                                              <option value="4" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 4 else '' }}>4. Sınıf</option>
+                                              <option value="5" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 5 else '' }}>5. Sınıf</option>
+                                              <option value="6" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 6 else '' }}>6. Sınıf</option>
+                                              <option value="7" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 7 else '' }}>7. Sınıf</option>
+                                              <option value="8" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 8 else '' }}>8. Sınıf</option>
+                                              <option value="9" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 9 else '' }}>9. Sınıf</option>
+                                              <option value="10" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 10 else '' }}>10. Sınıf</option>
+                                              <option value="11" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 11 else '' }}>11. Sınıf</option>
+                                              <option value="12" {{ 'selected' if user and user.grade_level_id and user.grade_level_id == 12 else '' }}>12. Sınıf</option>
                                           </select>
                                           <button type="button" class="btn-edit-field" data-field="gradeLevel">
                                               <i class="fas fa-edit"></i>

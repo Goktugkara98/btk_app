@@ -1,7 +1,7 @@
 from flask import Flask, render_template, session
 from config import Config
 from app.database.db_connection import DatabaseConnection
-from app.database.db_migrations import Migrations
+from app.database.db_migrations import DatabaseMigrations
 import os
 import secrets
 
@@ -32,7 +32,7 @@ def create_app(config_class=Config):
         db_connection = DatabaseConnection()
         
         # Run database migrations
-        migrations = Migrations(db_connection)
+        migrations = DatabaseMigrations(db_connection)
         migrations.run_migrations()
         
         # Store the database connection in the app context

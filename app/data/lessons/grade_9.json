@@ -1,0 +1,187 @@
+[
+    {
+      "gradeLevel": 9,
+      "gradeName": "9. Sınıf",
+      "subjects": [
+        {
+          "subjectId": "turkishLanguageAndLiterature",
+          "subjectName": "Türk Dili ve Edebiyatı",
+          "units": [
+            {
+              "unitId": "introductionToLiterature",
+              "unitName": "Edebiyata Giriş",
+              "topics": ["Edebiyat nedir", "Bilimle ve sanatla ilişkisi"]
+            },
+            {
+              "unitId": "periodsOfTurkishLiterature",
+              "unitName": "Türk Edebiyatının Dönemleri",
+              "topics": []
+            },
+            {
+              "unitId": "writingAndPunctuation",
+              "unitName": "Yazım Kuralları ve Noktalama İşaretleri",
+              "topics": []
+            },
+            { "unitId": "story", "unitName": "Hikaye (Öykü)", "topics": [] },
+            {
+              "unitId": "poetry",
+              "unitName": "Şiir",
+              "topics": ["Tema", "Gelenek", "Nazım birimi", "Ölçü", "Uyak"]
+            },
+            { "unitId": "taleAndFable", "unitName": "Masal / Fabl", "topics": [] },
+            { "unitId": "novel", "unitName": "Roman", "topics": [] },
+            { "unitId": "theater", "unitName": "Tiyatro", "topics": [] },
+            { "unitId": "biographyAndAutobiography", "unitName": "Biyografi / Otobiyografi", "topics": [] },
+            { "unitId": "letterAndEmail", "unitName": "Mektup / E-Posta", "topics": [] },
+            { "unitId": "diaryAndBlog", "unitName": "Günlük / Blog", "topics": [] },
+            { "unitId": "nounsAndPronouns", "unitName": "İsimler ve Zamirler", "topics": [] },
+            { "unitId": "adjectives", "unitName": "Sıfatlar", "topics": [] }
+          ]
+        },
+        {
+          "subjectId": "mathematics",
+          "subjectName": "Matematik",
+          "units": [
+            {
+              "unitId": "logic",
+              "unitName": "Mantık",
+              "topics": ["Önermeler", "Bileşik önermeler", "Niceleyiciler"]
+            },
+            {
+              "unitId": "sets",
+              "unitName": "Kümeler",
+              "topics": ["Alt küme", "Kesişim", "Birleşim", "Fark", "Tümleme"]
+            },
+            {
+              "unitId": "equationsAndInequalities",
+              "unitName": "Denklemler ve Eşitsizlikler",
+              "topics": ["Sayı kümeleri", "Birinci dereceden denklemler ve eşitsizlikler", "Üslü ifadeler", "Köklü ifadeler", "Mutlak değer"]
+            },
+            { "unitId": "divisibilityRules", "unitName": "Bölünebilme Kuralları", "topics": [] },
+            { "unitId": "ratioAndProportion", "unitName": "Oran ve Orantı", "topics": [] },
+            {
+              "unitId": "problems",
+              "unitName": "Problemler",
+              "topics": ["Sayı", "Kesir", "Yaş", "Yüzde", "Kar-zarar", "Karışım", "Hareket", "İşçi"]
+            },
+            {
+              "unitId": "triangles",
+              "unitName": "Üçgenler",
+              "topics": ["Açılar", "Açı-kenar bağıntıları", "İkizkenar-eşkenar üçgen", "Yardımcı elemanlar", "Dik üçgen", "Alan"]
+            },
+            {
+              "unitId": "data",
+              "unitName": "Veri",
+              "topics": ["Merkezi eğilim ve yayılım ölçüleri", "Grafik türleri"]
+            }
+          ]
+        },
+        {
+          "subjectId": "physics",
+          "subjectName": "Fizik",
+          "units": [
+            {
+              "unitId": "introductionToPhysics",
+              "unitName": "Fizik Bilimine Giriş",
+              "topics": ["Fiziğin alt dalları", "Temel ve türetilmiş büyüklükler"]
+            },
+            {
+              "unitId": "matterAndProperties",
+              "unitName": "Madde ve Özellikleri",
+              "topics": ["Özkütle", "Dayanıklılık", "Adezyon", "Kohezyon"]
+            },
+            {
+              "unitId": "motionAndForce",
+              "unitName": "Hareket ve Kuvvet",
+              "topics": ["Konum", "Hız", "Sürat", "İvme", "Kuvvet", "Newton'un hareket yasaları"]
+            },
+            {
+              "unitId": "energy",
+              "unitName": "Enerji",
+              "topics": ["İş", "Güç", "Enerji", "Kinetik ve potansiyel enerji", "Enerjinin korunumu"]
+            },
+            {
+              "unitId": "heatAndTemperature",
+              "unitName": "Isı ve Sıcaklık",
+              "topics": ["İç enerji", "Sıcaklık", "Isı", "Isıl denge", "Hal değişimi"]
+            },
+            {
+              "unitId": "electrostatics",
+              "unitName": "Elektrostatik",
+              "topics": ["Elektrik yükleri", "İletken ve yalıtkanlar", "Elektriklenme", "Elektroskop"]
+            }
+          ]
+        },
+        {
+          "subjectId": "chemistry",
+          "subjectName": "Kimya",
+          "units": [
+            {
+              "unitId": "scienceOfChemistry",
+              "unitName": "Kimya Bilimi",
+              "topics": ["Simyadan kimyaya", "Kimyanın disiplinleri", "Kimyacıların çalışma alanları"]
+            },
+            {
+              "unitId": "atomAndPeriodicSystem",
+              "unitName": "Atom ve Periyodik Sistem",
+              "topics": ["Atom modelleri", "Atomun yapısı", "Periyodik sistem"]
+            },
+            {
+              "unitId": "chemicalInteractions",
+              "unitName": "Kimyasal Türler Arası Etkileşimler",
+              "topics": ["Güçlü etkileşimler", "Zayıf etkileşimler"]
+            },
+            {
+              "unitId": "statesOfMatter",
+              "unitName": "Maddenin Halleri",
+              "topics": ["Katılar", "Sıvılar", "Gazlar", "Plazma"]
+            },
+            {
+              "unitId": "natureAndChemistry",
+              "unitName": "Doğa ve Kimya",
+              "topics": ["Su ve hayat", "Çevre kimyası"]
+            }
+          ]
+        },
+        {
+          "subjectId": "biology",
+          "subjectName": "Biyoloji",
+          "units": [
+            { "unitId": "lifeScienceBiology", "unitName": "Yaşam Bilimi Biyoloji", "topics": ["Biyoloji ve canlıların ortak özellikleri"] },
+            { "unitId": "basicComponentsOfLife", "unitName": "Canlıların Yapısında Bulunan Temel Bileşikler", "topics": ["İnorganik bileşikler", "Organik bileşikler"] },
+            { "unitId": "cell", "unitName": "Hücre", "topics": ["Hücre teorisi", "Prokaryot ve ökaryot hücreler", "Organeller"] },
+            { "unitId": "worldOfLivingThings", "unitName": "Canlılar Dünyası", "topics": ["Canlıların sınıflandırılması", "Bakteriler", "Arkeler", "Protistler", "Mantarlar", "Bitkiler", "Hayvanlar"] }
+          ]
+        },
+        {
+          "subjectId": "history",
+          "subjectName": "Tarih",
+          "units": [
+            { "unitId": "historyAndTime", "unitName": "Tarih ve Zaman", "topics": [] },
+            { "unitId": "firstAgesOfHumanity", "unitName": "İnsanlığın İlk Dönemleri", "topics": ["Yazının icadından önceki dönem", "İlk çağ medeniyetleri"] },
+            { "unitId": "worldInTheMiddleAges", "unitName": "Orta Çağ'da Dünya", "topics": [] },
+            { "unitId": "turkishWorldInEarlyAndMiddleAges", "unitName": "İlk ve Orta Çağlarda Türk Dünyası", "topics": [] },
+            { "unitId": "birthOfIslamicCivilization", "unitName": "İslam Medeniyetinin Doğuşu", "topics": [] },
+            { "unitId": "turksAcceptanceOfIslam", "unitName": "Türklerin İslamiyet'i Kabulü ve İlk Türk İslam Devletleri", "topics": [] }
+          ]
+        },
+        {
+          "subjectId": "geography",
+          "subjectName": "Coğrafya",
+          "units": [
+            { "unitId": "natureAndHumanInteraction", "unitName": "Doğa ve İnsan Etkileşimi", "topics": [] },
+            { "unitId": "shapeAndMovementsOfEarth", "unitName": "Dünya'nın Şekli ve Hareketleri", "topics": [] },
+            { "unitId": "geographicalLocation", "unitName": "Coğrafi Konum", "topics": ["Matematiksel konum", "Özel konum"] },
+            { "unitId": "mapSkills", "unitName": "Harita Bilgisi", "topics": ["Ölçek", "Projeksiyonlar", "Harita okuma"] },
+            { "unitId": "atmosphereAndTemperature", "unitName": "Atmosfer ve Sıcaklık", "topics": [] },
+            { "unitId": "pressureAndWinds", "unitName": "Basınç ve Rüzgarlar", "topics": [] },
+            { "unitId": "humidityAndPrecipitation", "unitName": "Nemlilik ve Yağış", "topics": [] },
+            { "unitId": "majorClimateTypes", "unitName": "Büyük İklim Tipleri", "topics": [] },
+            { "unitId": "internalForces", "unitName": "İç Kuvvetler", "topics": ["Orojenez", "Epirojenez", "Volkanizma", "Depremler"] },
+            { "unitId": "externalForces", "unitName": "Dış Kuvvetler", "topics": ["Akarsular", "Rüzgarlar", "Buzullar", "Dalgalar"] },
+            { "unitId": "waterSoilAndPlants", "unitName": "Su Kaynakları, Topraklar ve Bitkiler", "topics": [] }
+          ]
+        }
+      ]
+    }
+]

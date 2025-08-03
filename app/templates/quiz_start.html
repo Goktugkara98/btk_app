@@ -45,10 +45,7 @@
                                     </label>
                                     <select id="class-select" class="form-control">
                                         <option value="">Sınıf seçiniz</option>
-                                        <option value="9">9. Sınıf</option>
-                                        <option value="10">10. Sınıf</option>
-                                        <option value="11">11. Sınıf</option>
-                                        <option value="12">12. Sınıf</option>
+                                        <!-- Sınıflar veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
 
@@ -58,10 +55,10 @@
                                         <i class="fas fa-book"></i>
                                         Ders Seçimi
                                     </label>
-                                                                         <select id="subject-select" class="form-control" disabled>
-                                         <option value="">Önce sınıf seçiniz</option>
-                                         <option value="random">Rasgele Ders</option>
-                                     </select>
+                                    <select id="subject-select" class="form-control" disabled>
+                                        <option value="">Önce sınıf seçiniz</option>
+                                        <!-- Dersler veritabanından dinamik olarak yüklenecek -->
+                                    </select>
                                 </div>
 
                                 <!-- Topic Selection -->
@@ -70,10 +67,10 @@
                                         <i class="fas fa-tag"></i>
                                         Konu Seçimi
                                     </label>
-                                                                         <select id="topic-select" class="form-control" disabled>
-                                         <option value="">Önce ders seçiniz</option>
-                                         <option value="random">Rasgele Konu</option>
-                                     </select>
+                                    <select id="topic-select" class="form-control" disabled>
+                                        <option value="">Önce ders seçiniz</option>
+                                        <!-- Konular veritabanından dinamik olarak yüklenecek -->
+                                    </select>
                                 </div>
 
                                 <div class="step-actions">
@@ -272,5 +269,21 @@
 {% endblock %}
 
 {% block page_scripts %}
-    <script src="{{ url_for('static', filename='js/quiz_start/quiz_start.js') }}" type="module"></script>
+    <script>
+        console.log('🎯 Quiz start sayfası yüklendi!');
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 DOM ready event tetiklendi!');
+            const startBtn = document.getElementById('start-quiz-btn');
+            if (startBtn) {
+                console.log('🎯 Start butonu bulundu:', startBtn);
+                startBtn.addEventListener('click', () => {
+                    console.log('🎯 Start butonuna tıklandı!');
+                    alert('Start butonuna tıklandı!');
+                });
+            } else {
+                console.log('🎯 Start butonu bulunamadı!');
+            }
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/quiz_start/quiz_start.js') }}"></script>
 {% endblock %}
