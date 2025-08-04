@@ -149,10 +149,17 @@ btk_app/
 │   │   └── quiz_results.html   # Quiz sonuçları
 │   │
 │   ├── data/                   # Veri dosyaları
+<<<<<<< HEAD
 │   │   ├── curriculum_structure/ # Müfredat yapısı
 │   │   │   ├── grade_8.json    # 8. sınıf müfredatı
 │   │   │   └── grade_9.json    # 9. sınıf müfredatı
 │   │   ├── quiz_banks/         # Soru bankaları
+=======
+│   │   ├── lessons/            # Ders verileri
+│   │   │   ├── grade_8.json    # 8. sınıf dersleri
+│   │   │   └── grade_9.json    # 9. sınıf dersleri
+│   │   ├── question_banks/     # Soru bankaları
+>>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
 │   │   │   ├── grade_8/        # 8. sınıf soruları
 │   │   │   │   └── turkish/    # Türkçe soruları
 │   │   │   │       └── verbals/ # Fiilimsiler
@@ -163,6 +170,10 @@ btk_app/
 │   │   └── quiz-data.json      # Quiz verileri
 │   │
 │   └── utils/                  # Yardımcı modüller
+<<<<<<< HEAD
+=======
+│       └── auth_utils.py       # Kimlik doğrulama yardımcıları
+>>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
 │
 └── instance/                   # Instance klasörü (Flask)
 ```
@@ -273,7 +284,11 @@ Uygulama ilk çalıştırıldığında:
 ### **Manuel Veri Yükleme**
 ```bash
 # Soru verilerini manuel yüklemek için
+<<<<<<< HEAD
 python -m app.database.quiz_data_cli
+=======
+python -m app.database.load_questions
+>>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
 ```
 
 ### **Veritabanı Yapısı**
@@ -460,4 +475,8 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 **Son Güncelleme**: 2025-01-27  
 **Versiyon**: 2.0.0  
+<<<<<<< HEAD
 **Durum**: Developement
+=======
+**Durum**: Developement
+>>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
