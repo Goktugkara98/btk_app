@@ -88,18 +88,19 @@ def create_app(config_class=Config):
         app.logger.error(f"Failed to register app blueprints: {e}")
         raise
     
-    # Register news editor module
-    try:
-        from news_editor import news_editor_bp
-        
-        app.register_blueprint(news_editor_bp)
-        app.logger.info("News editor module registered successfully")
-    except ImportError as e:
-        app.logger.error(f"Failed to import news editor module: {e}")
-        # Don't raise here, as the main app should still work without the news editor
-    except Exception as e:
-        app.logger.error(f"Failed to register news editor module: {e}")
-        # Don't raise here, as the main app should still work without the news editor
+    # News Editor is now a standalone application running on port 5001
+    # Register news editor module (COMMENTED OUT - Now standalone)
+    # try:
+    #     from news_editor import news_editor_bp
+    #     
+    #     app.register_blueprint(news_editor_bp)
+    #     app.logger.info("News editor module registered successfully")
+    # except ImportError as e:
+    #     app.logger.error(f"Failed to import news editor module: {e}")
+    #     # Don't raise here, as the main app should still work without the news editor
+    # except Exception as e:
+    #     app.logger.error(f"Failed to register news editor module: {e}")
+    #     # Don't raise here, as the main app should still work without the news editor
     
     # Context processor to make session data available in all templates
     @app.context_processor
