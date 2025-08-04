@@ -98,7 +98,7 @@ export class QuizUI {
 
         // Create option elements
         questionData.question.options.forEach((option, optionIndex) => {
-            const optionElement = this.createOptionElement(option.option_text, optionIndex, questionData.question_number - 1);
+            const optionElement = this.createOptionElement(option.name, optionIndex, questionData.question_number - 1);
             this.elements.optionsContainer.appendChild(optionElement);
             this.elements.options.push(optionElement);
         });

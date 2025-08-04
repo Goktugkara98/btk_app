@@ -23,7 +23,9 @@ from app.database.schemas import (
     TOPICS_TABLE_SQL, TOPICS_SAMPLE_DATA,
     QUESTIONS_TABLE_SQL, QUESTIONS_SAMPLE_DATA,
     QUESTION_OPTIONS_TABLE_SQL, QUESTION_OPTIONS_SAMPLE_DATA,
-    USERS_TABLE_SQL, USERS_SAMPLE_DATA
+    USERS_TABLE_SQL, USERS_SAMPLE_DATA,
+    QUIZ_SESSIONS_TABLE_SQL, QUIZ_SESSIONS_SAMPLE_DATA,
+    QUIZ_SESSION_QUESTIONS_TABLE_SQL, QUIZ_SESSION_QUESTIONS_SAMPLE_DATA
 )
 
 class DatabaseMigrations:
@@ -53,11 +55,13 @@ class DatabaseMigrations:
             'topics': (TOPICS_TABLE_SQL, ""),  # JSON'dan doldurulacak
             'questions': (QUESTIONS_TABLE_SQL, QUESTIONS_SAMPLE_DATA),
             'question_options': (QUESTION_OPTIONS_TABLE_SQL, QUESTION_OPTIONS_SAMPLE_DATA),
-            'users': (USERS_TABLE_SQL, USERS_SAMPLE_DATA)
+            'users': (USERS_TABLE_SQL, USERS_SAMPLE_DATA),
+            'quiz_sessions': (QUIZ_SESSIONS_TABLE_SQL, QUIZ_SESSIONS_SAMPLE_DATA),
+            'quiz_session_questions': (QUIZ_SESSION_QUESTIONS_TABLE_SQL, QUIZ_SESSION_QUESTIONS_SAMPLE_DATA)
         }
         
         # Tablo oluşturma sırası (foreign key bağımlılıklarına göre)
-        self.table_order = ['grades', 'subjects', 'units', 'topics', 'questions', 'question_options', 'users']
+        self.table_order = ['grades', 'subjects', 'units', 'topics', 'questions', 'question_options', 'users', 'quiz_sessions', 'quiz_session_questions']
 
     def __del__(self):
         """Destructor - bağlantıyı temizle."""
@@ -182,6 +186,8 @@ class DatabaseMigrations:
             
             # Tabloları sil (child tablolar önce)
             tables = [
+                'quiz_session_questions',
+                'quiz_sessions',
                 'question_options',
                 'questions', 
                 'topics',
@@ -253,7 +259,7 @@ class DatabaseMigrations:
         try:
             required_tables = [
                 'grades', 'subjects', 'units', 'topics', 'questions', 
-                'question_options', 'users'
+                'question_options', 'users', 'quiz_sessions', 'quiz_session_questions'
             ]
             
             with self.db as conn:
@@ -304,8 +310,11 @@ class DatabaseMigrations:
             print("   • questions (Sorular)")
             print("   • question_options (Soru Seçenekleri)")
             print("   • users (Kullanıcılar)")
+            print("   • quiz_sessions (Quiz Oturumları)")
+            print("   • quiz_session_questions (Quiz Oturumu Soruları)")
             print("\n📚 Hiyerarşik yapı:")
             print("   Grade → Subject → Unit → Topic → Question → Question Options")
+            print("   Quiz Session → Quiz Session Questions")
             
         except Exception as e:
             print(f"❌ Migration hatası: {e}")

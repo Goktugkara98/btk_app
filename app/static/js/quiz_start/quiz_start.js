@@ -542,7 +542,7 @@ class QuizStartManager {
             if (data.status === 'success') {
                 console.log('✅ Quiz oturumu oluşturuldu, yönlendiriliyor...');
                 // Quiz oturumu oluşturuldu, quiz sayfasına yönlendir
-                window.location.href = `/quiz/screen?session_id=${data.data.id}`;
+                window.location.href = `/quiz/screen?session_id=${data.data.session_id}`;
             } else {
                 console.log('❌ API hatası:', data.message);
                 this.showError(data.message || 'Quiz başlatılırken bir hata oluştu');

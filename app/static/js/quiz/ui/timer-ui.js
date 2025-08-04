@@ -21,7 +21,7 @@ export class TimerUI {
     }
 
     init() {
-        this.timerElement = document.querySelector('.timer-text');
+        this.timerElement = document.querySelector('#timer-display');
         if (!this.timerElement) {
             console.error('❌ Timer element not found');
             return;

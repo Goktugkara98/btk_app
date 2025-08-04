@@ -140,7 +140,8 @@ class QuizApp {
             
             // API'ye gönderilecek veri
             const requestData = {
-                selected_option_id: this.currentQuestion.question.options[selectedOptionId].id
+                question_id: this.currentQuestion.question.id,
+                user_answer_option_id: this.currentQuestion.question.options[selectedOptionId].id
             };
             
             console.log('📤 Request data:', requestData);
