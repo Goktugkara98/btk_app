@@ -256,16 +256,22 @@ class DatabaseMigrations:
                 'question_options', 'users'
             ]
             
-            for table in required_tables:
-                with self.db as conn:
-                    conn.cursor.execute(f"SHOW TABLES LIKE '{table}'")
-                    if not conn.cursor.fetchone():
+            with self.db as conn:
+                for table in required_tables:
+                    try:
+                        conn.cursor.execute(f"SHOW TABLES LIKE '{table}'")
+                        if not conn.cursor.fetchone():
+                            print(f"❌ Tablo bulunamadı: {table}")
+                            return False
+                    except MySQLError as e:
+                        print(f"❌ Tablo kontrol hatası ({table}): {e}")
                         return False
             
+            print("✅ Tüm gerekli tablolar mevcut")
             return True
             
         except MySQLError as e:
-            print(f"❌ Tablo kontrol hatası: {e}")
+            print(f"❌ Genel tablo kontrol hatası: {e}")
             return False
 
     def run_migrations(self):
@@ -333,10 +339,12 @@ class DatabaseMigrations:
             with self.db as conn:
                 for table_name in self.table_order:
                     try:
-                        conn.cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-                        count = conn.cursor.fetchone()[0]
+                        conn.cursor.execute(f"SELECT COUNT(*) as count FROM {table_name}")
+                        result = conn.cursor.fetchone()
+                        count = result['count'] if result else 0
                         table_counts[table_name] = count
-                    except MySQLError:
+                    except MySQLError as e:
+                        print(f"⚠️  {table_name} tablosu sayım hatası: {e}")
                         table_counts[table_name] = 0
             
             return table_counts

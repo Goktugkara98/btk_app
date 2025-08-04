@@ -101,9 +101,15 @@ class DatabaseConnection:
 
     def _ensure_connection(self):
         """5.2.3. Bağlantının aktif olup olmadığını kontrol eder. Değilse, yeniden bağlanır."""
-        if not self.connection or not self.connection.is_connected():
-            if not self.connect():
-                raise MySQLError("Veritabanına bağlanılamadı")
+        try:
+            if not self.connection or not self.connection.is_connected():
+                print("🔄 Veritabanı bağlantısı yeniden kuruluyor...")
+                if not self.connect():
+                    raise MySQLError("Veritabanına bağlanılamadı")
+                print("✅ Veritabanı bağlantısı başarıyla kuruldu")
+        except Exception as e:
+            print(f"❌ Bağlantı kontrol hatası: {e}")
+            raise MySQLError(f"Veritabanı bağlantı hatası: {e}")
 
     # -------------------------------------------------------------------------
     # 5.3. Context Manager Metotları

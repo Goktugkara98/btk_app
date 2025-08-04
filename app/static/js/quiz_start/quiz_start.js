@@ -9,6 +9,7 @@ class QuizStartManager {
         this.formData = {
             grade_id: '',
             subject_id: '',
+            unit_id: '',
             topic_id: '',
             difficulty: 'random',
             quiz_mode: 'educational',
@@ -19,6 +20,7 @@ class QuizStartManager {
         // Cache for loaded data
         this.grades = [];
         this.subjects = [];
+        this.units = [];
         this.topics = [];
         
         this.init();
@@ -41,6 +43,7 @@ class QuizStartManager {
         // Form controls
         document.getElementById('class-select')?.addEventListener('change', (e) => this.handleClassChange(e));
         document.getElementById('subject-select')?.addEventListener('change', (e) => this.handleSubjectChange(e));
+        document.getElementById('unit-select')?.addEventListener('change', (e) => this.handleUnitChange(e));
         document.getElementById('topic-select')?.addEventListener('change', (e) => this.handleTopicChange(e));
 
         // Difficulty selection
@@ -121,12 +124,14 @@ class QuizStartManager {
         this.formData.grade_id = gradeId;
         
         if (gradeId) {
-            this.loadSubjects();
+            this.loadSubjects(gradeId);
             this.showElement('subject-group');
         } else {
             this.hideElement('subject-group');
+            this.hideElement('unit-group');
             this.hideElement('topic-group');
             this.formData.subject_id = '';
+            this.formData.unit_id = '';
             this.formData.topic_id = '';
         }
         
@@ -139,7 +144,25 @@ class QuizStartManager {
         this.formData.subject_id = subjectId;
         
         if (subjectId && subjectId !== 'random') {
-            this.loadTopics(subjectId);
+            this.loadUnits(subjectId);
+            this.showElement('unit-group');
+        } else {
+            this.hideElement('unit-group');
+            this.hideElement('topic-group');
+            this.formData.unit_id = '';
+            this.formData.topic_id = '';
+        }
+        
+        this.updatePreview();
+        this.validateStep1();
+    }
+
+    handleUnitChange(event) {
+        const unitId = event.target.value;
+        this.formData.unit_id = unitId;
+        
+        if (unitId && unitId !== 'random') {
+            this.loadTopics(unitId);
             this.showElement('topic-group');
         } else {
             this.hideElement('topic-group');
@@ -196,10 +219,10 @@ class QuizStartManager {
         }
     }
 
-    async loadSubjects() {
+    async loadSubjects(gradeId) {
         try {
-            console.log('📖 Dersler yükleniyor...');
-            const response = await fetch('/api/quiz/subjects');
+            console.log('📖 Dersler yükleniyor... (grade_id:', gradeId, ')');
+            const response = await fetch(`/api/quiz/subjects?grade_id=${gradeId}`);
             const data = await response.json();
             
             if (data.status === 'success') {
@@ -214,10 +237,28 @@ class QuizStartManager {
         }
     }
 
-    async loadTopics(subjectId) {
+    async loadUnits(subjectId) {
         try {
-            console.log('📝 Konular yükleniyor... (subject_id:', subjectId, ')');
-            const response = await fetch(`/api/quiz/topics?subject_id=${subjectId}`);
+            console.log('📚 Üniteler yükleniyor... (subject_id:', subjectId, ')');
+            const response = await fetch(`/api/quiz/units?subject_id=${subjectId}`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                this.units = data.data;
+                this.populateUnitsSelect();
+                console.log('✅ Üniteler yüklendi:', this.units.length);
+            } else {
+                console.error('❌ Üniteler yüklenirken hata:', data.message);
+            }
+        } catch (error) {
+            console.error('❌ Üniteler yüklenirken hata:', error);
+        }
+    }
+
+    async loadTopics(unitId) {
+        try {
+            console.log('📝 Konular yükleniyor... (unit_id:', unitId, ')');
+            const response = await fetch(`/api/quiz/topics?unit_id=${unitId}`);
             const data = await response.json();
             
             if (data.status === 'success') {
@@ -254,10 +295,8 @@ class QuizStartManager {
         const select = document.getElementById('subject-select');
         if (!select) return;
 
-        // Clear existing options except the first one
-        while (select.children.length > 1) {
-            select.removeChild(select.lastChild);
-        }
+        // Clear all existing options
+        select.innerHTML = '';
 
         // Add "Random" option
         const randomOption = document.createElement('option');
@@ -277,14 +316,37 @@ class QuizStartManager {
         select.disabled = false;
     }
 
+    populateUnitsSelect() {
+        const select = document.getElementById('unit-select');
+        if (!select) return;
+
+        // Clear all existing options
+        select.innerHTML = '';
+
+        // Add "Random" option
+        const randomOption = document.createElement('option');
+        randomOption.value = 'random';
+        randomOption.textContent = 'Rasgele Ünite';
+        select.appendChild(randomOption);
+
+        // Add new options
+        this.units.forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit.id;
+            option.textContent = unit.name;
+            select.appendChild(option);
+        });
+
+        // Enable the select
+        select.disabled = false;
+    }
+
     populateTopicsSelect() {
         const select = document.getElementById('topic-select');
         if (!select) return;
 
-        // Clear existing options except the first one
-        while (select.children.length > 1) {
-            select.removeChild(select.lastChild);
-        }
+        // Clear all existing options
+        select.innerHTML = '';
 
         // Add "Random" option
         const randomOption = document.createElement('option');
@@ -308,6 +370,7 @@ class QuizStartManager {
     validateStep1() {
         const isValid = this.formData.grade_id && 
                        this.formData.subject_id && 
+                       this.formData.unit_id && 
                        this.formData.topic_id;
         
         const nextBtn = document.getElementById('next-step-btn');
@@ -329,6 +392,7 @@ class QuizStartManager {
     updatePreview() {
         this.updatePreviewItem('class', this.getGradeName(this.formData.grade_id));
         this.updatePreviewItem('subject', this.getSubjectName(this.formData.subject_id));
+        this.updatePreviewItem('unit', this.getUnitName(this.formData.unit_id));
         this.updatePreviewItem('topic', this.getTopicName(this.formData.topic_id));
         this.updatePreviewItem('difficulty', this.getDifficultyName(this.formData.difficulty));
         this.updatePreviewItem('timer', this.getTimerText());
@@ -355,6 +419,13 @@ class QuizStartManager {
         if (subjectId === 'random') return 'Rasgele Ders';
         const subject = this.subjects.find(s => s.id == subjectId);
         return subject ? subject.name : '-';
+    }
+
+    getUnitName(unitId) {
+        if (!unitId) return '-';
+        if (unitId === 'random') return 'Rasgele Ünite';
+        const unit = this.units.find(u => u.id == unitId);
+        return unit ? unit.name : '-';
     }
 
     getTopicName(topicId) {
@@ -392,6 +463,7 @@ class QuizStartManager {
     validateForm() {
         const isValid = this.formData.grade_id && 
                        this.formData.subject_id && 
+                       this.formData.unit_id && 
                        this.formData.topic_id;
         
         const startBtn = document.getElementById('start-quiz-btn');
@@ -491,6 +563,7 @@ class QuizStartManager {
         this.formData = {
             grade_id: '',
             subject_id: '',
+            unit_id: '',
             topic_id: '',
             difficulty: 'random',
             quiz_mode: 'educational',
@@ -502,8 +575,15 @@ class QuizStartManager {
         document.getElementById('class-select').value = '';
         document.getElementById('subject-select').value = '';
         document.getElementById('subject-select').disabled = true;
+        document.getElementById('unit-select').value = '';
+        document.getElementById('unit-select').disabled = true;
         document.getElementById('topic-select').value = '';
         document.getElementById('topic-select').disabled = true;
+        
+        // Placeholder'ları ayarla
+        document.getElementById('subject-select').innerHTML = '<option value="">Ders seçiniz</option>';
+        document.getElementById('unit-select').innerHTML = '<option value="">Ünite seçiniz</option>';
+        document.getElementById('topic-select').innerHTML = '<option value="">Konu seçiniz</option>';
 
         // Radio button'ları sıfırla
         document.querySelector('input[name="difficulty"][value="random"]').checked = true;
@@ -512,6 +592,7 @@ class QuizStartManager {
 
         // UI'yi güncelle
         this.hideElement('subject-group');
+        this.hideElement('unit-group');
         this.hideElement('topic-group');
         this.showStep(1);
         this.updatePreview();

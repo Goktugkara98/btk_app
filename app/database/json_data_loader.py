@@ -122,12 +122,12 @@ class JSONDataLoader:
         self.units_data = units
         return units
     
-    def extract_topics(self) -> List[Tuple[str, str, str]]:
+    def extract_topics(self) -> List[Tuple[str, str, str, str]]:
         """
         Tüm grade'lerden konuları çıkarır.
         
         Returns:
-            (konu_adı, unit_id, açıklama) listesi
+            (topic_id, topic_name, unit_id, açıklama) listesi
         """
         topics = []
         
@@ -145,8 +145,22 @@ class JSONDataLoader:
                     if unit_id and unit_name:
                         # Alt konular
                         for topic in unit_topics:
-                            if topic:  # Boş olmayan konular
+                            if isinstance(topic, dict):
+                                # Yeni format: {"topicId": "...", "topicName": "..."}
+                                topic_id = topic.get('topicId')
+                                topic_name = topic.get('topicName')
+                                
+                                if topic_id and topic_name:
+                                    topics.append((
+                                        topic_id,
+                                        topic_name,
+                                        unit_id,
+                                        f'{unit_name} - {topic_name}'
+                                    ))
+                            elif isinstance(topic, str) and topic:
+                                # Eski format: string (geriye uyumluluk için)
                                 topics.append((
+                                    topic.lower().replace(' ', '_'),
                                     topic,
                                     unit_id,
                                     f'{unit_name} - {topic}'
@@ -168,15 +182,16 @@ class JSONDataLoader:
         values = []
         for grade_level, grade_data in self.grades_data.items():
             grade_name = grade_data.get('gradeName', f'{grade_level}. Sınıf')
+            grade_name_id = f'grade_{grade_level}'
             description = f'{grade_name} seviyesi'
             
-            values.append(f"({grade_level}, '{grade_name}', '{description}')")
+            values.append(f"('{grade_name}', '{grade_name_id}', {grade_level}, '{description}')")
             
         if not values:
             return ""
             
         sql = f"""
-INSERT INTO grades (level, name, description) VALUES
+INSERT INTO grades (name, name_id, level, description) VALUES
 {', '.join(values)}
 ON DUPLICATE KEY UPDATE 
     name = VALUES(name),
@@ -206,13 +221,13 @@ ON DUPLICATE KEY UPDATE
                 subject_name_escaped = subject_name.replace("'", "''")
                 description_escaped = description.replace("'", "''")
                 
-                values.append(f"('{subject_name_escaped}', '{subject_code.upper()}', {grade_id}, '{description_escaped}')")
+                values.append(f"({grade_id}, '{subject_name_escaped}', '{subject_code.upper()}', '{description_escaped}')")
             
         if not values:
             return ""
             
         sql = f"""
-INSERT INTO subjects (name, code, grade_id, description) VALUES
+INSERT INTO subjects (grade_id, name, name_id, description) VALUES
 {', '.join(values)}
 ON DUPLICATE KEY UPDATE 
     name = VALUES(name),
@@ -242,13 +257,13 @@ ON DUPLICATE KEY UPDATE
                 unit_name_escaped = unit_name.replace("'", "''")
                 description_escaped = description.replace("'", "''")
                 
-                values.append(f"('{unit_name_escaped}', '{unit_id}', {subject_id}, '{description_escaped}')")
+                values.append(f"({subject_id}, '{unit_name_escaped}', '{unit_id}', '{description_escaped}')")
             
         if not values:
             return ""
             
         sql = f"""
-INSERT INTO units (name, unit_id, subject_id, description) VALUES
+INSERT INTO units (subject_id, name, name_id, description) VALUES
 {', '.join(values)}
 ON DUPLICATE KEY UPDATE 
     name = VALUES(name),
@@ -270,21 +285,22 @@ ON DUPLICATE KEY UPDATE
             return ""
             
         values = []
-        for topic_name, unit_id, description in self.topics_data:
+        for topic_id, topic_name, unit_id, description in self.topics_data:
             db_unit_id = unit_id_map.get(unit_id)
             
             if db_unit_id:
                 # SQL injection'a karşı koruma
+                topic_id_escaped = topic_id.replace("'", "''")
                 topic_name_escaped = topic_name.replace("'", "''")
                 description_escaped = description.replace("'", "''")
                 
-                values.append(f"('{topic_name_escaped}', {db_unit_id}, '{description_escaped}')")
+                values.append(f"({db_unit_id}, '{topic_name_escaped}', '{topic_id_escaped}', '{description_escaped}')")
             
         if not values:
             return ""
             
         sql = f"""
-INSERT INTO topics (name, unit_id, description) VALUES
+INSERT INTO topics (unit_id, name, name_id, description) VALUES
 {', '.join(values)}
 ON DUPLICATE KEY UPDATE 
     name = VALUES(name),
@@ -373,7 +389,7 @@ ON DUPLICATE KEY UPDATE
             with db_connection as conn:
                 for grade_level, subject_code, subject_name, description in self.subjects_data:
                     conn.cursor.execute(
-                        "SELECT s.id FROM subjects s JOIN grades g ON s.grade_id = g.id WHERE s.code = %s AND g.level = %s",
+                        "SELECT s.id FROM subjects s JOIN grades g ON s.grade_id = g.id WHERE s.name_id = %s AND g.level = %s",
                         (subject_code.upper(), grade_level)
                     )
                     result = conn.cursor.fetchone()
@@ -404,7 +420,7 @@ ON DUPLICATE KEY UPDATE
             with db_connection as conn:
                 for unit_id, unit_name, subject_code, description in self.units_data:
                     conn.cursor.execute(
-                        "SELECT u.id FROM units u JOIN subjects s ON u.subject_id = s.id WHERE u.unit_id = %s AND s.code = %s",
+                        "SELECT u.id FROM units u JOIN subjects s ON u.subject_id = s.id WHERE u.name_id = %s AND s.name_id = %s",
                         (unit_id, subject_code.upper())
                     )
                     result = conn.cursor.fetchone()

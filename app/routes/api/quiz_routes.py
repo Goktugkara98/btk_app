@@ -97,7 +97,15 @@ def get_grades():
 
 @quiz_bp.route('/quiz/subjects', methods=['GET'])
 def get_subjects():
-    """5.1.2. Tüm dersleri listeler."""
+    """5.1.2. Belirli bir sınıfa ait dersleri listeler."""
+    grade_id = request.args.get('grade_id', type=int)
+    
+    if not grade_id:
+        return jsonify({
+            'status': 'error',
+            'message': 'Grade ID is required'
+        }), 400
+    
     try:
         if not DatabaseConnection:
             return jsonify({
@@ -107,11 +115,12 @@ def get_subjects():
         
         with DatabaseConnection() as conn:
             conn.cursor.execute("""
-                SELECT id, name, code, description 
-                FROM subjects 
-                WHERE is_active = 1 
-                ORDER BY name
-            """)
+                SELECT s.id, s.name, s.code, s.description, g.name as grade_name
+                FROM subjects s 
+                JOIN grades g ON s.grade_id = g.id
+                WHERE s.grade_id = %s AND s.is_active = 1 
+                ORDER BY s.name
+            """, (grade_id,))
             subjects = conn.cursor.fetchall()
             
             # Convert to list of dictionaries
@@ -121,7 +130,8 @@ def get_subjects():
                     'id': subject['id'],
                     'name': subject['name'],
                     'code': subject['code'],
-                    'description': subject['description']
+                    'description': subject['description'],
+                    'grade_name': subject['grade_name']
                 })
             
             return jsonify({
@@ -137,9 +147,9 @@ def get_subjects():
             'error': str(e)
         }), 500
 
-@quiz_bp.route('/quiz/topics', methods=['GET'])
-def get_topics():
-    """5.1.3. Belirli bir derse ait konuları listeler."""
+@quiz_bp.route('/quiz/units', methods=['GET'])
+def get_units():
+    """5.1.3. Belirli bir derse ait üniteleri listeler."""
     subject_id = request.args.get('subject_id', type=int)
     
     if not subject_id:
@@ -157,11 +167,64 @@ def get_topics():
         
         with DatabaseConnection() as conn:
             conn.cursor.execute("""
-                SELECT id, name, subject_id, description 
-                FROM topics 
-                WHERE subject_id = %s AND is_active = 1 
-                ORDER BY name
+                SELECT u.id, u.name, u.unit_id, u.description, s.name as subject_name
+                FROM units u 
+                JOIN subjects s ON u.subject_id = s.id
+                WHERE u.subject_id = %s AND u.is_active = 1 
+                ORDER BY u.name
             """, (subject_id,))
+            units = conn.cursor.fetchall()
+            
+            # Convert to list of dictionaries
+            units_list = []
+            for unit in units:
+                units_list.append({
+                    'id': unit['id'],
+                    'name': unit['name'],
+                    'unit_id': unit['unit_id'],
+                    'description': unit['description'],
+                    'subject_name': unit['subject_name']
+                })
+            
+            return jsonify({
+                'status': 'success',
+                'message': 'Units retrieved successfully',
+                'data': units_list
+            }), 200
+            
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to retrieve units',
+            'error': str(e)
+        }), 500
+
+@quiz_bp.route('/quiz/topics', methods=['GET'])
+def get_topics():
+    """5.1.4. Belirli bir üniteye ait konuları listeler."""
+    unit_id = request.args.get('unit_id', type=int)
+    
+    if not unit_id:
+        return jsonify({
+            'status': 'error',
+            'message': 'Unit ID is required'
+        }), 400
+    
+    try:
+        if not DatabaseConnection:
+            return jsonify({
+                'status': 'error',
+                'message': 'Database connection not available'
+            }), 500
+        
+        with DatabaseConnection() as conn:
+            conn.cursor.execute("""
+                SELECT t.id, t.name, t.description, u.name as unit_name
+                FROM topics t 
+                JOIN units u ON t.unit_id = u.id
+                WHERE t.unit_id = %s AND t.is_active = 1 
+                ORDER BY t.name
+            """, (unit_id,))
             topics = conn.cursor.fetchall()
             
             # Convert to list of dictionaries
@@ -170,8 +233,8 @@ def get_topics():
                 topics_list.append({
                     'id': topic['id'],
                     'name': topic['name'],
-                    'subject_id': topic['subject_id'],
-                    'description': topic['description']
+                    'description': topic['description'],
+                    'unit_name': topic['unit_name']
                 })
             
             return jsonify({

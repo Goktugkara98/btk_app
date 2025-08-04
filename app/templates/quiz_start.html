@@ -56,8 +56,20 @@
                                         Ders Seçimi
                                     </label>
                                     <select id="subject-select" class="form-control" disabled>
-                                        <option value="">Önce sınıf seçiniz</option>
+                                        <option value="">Ders seçiniz</option>
                                         <!-- Dersler veritabanından dinamik olarak yüklenecek -->
+                                    </select>
+                                </div>
+
+                                <!-- Unit Selection -->
+                                <div class="form-group" id="unit-group" style="display: none;">
+                                    <label for="unit-select" class="form-label">
+                                        <i class="fas fa-layer-group"></i>
+                                        Ünite Seçimi
+                                    </label>
+                                    <select id="unit-select" class="form-control" disabled>
+                                        <option value="">Ünite seçiniz</option>
+                                        <!-- Üniteler veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
 
@@ -68,7 +80,7 @@
                                         Konu Seçimi
                                     </label>
                                     <select id="topic-select" class="form-control" disabled>
-                                        <option value="">Önce ders seçiniz</option>
+                                        <option value="">Konu seçiniz</option>
                                         <!-- Konular veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
@@ -230,6 +242,10 @@
                         <div class="preview-item">
                             <span class="preview-label">Ders</span>
                             <span class="preview-value" id="preview-subject">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <span class="preview-label">Ünite</span>
+                            <span class="preview-value" id="preview-unit">-</span>
                         </div>
                         <div class="preview-item">
                             <span class="preview-label">Konu</span>

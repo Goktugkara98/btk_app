@@ -2,6 +2,7 @@ from flask import Flask, render_template, session
 from config import Config
 from app.database.db_connection import DatabaseConnection
 from app.database.db_migrations import DatabaseMigrations
+from app.database.question_loader import QuestionLoader
 import os
 import secrets
 
@@ -34,6 +35,34 @@ def create_app(config_class=Config):
         # Run database migrations
         migrations = DatabaseMigrations(db_connection)
         migrations.run_migrations()
+        
+        # Load question data if tables are empty
+        try:
+            question_loader = QuestionLoader(db_connection=db_connection)
+            
+            # Check if questions table is empty
+            with db_connection as conn:
+                conn.cursor.execute("SELECT COUNT(*) as count FROM questions")
+                question_count = conn.cursor.fetchone()['count']
+            
+            if question_count == 0:
+                app.logger.info("Questions table is empty. Loading question data...")
+                results = question_loader.process_all_question_files()
+                
+                total_success = 0
+                total_questions = 0
+                for filename, (success, total) in results.items():
+                    app.logger.info(f"Loaded {filename}: {success}/{total} questions")
+                    total_success += success
+                    total_questions += total
+                
+                app.logger.info(f"Question loading completed: {total_success}/{total_questions} questions loaded")
+            else:
+                app.logger.info(f"Questions table already contains {question_count} questions. Skipping question loading.")
+                
+        except Exception as e:
+            app.logger.warning(f"Failed to load question data: {e}")
+            # Don't raise here, as the main app should still work without questions
         
         # Store the database connection in the app context
         app.config['DB_CONNECTION'] = db_connection
