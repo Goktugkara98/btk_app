@@ -1,212 +1,309 @@
-# Database Module - SQL File Based Structure
+# 📊 Veritabanı Modülü
 
-## 📁 Dosya Yapısı
+Bu klasör, Daima Uygulaması'nın veritabanı yönetimi ve veri işleme işlevlerini içerir.
+
+## 📁 Klasör Yapısı
 
 ```
 app/database/
-├── db_connection.py          # Veritabanı bağlantı yönetimi
-├── db_migrations.py          # Migration sistemi (SQL dosya tabanlı)
-├── user_repository.py        # Kullanıcı veri erişim katmanı
-├── schemas/
-│   └── __init__.py          # SQL dosya yolları
-└── sql_schemas/
-    ├── grades.sql           # Sınıflar tablosu
-    ├── subjects.sql         # Dersler tablosu
-    ├── topics.sql           # Konular tablosu
-    ├── questions.sql        # Sorular tablosu
-    ├── question_options.sql # Soru seçenekleri tablosu
-    └── users.sql           # Kullanıcılar tablosu
+├── README.md                    # Bu dosya
+├── db_connection.py             # Veritabanı bağlantı yönetimi
+├── db_migrations.py             # Veritabanı migration sistemi
+├── question_loader.py           # Question verilerini yükleme
+├── json_data_loader.py          # JSON verilerini yükleme
+├── load_questions.py            # Question yükleme CLI scripti
+├── user_repository.py           # Kullanıcı veri erişimi
+└── schemas/                     # Veritabanı tablo şemaları
+    ├── __init__.py
+    ├── grades_schema.py         # Sınıflar tablosu
+    ├── subjects_schema.py       # Dersler tablosu
+    ├── units_schema.py          # Üniteler tablosu
+    ├── topics_schema.py         # Konular tablosu
+    ├── questions_schema.py      # Sorular tablosu
+    ├── question_options_schema.py # Şıklar tablosu
+    └── users_schema.py          # Kullanıcılar tablosu
 ```
 
-## 🚀 Kullanım
+## 🗄️ Veritabanı Yapısı
 
-### 1. Migration Çalıştırma
+### 📋 Standart Tablo Yapısı
 
+Her tabloda tutarlı bir sütun düzeni kullanılır:
+
+1. **id** (Primary Key)
+2. **[parent_id]** (Üst sınıf ID'si)
+3. **name** (Türkçe isim - geliştirici ve frontend için)
+4. **name_id** (İngilizce kod - veri işlemleri için)
+5. **description** (Açıklama)
+6. **[extra sütunlar]** (Tabloya özel sütunlar)
+7. **is_active** (Aktiflik durumu)
+8. **created_at** (Oluşturma tarihi)
+9. **updated_at** (Güncelleme tarihi)
+
+### 📊 Tablo Detayları
+
+#### **GRADES (Sınıflar)**
+```sql
+id, name, name_id, level, description, is_active, created_at, updated_at
+```
+- **Amaç**: Sınıf seviyelerini (8, 9, 10, 11, 12) tanımlar
+- **Örnek**: "8. Sınıf", "grade_8", 8
+
+#### **SUBJECTS (Dersler)**
+```sql
+id, grade_id, name, name_id, description, is_active, created_at, updated_at
+```
+- **Amaç**: Her sınıf seviyesindeki dersleri tanımlar
+- **Örnek**: "Türkçe", "turkish", "Türkçe dersi"
+
+#### **UNITS (Üniteler)**
+```sql
+id, subject_id, name, name_id, description, is_active, created_at, updated_at
+```
+- **Amaç**: Her dersin ünitelerini tanımlar
+- **Örnek**: "Fiilimsiler", "verbals", "Fiilimsiler ünitesi"
+
+#### **TOPICS (Konular)**
+```sql
+id, unit_id, name, name_id, description, is_active, created_at, updated_at
+```
+- **Amaç**: Her ünitenin konularını tanımlar
+- **Örnek**: "Sıfat-fiil", "participle", "Fiilimsiler - Sıfat-fiil"
+
+#### **QUESTIONS (Sorular)**
+```sql
+id, topic_id, name, name_id, difficulty_level, question_type, points, description, is_active, created_at, updated_at
+```
+- **Amaç**: Konulara ait soruları saklar
+- **Özel Alanlar**:
+  - `difficulty_level`: 'easy', 'medium', 'hard'
+  - `question_type`: 'multiple_choice', 'true_false', 'fill_blank', 'essay'
+  - `points`: Soru puanı
+  - `description`: Soru açıklaması
+
+#### **QUESTION_OPTIONS (Şıklar)**
+```sql
+id, question_id, name, name_id, is_correct, option_order, description, is_active, created_at, updated_at
+```
+- **Amaç**: Soruların şıklarını saklar
+- **Özel Alanlar**:
+  - `is_correct`: Doğru şık mı?
+  - `option_order`: Şık sırası (A=1, B=2, C=3, D=4)
+  - `description`: Şık açıklaması
+
+#### **USERS (Kullanıcılar)**
+```sql
+id, grade_level_id, name, name_id, email, password_hash, first_name, last_name, phone, birth_date, gender, school, bio, avatar_path, is_active, is_admin, created_at, updated_at
+```
+- **Amaç**: Sistem kullanıcılarını saklar
+- **Özel Alanlar**:
+  - `password_hash`: Şifrelenmiş parola
+  - `is_admin`: Yönetici yetkisi
+  - `avatar_path`: Profil resmi yolu
+
+## 🔧 Modüller
+
+### **db_connection.py**
+Veritabanı bağlantı yönetimi için wrapper sınıf.
+
+**Özellikler:**
+- Otomatik bağlantı yenileme
+- Context manager desteği (`with` bloğu)
+- Hata yönetimi ve loglama
+- Transaction yönetimi
+
+**Kullanım:**
 ```python
 from app.database.db_connection import DatabaseConnection
+
+db = DatabaseConnection()
+with db as conn:
+    conn.cursor.execute("SELECT * FROM users")
+    users = conn.cursor.fetchall()
+```
+
+### **db_migrations.py**
+Veritabanı tablolarını oluşturan ve yöneten sistem.
+
+**Özellikler:**
+- Otomatik tablo oluşturma
+- JSON verilerini yükleme
+- Tablo varlık kontrolü
+- Migration geçmişi
+
+**Kullanım:**
+```python
 from app.database.db_migrations import DatabaseMigrations
 
-# Bağlantı oluştur
-db_connection = DatabaseConnection()
 migrations = DatabaseMigrations(db_connection)
+migrations.run_migrations()  # Tabloları oluştur
+```
 
-# Migration'ları çalıştır
+### **question_loader.py**
+JSON dosyalarından question verilerini veritabanına yükler.
+
+**Özellikler:**
+- JSON dosya okuma
+- Metadata kontrolü
+- Topic ID eşleştirme
+- Soru ve şık açıklamalarını kaydetme
+
+**Kullanım:**
+```python
+from app.database.question_loader import QuestionLoader
+
+loader = QuestionLoader()
+results = loader.process_all_question_files()
+```
+
+### **json_data_loader.py**
+Grade, subject, unit, topic verilerini JSON'dan yükler.
+
+**Özellikler:**
+- Grade dosyalarını okuma
+- Hiyerarşik veri çıkarma
+- SQL insert ifadeleri oluşturma
+- ID eşleştirme
+
+### **load_questions.py**
+Question yükleme için CLI scripti.
+
+**Kullanım:**
+```bash
+# Tüm question dosyalarını yükle
+python app/database/load_questions.py
+
+# Belirli bir dosyayı yükle
+python app/database/load_questions.py --file path/to/file.json
+
+# Belirli bir dizindeki dosyaları yükle
+python app/database/load_questions.py --dir path/to/directory
+```
+
+### **user_repository.py**
+Kullanıcı verilerine erişim için repository pattern.
+
+**Özellikler:**
+- CRUD işlemleri
+- Kullanıcı doğrulama
+- Şifre hashleme
+- Arama ve filtreleme
+
+## 📝 Şema Dosyaları
+
+Her tablo için ayrı şema dosyası bulunur:
+
+- **grades_schema.py**: Sınıflar tablosu tanımı
+- **subjects_schema.py**: Dersler tablosu tanımı
+- **units_schema.py**: Üniteler tablosu tanımı
+- **topics_schema.py**: Konular tablosu tanımı
+- **questions_schema.py**: Sorular tablosu tanımı
+- **question_options_schema.py**: Şıklar tablosu tanımı
+- **users_schema.py**: Kullanıcılar tablosu tanımı
+
+Her şema dosyası şunları içerir:
+- `CREATE TABLE` SQL ifadesi
+- İndeksler ve foreign key'ler
+- Örnek veriler (opsiyonel)
+
+## 🚀 Kurulum ve Kullanım
+
+### 1. Veritabanı Bağlantısı
+```python
+from app.database.db_connection import DatabaseConnection
+
+db = DatabaseConnection()
+```
+
+### 2. Tabloları Oluştur
+```python
+from app.database.db_migrations import DatabaseMigrations
+
+migrations = DatabaseMigrations(db)
 migrations.run_migrations()
 ```
 
-### 2. Tabloları Yeniden Oluşturma
-
+### 3. Question Verilerini Yükle
 ```python
-# Tüm verileri sil ve yeniden oluştur
-migrations.force_recreate()
+from app.database.question_loader import QuestionLoader
+
+loader = QuestionLoader()
+results = loader.process_all_question_files()
 ```
 
-### 3. Tablo Bilgilerini Alma
-
-```python
-# Tablo kayıt sayılarını al
-table_counts = migrations.get_table_info()
-print(table_counts)
-```
-
-## 📊 Veritabanı Yapısı
-
-### Hiyerarşi
-```
-grades (Sınıflar)
-    ↓
-subjects (Dersler)
-    ↓
-topics (Konular)
-    ↓
-questions (Sorular)
-    ↓
-question_options (Soru Seçenekleri)
-
-users (Kullanıcılar) - Bağımsız tablo
-```
-
-### Tablo Detayları
-
-#### grades (Sınıflar)
-- `id`: Birincil anahtar
-- `name`: Sınıf adı (örn: "1. Sınıf")
-- `level`: Sınıf seviyesi (1-12)
-- `description`: Açıklama
-- `is_active`: Aktiflik durumu
-
-#### subjects (Dersler)
-- `id`: Birincil anahtar
-- `grade_id`: Sınıf referansı (grades.id)
-- `name`: Ders adı (örn: "Matematik")
-- `description`: Açıklama
-- `is_active`: Aktiflik durumu
-
-#### topics (Konular)
-- `id`: Birincil anahtar
-- `subject_id`: Ders referansı (subjects.id)
-- `name`: Konu adı (örn: "Kesirler")
-- `description`: Açıklama
-- `is_active`: Aktiflik durumu
-
-#### questions (Sorular)
-- `id`: Birincil anahtar
-- `topic_id`: Konu referansı (topics.id)
-- `question_text`: Soru metni
-- `question_type`: Soru tipi (multiple_choice, true_false, fill_blank)
-- `difficulty_level`: Zorluk seviyesi (easy, medium, hard)
-- `explanation`: Açıklama
-- `is_active`: Aktiflik durumu
-
-#### question_options (Soru Seçenekleri)
-- `id`: Birincil anahtar
-- `question_id`: Soru referansı (questions.id)
-- `option_text`: Seçenek metni
-- `is_correct`: Doğru seçenek mi?
-- `order_index`: Sıralama
-
-#### users (Kullanıcılar)
-- `id`: Birincil anahtar
-- `username`: Kullanıcı adı
-- `email`: E-posta
-- `password_hash`: Şifre hash'i
-- `first_name`: Ad
-- `last_name`: Soyad
-- `avatar_path`: Avatar dosya yolu
-- `is_active`: Aktiflik durumu
-- `is_admin`: Admin mi?
-
-## 🔧 Özellikler
-
-### SQL Dosya Tabanlı Migration
-- Her tablo için ayrı SQL dosyası
-- Otomatik dosya okuma ve çalıştırma
-- Foreign key bağımlılıklarına göre sıralı oluşturma
-- Hata yönetimi ve geri bildirim
-
-### Veritabanı Bağlantısı
-- Context manager desteği (`with` bloğu)
-- Otomatik bağlantı yönetimi
-- Hata durumunda rollback
-- Başarılı durumda commit
-
-### Veri Bütünlüğü
-- Foreign key constraint'ler
-- CASCADE DELETE
-- Unique key'ler
-- NOT NULL constraint'ler
-
-## 📝 Örnek Kullanım
-
-### Migration Test Etme
+### 4. CLI ile Yükleme
 ```bash
-python test_db_structure.py
+python app/database/load_questions.py
 ```
 
-### Veritabanı Bağlantısı
+## 🔍 Veri Kontrolü
+
+### Tablo Sayılarını Kontrol Et
 ```python
 from app.database.db_connection import DatabaseConnection
 
-# Bağlantı oluştur
 db = DatabaseConnection()
-
-# Kullan
 with db as conn:
-    conn.cursor.execute("SELECT * FROM grades")
-    grades = conn.cursor.fetchall()
-    print(grades)
+    conn.cursor.execute("SELECT COUNT(*) as count FROM questions")
+    result = conn.cursor.fetchone()
+    print(f"Toplam soru sayısı: {result['count']}")
 ```
 
-### Repository Kullanımı
+### Soru Detaylarını Kontrol Et
 ```python
-from app.database.user_repository import UserRepository
-
-# Repository oluştur
-user_repo = UserRepository()
-
-# Kullanıcı ekle
-user_data = {
-    'username': 'test_user',
-    'email': 'test@example.com',
-    'password_hash': 'hashed_password',
-    'first_name': 'Test',
-    'last_name': 'User'
-}
-user_id = user_repo.create_user(user_data)
+with db as conn:
+    conn.cursor.execute("""
+        SELECT q.name, q.description, t.name as topic_name
+        FROM questions q
+        JOIN topics t ON q.topic_id = t.id
+        LIMIT 5
+    """)
+    questions = conn.cursor.fetchall()
+    for q in questions:
+        print(f"Soru: {q['name']}")
+        print(f"Açıklama: {q['description']}")
+        print(f"Konu: {q['topic_name']}")
 ```
 
 ## ⚠️ Önemli Notlar
 
-1. **SQL Dosyaları**: Migration sistemi SQL dosyalarını okur ve çalıştırır
-2. **Sıralama**: Tablolar foreign key bağımlılıklarına göre sıralı oluşturulur
-3. **Veri Korunması**: `ON DUPLICATE KEY UPDATE` ile mevcut veriler korunur
-4. **Hata Yönetimi**: Dosya bulunamazsa veya SQL hatası olursa detaylı hata mesajı verilir
-5. **Bağlantı Yönetimi**: Context manager ile otomatik bağlantı yönetimi
+1. **Bağlantı Yönetimi**: Her zaman `with` bloğu kullanın
+2. **Transaction**: Otomatik commit/rollback yapılır
+3. **Hata Yönetimi**: Tüm modüller exception handling içerir
+4. **Veri Bütünlüğü**: Foreign key constraint'ler aktif
+5. **Performans**: İndeksler optimize edilmiş
 
-## 🛠️ Sorun Giderme
-
-### SQL Dosyası Bulunamadı
-```
-❌ SQL dosyası bulunamadı: app/database/sql_schemas/grades.sql
-```
-**Çözüm**: SQL dosyalarının doğru konumda olduğundan emin olun.
-
-### Foreign Key Hatası
-```
-❌ SQL hatası: Cannot add foreign key constraint
-```
-**Çözüm**: Tabloların doğru sırada oluşturulduğundan emin olun.
+## 🐛 Sorun Giderme
 
 ### Bağlantı Hatası
+```python
+# Bağlantıyı yeniden kur
+db = DatabaseConnection()
+db._ensure_connection()
 ```
-❌ Veritabanı bağlantı hatası: Access denied
+
+### Tablo Bulunamadı
+```python
+# Migration'ları çalıştır
+migrations = DatabaseMigrations(db)
+migrations.force_recreate()
 ```
-**Çözüm**: Veritabanı bağlantı bilgilerini kontrol edin.
 
-## 📞 Destek
+### Question Yükleme Hatası
+```bash
+# Verbose mod ile çalıştır
+python app/database/load_questions.py --verbose
+```
 
-Herhangi bir sorun yaşarsanız:
-1. SQL dosyalarının varlığını kontrol edin
-2. Veritabanı bağlantı bilgilerini doğrulayın
-3. Migration log'larını inceleyin
-4. Test scriptini çalıştırın 
+## 📚 İlgili Dosyalar
+
+- **main.py**: Uygulama başlatma ve veritabanı init
+- **config.py**: Veritabanı konfigürasyonu
+- **app/data/question_banks/**: Question JSON dosyaları
+- **app/data/lessons/**: Grade JSON dosyaları
+
+---
+
+**Son Güncelleme**: 2025-01-27  
+**Versiyon**: 2.0  
+**Yazar**: Göktuğ KARA
