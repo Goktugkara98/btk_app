@@ -2,7 +2,7 @@ from flask import Flask, render_template, session
 from config import Config
 from app.database.db_connection import DatabaseConnection
 from app.database.db_migrations import DatabaseMigrations
-from app.database.question_loader import QuestionLoader
+from app.database.quiz_data_loader import QuestionLoader
 import os
 import secrets
 

@@ -34,10 +34,12 @@ quiz_bp = Blueprint('quiz', __name__)
 # Import services here to avoid circular imports
 try:
     from app.services import get_quiz_service
+    from app.services.auth_service import login_required
     from app.database.db_connection import DatabaseConnection
 except ImportError as e:
     print(f"Warning: Could not import services: {e}")
     get_quiz_service = None
+    login_required = None
     DatabaseConnection = None
 
 # =============================================================================
@@ -279,6 +281,7 @@ def get_quiz_data():
 # -------------------------------------------------------------------------
 
 @quiz_bp.route('/quiz/start', methods=['POST'])
+@login_required
 def start_quiz():
     """5.2.1. Yeni bir quiz başlatır."""
     if not session.get('logged_in'):
@@ -323,10 +326,9 @@ def start_quiz():
         }), 500
 
 @quiz_bp.route('/quiz/submit', methods=['POST'])
+@login_required
 def submit_quiz():
     """5.2.2. Quiz sonuçlarını gönderir."""
-    if not session.get('logged_in'):
-        return jsonify({'status': 'error', 'message': 'Giriş yapmanız gerekiyor'}), 401
     
     data = request.get_json()
     if not data:
@@ -367,10 +369,9 @@ def submit_quiz():
         }), 500
 
 @quiz_bp.route('/quiz/results', methods=['GET'])
+@login_required
 def get_quiz_results():
     """5.2.3. Kullanıcının quiz sonuçlarını getirir."""
-    if not session.get('logged_in'):
-        return jsonify({'status': 'error', 'message': 'Giriş yapmanız gerekiyor'}), 401
     
     try:
         user_id = session.get('user_id')

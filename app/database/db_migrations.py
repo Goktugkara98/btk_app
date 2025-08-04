@@ -3,7 +3,7 @@
 # =============================================================================
 # Bu modül, veritabanı tablolarını oluşturmak için kullanılır.
 # Python şemaları app/database/schemas/ klasöründe tutulur.
-# JSON verileri app/data/lessons/ klasöründen dinamik olarak yüklenir.
+# JSON verileri app/data/curriculum_structure/ klasöründen dinamik olarak yüklenir.
 # =============================================================================
 
 from mysql.connector import Error as MySQLError
@@ -15,7 +15,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from app.database.db_connection import DatabaseConnection
-from app.database.json_data_loader import JSONDataLoader
+from app.database.curriculum_data_loader import JSONDataLoader
 from app.database.schemas import (
     GRADES_TABLE_SQL, GRADES_SAMPLE_DATA,
     SUBJECTS_TABLE_SQL, SUBJECTS_SAMPLE_DATA,

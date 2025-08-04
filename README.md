@@ -80,8 +80,8 @@ btk_app/
 │   │   ├── README.md           # Veritabanı dokümantasyonu
 │   │   ├── db_connection.py    # Veritabanı bağlantısı
 │   │   ├── db_migrations.py    # Tablo oluşturma
-│   │   ├── question_loader.py  # Soru yükleme
-│   │   ├── json_data_loader.py # JSON veri yükleme
+│   │   ├── quiz_data_loader.py  # Quiz veri yükleme
+│   │   ├── curriculum_data_loader.py # Müfredat veri yükleme
 │   │   ├── user_repository.py  # Kullanıcı repository
 │   │   └── schemas/            # Veritabanı şemaları
 │   │       ├── grades_schema.py
@@ -149,10 +149,10 @@ btk_app/
 │   │   └── quiz_results.html   # Quiz sonuçları
 │   │
 │   ├── data/                   # Veri dosyaları
-│   │   ├── lessons/            # Ders verileri
-│   │   │   ├── grade_8.json    # 8. sınıf dersleri
-│   │   │   └── grade_9.json    # 9. sınıf dersleri
-│   │   ├── question_banks/     # Soru bankaları
+│   │   ├── curriculum_structure/ # Müfredat yapısı
+│   │   │   ├── grade_8.json    # 8. sınıf müfredatı
+│   │   │   └── grade_9.json    # 9. sınıf müfredatı
+│   │   ├── quiz_banks/         # Soru bankaları
 │   │   │   ├── grade_8/        # 8. sınıf soruları
 │   │   │   │   └── turkish/    # Türkçe soruları
 │   │   │   │       └── verbals/ # Fiilimsiler
@@ -163,7 +163,6 @@ btk_app/
 │   │   └── quiz-data.json      # Quiz verileri
 │   │
 │   └── utils/                  # Yardımcı modüller
-│       └── auth_utils.py       # Kimlik doğrulama yardımcıları
 │
 └── instance/                   # Instance klasörü (Flask)
 ```
@@ -274,7 +273,7 @@ Uygulama ilk çalıştırıldığında:
 ### **Manuel Veri Yükleme**
 ```bash
 # Soru verilerini manuel yüklemek için
-python -m app.database.load_questions
+python -m app.database.quiz_data_cli
 ```
 
 ### **Veritabanı Yapısı**

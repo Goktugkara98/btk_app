@@ -12,7 +12,7 @@ from pathlib import Path
 # Proje kök dizinini Python path'ine ekle
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from app.database.question_loader import QuestionLoader
+from app.database.quiz_data_loader import QuestionLoader
 
 def main():
     """
@@ -27,10 +27,10 @@ def main():
   python load_questions.py
 
   # Belirli bir dosyayı yükle
-  python load_questions.py --file app/data/question_banks/grade_8/turkish/verbals/participle.json
+  python load_questions.py --file app/data/quiz_banks/grade_8/turkish/verbals/participle.json
 
   # Belirli bir dizindeki dosyaları yükle
-  python load_questions.py --dir app/data/question_banks/grade_8/turkish
+  python load_questions.py --dir app/data/quiz_banks/grade_8/turkish
 
   # Verbose mod ile yükle
   python load_questions.py --verbose
@@ -52,8 +52,8 @@ def main():
     parser.add_argument(
         '--data-dir',
         type=str,
-        default='app/data/question_banks',
-        help='Question dosyalarının varsayılan dizini (varsayılan: app/data/question_banks)'
+        default='app/data/quiz_banks',
+        help='Question dosyalarının varsayılan dizini (varsayılan: app/data/quiz_banks)'
     )
     
     parser.add_argument(

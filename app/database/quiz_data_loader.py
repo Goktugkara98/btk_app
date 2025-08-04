@@ -15,7 +15,7 @@ class QuestionLoader:
     JSON dosyalarından question verilerini okur ve veritabanına ekler.
     """
     
-    def __init__(self, data_dir: str = "app/data/question_banks", db_connection: Optional[DatabaseConnection] = None):
+    def __init__(self, data_dir: str = "app/data/quiz_banks", db_connection: Optional[DatabaseConnection] = None):
         """
         QuestionLoader sınıfının kurucu metodu.
         

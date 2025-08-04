@@ -18,11 +18,14 @@ try:
     from .user_service import UserService
     from .quiz_service import QuizService
     from .system_service import SystemService
+    from .auth_service import AuthenticationService, auth_service
 except ImportError as e:
     print(f"Warning: Could not import some service classes: {e}")
     UserService = None
     QuizService = None
     SystemService = None
+    AuthenticationService = None
+    auth_service = None
 
 __all__ = [
     'service_factory',
@@ -31,5 +34,7 @@ __all__ = [
     'get_system_service',
     'UserService',
     'QuizService',
-    'SystemService'
+    'SystemService',
+    'AuthenticationService',
+    'auth_service'
 ] 

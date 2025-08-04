@@ -15,7 +15,7 @@ class JSONDataLoader:
     JSON dosyalarından veri okur ve veritabanı için SQL insert ifadeleri oluşturur.
     """
     
-    def __init__(self, data_dir: str = "app/data/lessons"):
+    def __init__(self, data_dir: str = "app/data/curriculum_structure"):
         """
         JSONDataLoader sınıfının kurucu metodu.
         

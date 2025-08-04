@@ -26,14 +26,25 @@
                     Sıradan quizleri unutun. Yapay zeka destekli kişisel öğrenme asistanınızla tanışın. Sadece doğru cevabı değil, bir soruyu neden yanlış anladığınızı keşfedin. Anlamadığınız her noktayı yapay zekaya sorun, sohbet ederek öğrenin ve kişisel analizlerle potansiyelinizi ortaya çıkarın. Öğrenmeyi yeniden keşfetmeye hazır mısınız?
                 </p>
                 <div class="hero-buttons">
-                    <a href="/quiz/start" class="btn btn-primary">
-                        <i class="bi bi-play-circle"></i>
-                        Tam Quiz Başlat
-                    </a>
-                    <a href="#features" class="btn btn-primary">
-                        <i class="bi bi-info-circle"></i>
-                        Daha Fazla
-                    </a>
+                    {% if session.get('logged_in') %}
+                        <a href="/quiz/start" class="btn btn-primary">
+                            <i class="bi bi-play-circle"></i>
+                            Tam Quiz Başlat
+                        </a>
+                        <a href="#features" class="btn btn-primary">
+                            <i class="bi bi-info-circle"></i>
+                            Daha Fazla
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-primary">
+                            <i class="bi bi-play-circle"></i>
+                            Demo Yap
+                        </a>
+                        <a href="/login" class="btn btn-primary">
+                            <i class="bi bi-person-circle"></i>
+                            Giriş Yap
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             
@@ -314,14 +325,25 @@
             <h2>Öğrenmeye Başlayın</h2>
             <p>Hemen ücretsiz hesap oluşturun ve öğrenme yolculuğunuza başlayın.</p>
             <div class="cta-buttons">
-                <a href="/quiz" class="btn btn-primary btn-large">
-                    <i class="bi bi-rocket"></i>
-                    Hemen Başla
-                </a>
-                <a href="#demo" class="btn btn-outline btn-large">
-                    <i class="bi bi-play"></i>
-                    Demo İzle
-                </a>
+                {% if session.get('logged_in') %}
+                    <a href="/quiz/start" class="btn btn-primary btn-large">
+                        <i class="bi bi-rocket"></i>
+                        Hemen Başla
+                    </a>
+                    <a href="#demo" class="btn btn-outline btn-large">
+                        <i class="bi bi-play"></i>
+                        Demo İzle
+                    </a>
+                {% else %}
+                    <a href="#" class="btn btn-primary btn-large">
+                        <i class="bi bi-play-circle"></i>
+                        Demo Yap
+                    </a>
+                    <a href="/login" class="btn btn-outline btn-large">
+                        <i class="bi bi-person-circle"></i>
+                        Giriş Yap
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>

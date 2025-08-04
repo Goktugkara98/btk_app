@@ -213,6 +213,8 @@ class UserService:
         4.2.4. Login form verilerini işler ve kullanıcı girişini gerçekleştirir.
         Login form'da email ve password alanları bulunur.
         """
+        from app.services.auth_service import auth_service
+        
         # 1. Form verilerini kontrol et
         email = login_data.get('email', '').strip()
         password = login_data.get('password', '')
@@ -239,11 +241,23 @@ class UserService:
             if not check_password_hash(user.get('password_hash'), password):
                 return False, {'message': 'E-posta veya şifre hatalı'}
 
-            # 6. Başarılı giriş - kullanıcı bilgilerini döndür (şifre hariç)
+            # 6. Session'a kullanıcıyı kaydet
+            user_data = {
+                'id': user.get('id'),
+                'username': user.get('username'),
+                'email': user.get('email'),
+                'is_admin': user.get('is_admin', False)
+            }
+            
+            if not auth_service.login_user(user_data):
+                return False, {'message': 'Oturum açılırken bir hata oluştu'}
+
+            # 7. Başarılı giriş - kullanıcı bilgilerini döndür (şifre hariç)
             return True, {
                 'id': user.get('id'),
                 'username': user.get('username'),
                 'email': user.get('email'),
+                'is_admin': user.get('is_admin', False),
                 'created_at': user.get('created_at').isoformat() if user.get('created_at') else None
             }
 
@@ -290,7 +304,7 @@ class UserService:
                 'school': user_profile.get('school'),
                 'grade_level': user_profile.get('grade_level_id'),
                 'bio': user_profile.get('bio'),
-                'avatar_url': user_profile.get('avatar_url'),
+                'avatar_path': user_profile.get('avatar_path'),
                 'created_at': created_at,
                 'updated_at': updated_at
             }
@@ -312,7 +326,6 @@ class UserService:
                 'phone': 'phone',
                 'birthDate': 'birth_date',
                 'gender': 'gender',
-
                 'school': 'school',
                 'gradeLevel': 'grade_level_id',
                 'bio': 'bio'
@@ -324,26 +337,29 @@ class UserService:
                 if form_field in profile_data and profile_data[form_field] is not None:
                     # gradeLevel için integer dönüşümü yap
                     if form_field == 'gradeLevel':
-                        print(f"Processing gradeLevel: {profile_data[form_field]}")  # Debug log
                         try:
-                            update_data[db_field] = int(profile_data[form_field])
-                            print(f"Converted gradeLevel to: {update_data[db_field]}")  # Debug log
+                            # Boş string kontrolü
+                            if profile_data[form_field] == '':
+                                update_data[db_field] = None
+                            else:
+                                update_data[db_field] = int(profile_data[form_field])
                         except (ValueError, TypeError):
-                            print(f"Failed to convert gradeLevel: {profile_data[form_field]}")  # Debug log
                             return False, {'message': 'Geçersiz sınıf değeri'}
                     else:
                         update_data[db_field] = profile_data[form_field]
             
             # Veritabanını güncelle
-            print(f"Final update_data: {update_data}")  # Debug log
-            success = self.user_repo.update_user(user_id, **update_data)
-            
-            if success:
-                # Güncellenmiş kullanıcı bilgilerini al
-                updated_user = self.get_user_profile(user_id)
-                return True, updated_user
-            else:
-                return False, {'message': 'Profil güncellenirken bir hata oluştu'}
+            try:
+                success = self.user_repo.update_user(user_id, **update_data)
+                
+                if success:
+                    # Güncellenmiş kullanıcı bilgilerini al
+                    updated_user = self.get_user_profile(user_id)
+                    return True, updated_user
+                else:
+                    return False, {'message': 'Profil güncellenirken bir hata oluştu'}
+            except Exception as e:
+                return False, {'message': f'Veritabanı güncelleme hatası: {str(e)}'}
                 
         except Exception as e:
             print(f"Error in update_user_profile service: {e}")
@@ -371,11 +387,11 @@ class UserService:
             file.save(file_path)
             
             # Update user's avatar path in database
-            avatar_url = f"/static/uploads/avatars/{unique_filename}"
-            success = self.user_repo.update_user(user_id, avatar_url=avatar_url)
+            avatar_path = f"/static/uploads/avatars/{unique_filename}"
+            success = self.user_repo.update_user(user_id, avatar_path=avatar_path)
             
             if success:
-                return True, {'avatar_url': avatar_url}
+                return True, {'avatar_path': avatar_path}
             else:
                 # Remove file if database update failed
                 if os.path.exists(file_path):

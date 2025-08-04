@@ -22,6 +22,13 @@
 # =============================================================================
 from flask import Blueprint, render_template, session, redirect, url_for
 
+# Import authentication service
+try:
+    from app.services.auth_service import login_required
+except ImportError as e:
+    print(f"Warning: Could not import auth_service: {e}")
+    login_required = None
+
 # Create the quiz pages blueprint
 quiz_bp = Blueprint('quiz', __name__)
 
@@ -34,25 +41,25 @@ quiz_bp = Blueprint('quiz', __name__)
 # -------------------------------------------------------------------------
 
 @quiz_bp.route('/quiz')
+@login_required
 def quiz():
     """4.1.1. Quiz sayfasını render eder."""
     return render_template('quiz_screen.html', title='Quiz')
 
 @quiz_bp.route('/quiz/start')
+@login_required
 def quiz_start():
     """4.1.2. Quiz başlatma sayfasını render eder."""
     return render_template('quiz_start.html', title='Quiz Başlat')
 
 @quiz_bp.route('/quiz/session/<session_id>')
+@login_required
 def quiz_session(session_id):
     """4.1.3. Quiz oturum sayfasını render eder."""
-    # Kullanıcının giriş yapmış olup olmadığını kontrol et
-    if not session.get('logged_in'):
-        return redirect(url_for('auth.login'))
-    
     return render_template('quiz_screen.html', title='Quiz', session_id=session_id)
 
 @quiz_bp.route('/quiz/results')
+@login_required
 def quiz_results():
     """4.1.4. Quiz sonuçları sayfasını render eder."""
     return render_template('quiz_results.html', title='Quiz Sonuçları') 

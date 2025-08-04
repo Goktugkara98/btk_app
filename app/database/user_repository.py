@@ -79,14 +79,14 @@ class UserRepository:
         self._ensure_connection()
         try:
             with self.db as conn:
-                # Temel alanlar
-                fields = ['username', 'email', 'password_hash']
-                values = [username, email, hashed_password]
+                # Temel alanlar (name_id otomatik olarak username ile aynı)
+                fields = ['username', 'name_id', 'email', 'password_hash']
+                values = [username, username, email, hashed_password]
                 
                 # Opsiyonel alanlar
                 optional_fields = [
                     'first_name', 'last_name', 'phone', 'birth_date', 'gender',
-                    'school', 'grade_level_id', 'bio'
+                    'school', 'grade_level_id', 'bio', 'avatar_path'
                 ]
                 
                 for field in optional_fields:
@@ -120,7 +120,7 @@ class UserRepository:
                 query = """
                     SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
                            u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
-                           u.bio, u.created_at, u.updated_at
+                           u.bio, u.avatar_path, u.created_at, u.updated_at
                     FROM users u
                     WHERE u.username = %s
                 """
@@ -139,7 +139,7 @@ class UserRepository:
                 query = """
                     SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
                            u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
-                           u.bio, u.created_at, u.updated_at
+                           u.bio, u.avatar_path, u.created_at, u.updated_at
                     FROM users u
                     WHERE u.email = %s
                 """
@@ -159,7 +159,7 @@ class UserRepository:
                 query = """
                     SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
                            u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
-                           u.bio, u.created_at, u.updated_at
+                           u.bio, u.avatar_path, u.created_at, u.updated_at
                     FROM users u
                     WHERE u.id = %s
                 """
@@ -181,7 +181,7 @@ class UserRepository:
                 query = """
                     SELECT u.id, u.username, u.email, u.password_hash, u.first_name, u.last_name, 
                            u.phone, u.birth_date, u.gender, u.school, u.grade_level_id,
-                           u.bio, u.created_at, u.updated_at
+                           u.bio, u.avatar_path, u.created_at, u.updated_at
                     FROM users u
                     ORDER BY u.created_at DESC
                 """
@@ -200,7 +200,7 @@ class UserRepository:
                 # Güncellenebilir alanlar
                 updatable_fields = [
                     'username', 'email', 'first_name', 'last_name', 'phone', 
-                    'birth_date', 'gender', 'school', 'grade_level_id', 'bio', 'avatar_url'
+                    'birth_date', 'gender', 'school', 'grade_level_id', 'bio', 'avatar_path'
                 ]
                 
                 # Güncellenecek alanları filtrele
@@ -217,11 +217,15 @@ class UserRepository:
                 
                 update_values.append(user_id)
                 query = f"UPDATE users SET {', '.join(update_fields)} WHERE id = %s"
+                
                 conn.cursor.execute(query, update_values)
                 conn.connection.commit()
-                return conn.cursor.rowcount > 0
-        except MySQLError:
+                row_count = conn.cursor.rowcount
+                return row_count > 0
+        except MySQLError as e:
             conn.connection.rollback()
+            return False
+        except Exception as e:
             return False
         finally:
             self._close_if_owned()
@@ -318,7 +322,7 @@ class UserRepository:
                 query = """
                     SELECT id, username, email, first_name, last_name, 
                            phone, birth_date, gender, school, grade_level_id,
-                           bio, created_at, updated_at
+                           bio, avatar_path, created_at, updated_at
                     FROM users u
                     WHERE u.id = %s
                 """

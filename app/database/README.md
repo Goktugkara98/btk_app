@@ -9,9 +9,9 @@ app/database/
 ├── README.md                    # Bu dosya
 ├── db_connection.py             # Veritabanı bağlantı yönetimi
 ├── db_migrations.py             # Veritabanı migration sistemi
-├── question_loader.py           # Question verilerini yükleme
-├── json_data_loader.py          # JSON verilerini yükleme
-├── load_questions.py            # Question yükleme CLI scripti
+├── curriculum_data_loader.py    # Müfredat verilerini yükleme
+├── quiz_data_loader.py          # Quiz verilerini yükleme
+├── quiz_data_cli.py             # Quiz veri yükleme CLI scripti
 ├── user_repository.py           # Kullanıcı veri erişimi
 └── schemas/                     # Veritabanı tablo şemaları
     ├── __init__.py
@@ -139,8 +139,8 @@ migrations = DatabaseMigrations(db_connection)
 migrations.run_migrations()  # Tabloları oluştur
 ```
 
-### **question_loader.py**
-JSON dosyalarından question verilerini veritabanına yükler.
+### **quiz_data_loader.py**
+JSON dosyalarından quiz verilerini veritabanına yükler.
 
 **Özellikler:**
 - JSON dosya okuma
@@ -150,13 +150,13 @@ JSON dosyalarından question verilerini veritabanına yükler.
 
 **Kullanım:**
 ```python
-from app.database.question_loader import QuestionLoader
+from app.database.quiz_data_loader import QuestionLoader
 
 loader = QuestionLoader()
 results = loader.process_all_question_files()
 ```
 
-### **json_data_loader.py**
+### **curriculum_data_loader.py**
 Grade, subject, unit, topic verilerini JSON'dan yükler.
 
 **Özellikler:**
@@ -165,19 +165,19 @@ Grade, subject, unit, topic verilerini JSON'dan yükler.
 - SQL insert ifadeleri oluşturma
 - ID eşleştirme
 
-### **load_questions.py**
-Question yükleme için CLI scripti.
+### **quiz_data_cli.py**
+Quiz veri yükleme için CLI scripti.
 
 **Kullanım:**
 ```bash
-# Tüm question dosyalarını yükle
-python app/database/load_questions.py
+# Tüm quiz dosyalarını yükle
+python app/database/quiz_data_cli.py
 
 # Belirli bir dosyayı yükle
-python app/database/load_questions.py --file path/to/file.json
+python app/database/quiz_data_cli.py --file path/to/file.json
 
 # Belirli bir dizindeki dosyaları yükle
-python app/database/load_questions.py --dir path/to/directory
+python app/database/quiz_data_cli.py --dir path/to/directory
 ```
 
 ### **user_repository.py**
@@ -223,9 +223,9 @@ migrations = DatabaseMigrations(db)
 migrations.run_migrations()
 ```
 
-### 3. Question Verilerini Yükle
+### 3. Quiz Verilerini Yükle
 ```python
-from app.database.question_loader import QuestionLoader
+from app.database.quiz_data_loader import QuestionLoader
 
 loader = QuestionLoader()
 results = loader.process_all_question_files()
@@ -233,7 +233,7 @@ results = loader.process_all_question_files()
 
 ### 4. CLI ile Yükleme
 ```bash
-python app/database/load_questions.py
+python app/database/quiz_data_cli.py
 ```
 
 ## 🔍 Veri Kontrolü
@@ -299,8 +299,8 @@ python app/database/load_questions.py --verbose
 
 - **main.py**: Uygulama başlatma ve veritabanı init
 - **config.py**: Veritabanı konfigürasyonu
-- **app/data/question_banks/**: Question JSON dosyaları
-- **app/data/lessons/**: Grade JSON dosyaları
+- **app/data/quiz_banks/**: Quiz JSON dosyaları
+- **app/data/curriculum_structure/**: Müfredat JSON dosyaları
 
 ---
 

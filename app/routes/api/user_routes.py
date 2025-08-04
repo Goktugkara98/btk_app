@@ -36,7 +36,7 @@ user_bp = Blueprint('user', __name__)
 # Import services here to avoid circular imports
 try:
     from app.services import get_user_service
-    from app.utils.auth_utils import logout_user
+    from app.services.auth_service import logout_user
 except ImportError as e:
     print(f"Warning: Could not import services: {e}")
     get_user_service = None
