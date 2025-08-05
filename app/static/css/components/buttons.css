@@ -51,9 +51,9 @@
 }
 
 .btn-secondary:hover {
-    background: var(--bg-dark);
-    color: white;
-    border-color: var(--bg-dark);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--bg-secondary);
 }
 
 .btn-outline {

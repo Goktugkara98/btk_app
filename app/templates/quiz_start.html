@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Quiz Başlat - Daima{% endblock %}
+{% block title %}Sınav Başlat - Daima{% endblock %}
 
 {% block head_extra_styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz_start/quiz_start.css') }}">
@@ -15,8 +15,8 @@
             <div class="col-lg-8">
                 <div class="settings-panel">
                     <div class="panel-header">
-                        <h2>Quiz Ayarları</h2>
-                        <p>Quiz'inizi özelleştirmek için aşağıdaki seçenekleri belirleyin</p>
+                        <h2>Sınav Ayarları</h2>
+                        <p>Gerçek sınav deneyimi için sınav ayarlarınızı belirleyin</p>
                     </div>
 
                     <div class="settings-content">
@@ -24,16 +24,16 @@
                         <div class="step-indicator">
                             <div class="step active" data-step="1">
                                 <span class="step-number">1</span>
-                                <span class="step-text">Temel Bilgiler</span>
+                                <span class="step-text">Sınav Konusu</span>
                             </div>
                             <div class="step-line"></div>
                             <div class="step" data-step="2">
                                 <span class="step-number">2</span>
-                                <span class="step-text">Quiz Ayarları</span>
+                                <span class="step-text">Sınav Ayarları</span>
                             </div>
                         </div>
 
-                                                       <!-- Step 1: Basic Information -->
+                        <!-- Step 1: Subject Selection -->
                                <div class="form-step active" id="step-1">
                                    <div class="step-content">
                                        
@@ -45,7 +45,6 @@
                                     </label>
                                     <select id="class-select" class="form-control">
                                         <option value="">Sınıf seçiniz</option>
-                                        <!-- Sınıflar veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
 
@@ -57,7 +56,6 @@
                                     </label>
                                     <select id="subject-select" class="form-control" disabled>
                                         <option value="">Ders seçiniz</option>
-                                        <!-- Dersler veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
 
@@ -69,7 +67,6 @@
                                     </label>
                                     <select id="unit-select" class="form-control" disabled>
                                         <option value="">Ünite seçiniz</option>
-                                        <!-- Üniteler veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
 
@@ -81,7 +78,6 @@
                                     </label>
                                     <select id="topic-select" class="form-control" disabled>
                                         <option value="">Konu seçiniz</option>
-                                        <!-- Konular veritabanından dinamik olarak yüklenecek -->
                                     </select>
                                 </div>
 
@@ -94,7 +90,7 @@
                             </div>
                         </div>
 
-                                                       <!-- Step 2: Quiz Settings -->
+                        <!-- Step 2: Exam Settings -->
                                <div class="form-step" id="step-2">
                                    <div class="step-content">
                                        
@@ -112,8 +108,8 @@
                                                      <i class="fas fa-random"></i>
                                                  </div>
                                                  <div class="option-text">
-                                                     <span class="option-title">Rasgele</span>
-                                                     <span class="option-desc">Karışık zorluk</span>
+                                                    <span class="option-title">Karışık</span>
+                                                    <span class="option-desc">Tüm zorluk seviyeleri</span>
                                                  </div>
                                              </div>
                                          </label>
@@ -125,7 +121,7 @@
                                                  </div>
                                                  <div class="option-text">
                                                      <span class="option-title">Kolay</span>
-                                                     <span class="option-desc">Başlangıç seviyesi</span>
+                                                    <span class="option-desc">Temel seviye</span>
                                                  </div>
                                              </div>
                                          </label>
@@ -160,57 +156,35 @@
                                 <div class="form-group">
                                     <label class="form-label">
                                         <i class="fas fa-clock"></i>
-                                        Zamanlayıcı
+                                        Sınav Süresi
                                     </label>
                                     <div class="timer-section">
-                                        <div class="timer-toggle">
-                                            <label class="toggle-option">
-                                                <input type="radio" name="timer" value="enabled" checked>
-                                                <span class="toggle-text">Açık</span>
-                                            </label>
-                                            <label class="toggle-option">
-                                                <input type="radio" name="timer" value="disabled">
-                                                <span class="toggle-text">Kapalı</span>
-                                            </label>
-                                        </div>
                                         <div class="timer-input" id="timer-duration">
-                                            <input type="number" id="timer-minutes" min="1" max="180" value="30" class="form-control">
+                                            <input type="number" id="timer-minutes" min="5" max="180" value="30" class="form-control">
                                             <span class="time-unit">dakika</span>
+                                        </div>
+                                        <div class="timer-note">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Sınav süresi dolduğunda otomatik olarak tamamlanacaktır</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Quiz Mode -->
+                                <!-- Question Count -->
                                 <div class="form-group">
                                     <label class="form-label">
-                                        <i class="fas fa-gamepad"></i>
-                                        Quiz Modu
+                                        <i class="fas fa-list-ol"></i>
+                                        Soru Sayısı
                                     </label>
-                                    <div class="options-grid">
-                                                                                 <label class="option-card mode-card">
-                                             <input type="radio" name="quiz-mode" value="educational" checked>
-                                             <div class="option-content">
-                                                 <div class="option-icon educational">
-                                                     <i class="fas fa-graduation-cap"></i>
+                                    <div class="question-count-section">
+                                        <div class="question-count-input">
+                                            <input type="number" id="question-count" min="5" max="50" value="20" class="form-control">
+                                            <span class="count-unit">soru</span>
                                                  </div>
-                                                 <div class="option-text">
-                                                     <span class="option-title">Öğretici Mod</span>
-                                                     <span class="option-desc">Öğrenme odaklı</span>
-                                                 </div>
+                                        <div class="question-count-note">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>5-50 soru arası seçebilirsiniz</span>
                                              </div>
-                                         </label>
-                                         <label class="option-card mode-card">
-                                             <input type="radio" name="quiz-mode" value="exam">
-                                             <div class="option-content">
-                                                 <div class="option-icon exam">
-                                                     <i class="fas fa-file-alt"></i>
-                                                 </div>
-                                                 <div class="option-text">
-                                                     <span class="option-title">Sınav Modu</span>
-                                                     <span class="option-desc">Gerçek sınav deneyimi</span>
-                                                 </div>
-                                             </div>
-                                         </label>
                                     </div>
                                 </div>
 
@@ -230,7 +204,7 @@
             <div class="col-lg-4">
                 <div class="preview-panel">
                     <div class="panel-header">
-                        <h2>Quiz Önizleme</h2>
+                        <h2>Sınav Önizleme</h2>
                         <p>Seçtiğiniz ayarların özeti</p>
                     </div>
 
@@ -253,15 +227,19 @@
                         </div>
                         <div class="preview-item">
                             <span class="preview-label">Zorluk</span>
-                                                         <span class="preview-value" id="preview-difficulty">Rasgele</span>
+                            <span class="preview-value" id="preview-difficulty">Karışık</span>
                         </div>
                         <div class="preview-item">
-                            <span class="preview-label">Zamanlayıcı</span>
+                            <span class="preview-label">Süre</span>
                             <span class="preview-value" id="preview-timer">30 dakika</span>
                         </div>
                         <div class="preview-item">
+                            <span class="preview-label">Soru Sayısı</span>
+                            <span class="preview-value" id="preview-question-count">20 soru</span>
+                        </div>
+                        <div class="preview-item">
                             <span class="preview-label">Mod</span>
-                                                         <span class="preview-value" id="preview-mode">Öğretici Mod</span>
+                            <span class="preview-value" id="preview-mode">Sınav Modu</span>
                         </div>
                     </div>
 
@@ -270,7 +248,7 @@
                     <div class="preview-actions">
                         <button type="button" class="btn btn-success btn-lg w-100" id="start-quiz-btn" disabled>
                             <i class="fas fa-play"></i>
-                            Quiz'i Başlat
+                            Sınavı Başlat
                         </button>
                         <button type="button" class="btn btn-outline-secondary w-100 mt-2" id="reset-settings-btn">
                             <i class="fas fa-redo"></i>
@@ -285,21 +263,5 @@
 {% endblock %}
 
 {% block page_scripts %}
-    <script>
-        console.log('🎯 Quiz start sayfası yüklendi!');
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🎯 DOM ready event tetiklendi!');
-            const startBtn = document.getElementById('start-quiz-btn');
-            if (startBtn) {
-                console.log('🎯 Start butonu bulundu:', startBtn);
-                startBtn.addEventListener('click', () => {
-                    console.log('🎯 Start butonuna tıklandı!');
-                    alert('Start butonuna tıklandı!');
-                });
-            } else {
-                console.log('🎯 Start butonu bulunamadı!');
-            }
-        });
-    </script>
     <script src="{{ url_for('static', filename='js/quiz_start/quiz_start.js') }}"></script>
 {% endblock %}

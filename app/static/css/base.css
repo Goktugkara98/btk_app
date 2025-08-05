@@ -27,7 +27,6 @@
     --text-light: #a0aec0;                 /* Açık metin rengi */
     --bg-primary: #fff;                    /* Modern arka plan (beyaz) */
     --bg-secondary: #f7f7fa;               /* Modern ikincil arka plan */
-    --bg-dark: #181818;                    /* Modern koyu arka plan */
     /* Gradientler */
     --primary-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
     --secondary-gradient: linear-gradient(135deg, #f3e8ff 0%, #a78bfa 100%);
@@ -101,7 +100,6 @@
     
     /* Profile Page Variables */
     --primary-rgb: 124, 58, 237;
-    --primary-dark: #6d28d9;
     --surface-color: #f8fafc;
     --border-color: #e2e8f0;
     --text-primary: #1e293b;
@@ -109,7 +107,6 @@
     --text-disabled: #94a3b8;
     --success-color: #10b981;
     --success-rgb: 16, 185, 129;
-    --success-dark: #059669;
     --error-color: #ef4444;
     --error-rgb: 239, 68, 68;
     --text-secondary: #444444;
@@ -134,31 +131,7 @@
   padding-right: 0 !important;
 }
 
-/* =============================================================================
- * KOYU TEMA
- * Kullanıcının OS tercihi "dark" ise, :root içindeki renk değişkenlerini
- * yeniden tanımlayarak tüm siteyi Koyu Tema'ya geçiririz.
- * Sadece renkleri değiştirmek yeterlidir.
- * =============================================================================
- */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-text-primary: #fff;
-        --color-text-secondary: #e0e0e0;
-        --color-background-primary: #181818;
-        --color-background-secondary: #23232b;
-        --color-border: #333;
-        --color-accent-primary: #a78bfa;
-        --color-accent-secondary: #7c3aed;
-        --bg-primary: #181818;
-        --bg-secondary: #23232b;
-        --bg-dark: #000;
-        --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-        --secondary-gradient: linear-gradient(135deg, #23232b 0%, #7c3aed 100%);
-        --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-        --text-on-accent: #181818;
-    }
-}
+
 
 /* =============================================================================
  * TEMEL RESET VE BODY STİLLERİ

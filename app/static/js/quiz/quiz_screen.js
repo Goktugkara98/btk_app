@@ -1,20 +1,14 @@
-/* =============================================================================
- * QUIZ SCREEN JAVASCRIPT
- * Quiz ekranı için temel JavaScript fonksiyonları
- * ============================================================================= */
+// =============================================================================
+// Quiz Screen - Main Entry Point
+// =============================================================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Quiz Screen loaded successfully!');
-    
-    // Basic functionality can be added here
-    // For now, just initialize the page
-    initQuizScreen();
-});
+import { QuizController } from './modules/controller.js';
 
-function initQuizScreen() {
-    // Initialize quiz screen components
-    console.log('Initializing quiz screen...');
-    
-    // Add any initialization logic here
-    // This will be expanded as we add more features
-} 
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎯 DOM loaded, initializing Quiz Controller...');
+    const quizController = new QuizController();
+    quizController.initialize();
+}); 

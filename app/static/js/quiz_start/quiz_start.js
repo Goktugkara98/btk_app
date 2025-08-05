@@ -1,6 +1,6 @@
 // =============================================================================
-// Quiz Start JavaScript
-// Quiz başlatma ekranı için JavaScript modülü
+// Quiz Start JavaScript - Exam Mode Focus
+// Sınav başlatma ekranı için JavaScript modülü
 // =============================================================================
 
 class QuizStartManager {
@@ -12,9 +12,10 @@ class QuizStartManager {
             unit_id: '',
             topic_id: '',
             difficulty: 'random',
-            quiz_mode: 'educational',
-            timer_enabled: 'enabled',
-            timer_duration: 30
+            quiz_mode: 'exam', // Always exam mode
+            timer_enabled: true, // Always enabled for exam mode
+            timer_duration: 30,
+            question_count: 20
         };
         
         // Cache for loaded data
@@ -52,15 +53,10 @@ class QuizStartManager {
         });
 
         // Timer settings
-        document.querySelectorAll('input[name="timer"]').forEach(radio => {
-            radio.addEventListener('change', (e) => this.handleTimerChange(e));
-        });
         document.getElementById('timer-minutes')?.addEventListener('change', (e) => this.handleTimerDurationChange(e));
 
-        // Quiz mode selection
-        document.querySelectorAll('input[name="quiz-mode"]').forEach(radio => {
-            radio.addEventListener('change', (e) => this.handleQuizModeChange(e));
-        });
+        // Question count
+        document.getElementById('question-count')?.addEventListener('change', (e) => this.handleQuestionCountChange(e));
 
         // Action buttons
         const startBtn = document.getElementById('start-quiz-btn');
@@ -185,18 +181,13 @@ class QuizStartManager {
         this.updatePreview();
     }
 
-    handleTimerChange(event) {
-        this.formData.timer_enabled = event.target.value;
-        this.updatePreview();
-    }
-
     handleTimerDurationChange(event) {
         this.formData.timer_duration = parseInt(event.target.value) || 30;
         this.updatePreview();
     }
 
-    handleQuizModeChange(event) {
-        this.formData.quiz_mode = event.target.value;
+    handleQuestionCountChange(event) {
+        this.formData.question_count = parseInt(event.target.value) || 20;
         this.updatePreview();
     }
 
@@ -396,7 +387,8 @@ class QuizStartManager {
         this.updatePreviewItem('topic', this.getTopicName(this.formData.topic_id));
         this.updatePreviewItem('difficulty', this.getDifficultyName(this.formData.difficulty));
         this.updatePreviewItem('timer', this.getTimerText());
-        this.updatePreviewItem('mode', this.getQuizModeName(this.formData.quiz_mode));
+        this.updatePreviewItem('question-count', this.getQuestionCountText());
+        this.updatePreviewItem('mode', 'Sınav Modu');
         
         this.validateForm();
     }
@@ -437,27 +429,20 @@ class QuizStartManager {
 
     getDifficultyName(difficulty) {
         const difficultyMap = {
-            'random': 'Rasgele',
+            'random': 'Karışık',
             'easy': 'Kolay',
             'medium': 'Orta',
             'hard': 'Zor'
         };
-        return difficultyMap[difficulty] || 'Rasgele';
+        return difficultyMap[difficulty] || 'Karışık';
     }
 
     getTimerText() {
-        if (this.formData.timer_enabled === 'disabled') {
-            return 'Kapalı';
-        }
         return `${this.formData.timer_duration} dakika`;
     }
 
-    getQuizModeName(mode) {
-        const modeMap = {
-            'educational': 'Öğretici Mod',
-            'exam': 'Sınav Modu'
-        };
-        return modeMap[mode] || 'Öğretici Mod';
+    getQuestionCountText() {
+        return `${this.formData.question_count} soru`;
     }
 
     validateForm() {
@@ -486,7 +471,7 @@ class QuizStartManager {
             container.innerHTML = `
                 <div class="validation-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Quiz başlatmak için tüm gerekli alanları doldurun
+                    Sınav başlatmak için tüm gerekli alanları doldurun
                 </div>
             `;
         }
@@ -522,7 +507,7 @@ class QuizStartManager {
         const startBtn = document.getElementById('start-quiz-btn');
         if (startBtn) {
             startBtn.disabled = true;
-            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Quiz Başlatılıyor...';
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sınav Başlatılıyor...';
         }
 
         try {
@@ -545,15 +530,15 @@ class QuizStartManager {
                 window.location.href = `/quiz/screen?session_id=${data.data.session_id}`;
             } else {
                 console.log('❌ API hatası:', data.message);
-                this.showError(data.message || 'Quiz başlatılırken bir hata oluştu');
+                this.showError(data.message || 'Sınav başlatılırken bir hata oluştu');
             }
         } catch (error) {
             console.error('❌ Quiz başlatılırken hata:', error);
-            this.showError('Quiz başlatılırken bir hata oluştu');
+            this.showError('Sınav başlatılırken bir hata oluştu');
         } finally {
             if (startBtn) {
                 startBtn.disabled = false;
-                startBtn.innerHTML = '<i class="fas fa-play"></i> Quiz\'i Başlat';
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Sınavı Başlat';
             }
         }
     }
@@ -566,9 +551,10 @@ class QuizStartManager {
             unit_id: '',
             topic_id: '',
             difficulty: 'random',
-            quiz_mode: 'educational',
-            timer_enabled: 'enabled',
-            timer_duration: 30
+            quiz_mode: 'exam',
+            timer_enabled: true,
+            timer_duration: 30,
+            question_count: 20
         };
 
         // Form elemanlarını sıfırla
@@ -587,8 +573,10 @@ class QuizStartManager {
 
         // Radio button'ları sıfırla
         document.querySelector('input[name="difficulty"][value="random"]').checked = true;
-        document.querySelector('input[name="timer"][value="enabled"]').checked = true;
-        document.querySelector('input[name="quiz-mode"][value="educational"]').checked = true;
+
+        // Input değerlerini sıfırla
+        document.getElementById('timer-minutes').value = 30;
+        document.getElementById('question-count').value = 20;
 
         // UI'yi güncelle
         this.hideElement('subject-group');

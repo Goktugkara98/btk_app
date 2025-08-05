@@ -1,148 +1,193 @@
-/**
- * =============================================================================
- * BOTTOM BAR - BOTTOM NAVBAR STYLES
- * =============================================================================
- * 
- * Bu dosya alt navbar'ın stillerini içerir.
- * 
- * Sorumlulukları:
- * - Alt navbar layout yapısı
- * - Navigasyon butonları stilleri
- * - Buton durumları (enabled/disabled)
- * - Alt navbar responsive tasarımı
- */
-
-/* =============================================================================
- * BOTTOM NAVBAR LAYOUT
- * ============================================================================= */
-
-/* Bottom Navbar - FULL WIDTH */
-.bottom-navbar {
+/* Quiz Bottom Bar Styles */
+.quiz-bottombar {
+    background: #ffffff;
+    color: #2c3e50;
+    padding: 0.75rem 0;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100vw !important;
-    height: var(--question-nav-height);
-    background-color: var(--quiz-bg-primary);
-    border-top: 1px solid var(--quiz-border-light);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
+    z-index: 100;
+    border-top: 1px solid #f0f0f0;
+    width: 100%;
 }
 
-/* =============================================================================
- * NAVIGATION BUTTONS
- * ============================================================================= */
-
-/* Navigation Buttons */
-.nav-btn {
+.bottombar-content {
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    border: 1px solid var(--quiz-border-light);
-    border-radius: var(--quiz-border-radius);
-    background-color: var(--quiz-bg-primary);
-    color: var(--quiz-text-primary);
-    font-family: var(--quiz-font-family);
-    font-size: 0.875rem;
+    justify-content: space-between;
+    padding: 0 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.bottombar-left {
+    display: flex;
+    align-items: center;
+}
+
+.bottombar-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.bottombar-right {
+    display: flex;
+    align-items: center;
+}
+
+.quiz-mode-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.mode-label {
+    font-size: 0.75rem;
+    color: #6c757d;
     font-weight: 500;
+    opacity: 0.8;
+}
+
+.mode-name {
+    font-size: 0.9rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.nav-button {
+    background: #ffffff;
+    color: #2c3e50;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    box-shadow: var(--quiz-shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.nav-btn:hover:not(:disabled) {
-    background-color: var(--quiz-bg-secondary);
-    border-color: var(--quiz-border-medium);
-    transform: translateY(-2px);
-    box-shadow: var(--quiz-shadow-md);
+.nav-button:hover:not(:disabled) {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
 }
 
-.nav-btn:disabled {
-    opacity: 0.5;
+.nav-button:disabled {
+    background: #f8f9fa;
+    color: #adb5bd;
+    border-color: #e9ecef;
     cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
+    opacity: 0.6;
 }
 
-.nav-btn i {
-    font-size: 1rem;
+/* Button States */
+.nav-button.loading {
+    position: relative;
+    color: transparent;
 }
 
-/* Next Button Special Styling */
-.next-btn {
-    background: var(--quiz-primary);
-    border-color: var(--quiz-primary);
-    color: white;
+.nav-button.loading::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.next-btn:hover:not(:disabled) {
-    background: var(--quiz-primary-dark);
-    border-color: var(--quiz-primary-dark);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--quiz-shadow-md);
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.next-btn:disabled {
-    background: var(--quiz-border-light);
-    border-color: var(--quiz-border-light);
-    color: var(--quiz-text-muted);
-}
-
-/* Finish Button State */
-.next-btn.finish {
-    background: var(--quiz-accent);
-    border-color: var(--quiz-accent);
-}
-
-.next-btn.finish:hover:not(:disabled) {
-    background: var(--quiz-accent-dark);
-    border-color: var(--quiz-accent-dark);
-}
-
-.next-btn.finish i {
-    transform: scale(1.1);
-}
-
-/* Button Icons */
-.nav-btn i {
-    font-size: 1.1rem;
-    transition: transform 0.2s ease;
-}
-
-.prev-btn:hover i {
-    transform: translateX(-2px);
-}
-
-.next-btn:hover i {
-    transform: translateX(2px);
-}
-
-/* =============================================================================
- * RESPONSIVE DESIGN
- * ============================================================================= */
-
+/* Responsive Design */
 @media (max-width: 768px) {
-    .nav-btn {
-        padding: 0.6rem 1rem;
-        font-size: 0.875rem;
+    .bottombar-content {
+        padding: 0 1rem;
+    }
+    
+    .quiz-mode-info {
+        gap: 0.15rem;
+    }
+    
+    .mode-label {
+        font-size: 0.7rem;
+    }
+    
+    .mode-name {
+        font-size: 0.85rem;
+    }
+    
+    .nav-button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .navigation-buttons {
+        gap: 0.8rem;
     }
 }
 
 @media (max-width: 480px) {
-    .nav-btn span {
-        display: none;
+    .bottombar-content {
+        padding: 0 0.8rem;
     }
     
-    .nav-btn {
-        padding: 0.75rem;
-        min-width: 48px;
-        justify-content: center;
+    .quiz-mode-info {
+        gap: 0.1rem;
+    }
+    
+    .mode-label {
+        font-size: 0.65rem;
+    }
+    
+    .mode-name {
+        font-size: 0.8rem;
+    }
+    
+    .nav-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .navigation-buttons {
+        gap: 0.6rem;
+    }
+}
+
+/* Tablet Landscape */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .bottombar-content {
+        padding: 0 1.5rem;
+    }
+    
+    .nav-button {
+        min-width: 90px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .quiz-mode-info {
+        min-width: 120px;
+        padding: 0.5rem 1rem;
     }
 } 

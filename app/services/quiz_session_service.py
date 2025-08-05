@@ -210,6 +210,15 @@ class QuizSessionService:
             print(f"❌ Soru seçenekleri getirme hatası: {e}")
             return []
 
+    def get_question_details(self, question_id: int) -> Optional[Dict[str, Any]]:
+        """4.3.1c. Soru detaylarını (açıklama dahil) getirir."""
+        try:
+            details = self.session_repo.get_question_details(question_id)
+            return details
+        except Exception as e:
+            print(f"❌ Soru detayları getirme hatası: {e}")
+            return None
+
     def calculate_answer_result(self, question_id: int, user_answer_id: Optional[int]) -> Dict[str, Any]:
         """4.3.2. Cevap sonucunu hesaplar."""
         try:

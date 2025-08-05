@@ -6,9 +6,7 @@
     --navbar-height: 70px;
     --navbar-height-scrolled: 65px;
     --navbar-bg: rgba(253, 253, 253, 1); /* Daha transparan */
-    --navbar-bg-dark: rgba(18, 18, 18, 0.8);
     --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    --navbar-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .navbar {
@@ -35,14 +33,7 @@
     height: var(--navbar-height-scrolled);
 }
 
-/* Koyu tema için navbar */
-@media (prefers-color-scheme: dark) {
-    .navbar {
-        background: var(--navbar-bg-dark);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: var(--navbar-shadow-dark);
-    }
-}
+
 
 /* Scroll durumunda navbar'ın görünümü */
 body:not([data-scroll-y="0"]) .navbar {
@@ -52,12 +43,7 @@ body:not([data-scroll-y="0"]) .navbar {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-    body:not([data-scroll-y="0"]) .navbar {
-        background: rgba(18, 18, 18, 0.9);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-}
+
 
 .navbar-container {
     width: 100% !important;
@@ -173,7 +159,7 @@ body:not([data-scroll-y="0"]) .navbar {
 }
 
 .nav-button:hover {
-    background: var(--color-accent-primary-dark);
+    background: var(--color-accent-primary);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }

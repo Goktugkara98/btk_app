@@ -261,13 +261,13 @@ class QuizSessionRepository:
             print(f"❌ Cevap güncelleme hatası: {e}")
             return False
 
-    def get_session_results(self, session_id: int) -> Dict[str, Any]:
+    def get_session_results(self, session_id: str) -> Dict[str, Any]:
         """4.3.4. Session sonuçlarını getirir."""
         try:
             with self.db as conn:
                 # Session bilgilerini al
                 conn.cursor.execute("""
-                    SELECT * FROM quiz_sessions WHERE id = %s
+                    SELECT * FROM quiz_sessions WHERE session_id = %s
                 """, (session_id,))
                 session = conn.cursor.fetchone()
                 
@@ -286,7 +286,7 @@ class QuizSessionRepository:
                     LEFT JOIN question_options uao ON qsq.user_answer_option_id = uao.id
                     WHERE qsq.session_id = %s
                     ORDER BY qsq.question_order
-                """, (session_id,))
+                """, (session['id'],))
                 
                 questions = conn.cursor.fetchall()
                 
@@ -369,7 +369,7 @@ class QuizSessionRepository:
         try:
             with self.db as conn:
                 conn.cursor.execute("""
-                    SELECT id, name, name_id, option_order
+                    SELECT id, name, name_id, option_order, description, is_correct
                     FROM question_options 
                     WHERE question_id = %s AND is_active = 1
                     ORDER BY option_order, RAND()
@@ -380,4 +380,25 @@ class QuizSessionRepository:
                 
         except Exception as e:
             print(f"❌ Soru seçenekleri getirme hatası: {e}")
-            return [] 
+            return []
+
+    def get_question_details(self, question_id: int) -> Optional[Dict[str, Any]]:
+        """4.4.4. Soru detaylarını (açıklama dahil) getirir."""
+        try:
+            with self.db as conn:
+                conn.cursor.execute("""
+                    SELECT q.id, q.name, q.description, q.difficulty_level, q.points, q.topic_id,
+                           t.name as topic_name,
+                           s.name as subject_name
+                    FROM questions q
+                    JOIN topics t ON q.topic_id = t.id
+                    JOIN subjects s ON t.subject_id = s.id
+                    WHERE q.id = %s AND q.is_active = 1
+                """, (question_id,))
+                
+                question = conn.cursor.fetchone()
+                return question
+                
+        except Exception as e:
+            print(f"❌ Soru detayları getirme hatası: {e}")
+            return None 

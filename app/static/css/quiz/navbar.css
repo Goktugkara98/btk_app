@@ -1,209 +1,320 @@
-/**
- * =============================================================================
- * NAVBAR - TOP NAVBAR STYLES
- * =============================================================================
- * 
- * Bu dosya üst navbar'ın stillerini içerir.
- * 
- * Sorumlulukları:
- * - Üst navbar layout yapısı
- * - Timer bileşeni stilleri
- * - Kategori ve ilerleme gösterimi
- * - Navbar bileşenlerinin responsive tasarımı
- */
-
-/* =============================================================================
- * TOP NAVBAR LAYOUT
- * ============================================================================= */
-
-/* Top Navbar - FULL WIDTH */
-.top-navbar {
-    position: fixed;
+/* Quiz Topbar/Navbar Styles */
+.quiz-topbar {
+    background: #ffffff;
+    color: #2c3e50;
+    padding: 0.75rem 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw !important;
-    height: var(--nav-height);
-    background-color: var(--quiz-bg-primary);
-    border-bottom: 1px solid var(--quiz-border-light);
-    box-shadow: var(--quiz-shadow-sm);
-    z-index: 1000;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
+    z-index: 100;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-/* Navbar Container - FULL WIDTH */
-.navbar-container {
+.topbar-content {
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Topbar Left - Quiz Info */
+.topbar-left {
+    flex: 1;
+}
+
+.quiz-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.subject-info {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    padding: 0 2rem;
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.7;
 }
 
-.navbar-left, .navbar-right {
+.subject-name {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.separator {
+    opacity: 0.4;
+    font-weight: 300;
+}
+
+.topic-name {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.difficulty-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 0.2rem 0.6rem;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.difficulty-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+
+/* Difficulty Colors */
+.difficulty-badge.easy {
+    background: rgba(40, 167, 69, 0.1);
+    border-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.difficulty-badge.medium {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.difficulty-badge.hard {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+/* Topbar Center - Question Indicator */
+.topbar-center {
     flex: 1;
     display: flex;
-    align-items: center;
+    justify-content: center;
 }
 
-.navbar-right {
+.question-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.question-label {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+
+.question-number-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.2rem;
+    font-weight: 700;
+}
+
+.current-question-number {
+    font-size: 1.6rem;
+    color: #667eea;
+    text-shadow: none;
+}
+
+.question-separator {
+    font-size: 1rem;
+    opacity: 0.4;
+    font-weight: 400;
+    color: #6c757d;
+}
+
+.total-question-number {
+    font-size: 1rem;
+    opacity: 0.6;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+/* Topbar Right - Timer */
+.topbar-right {
+    flex: 1;
+    display: flex;
     justify-content: flex-end;
 }
 
-.navbar-center {
-    flex: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* =============================================================================
- * NAVBAR COMPONENTS
- * ============================================================================= */
-
-/* Category Styles */
-.category {
+.timer-container {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: var(--quiz-border-radius);
-    backdrop-filter: blur(10px);
+    gap: 0.6rem;
+    min-width: 120px;
 }
 
-.category i {
-    color: var(--quiz-primary);
-    font-size: 1rem;
-}
-
-.category-text {
-    color: var(--quiz-primary);
-    font-weight: 600;
-    font-size: 0.9rem;
-    font-family: var(--quiz-font-family);
-}
-
-/* Question Progress Styles */
-.question-progress {
+.timer-icon {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.5rem 1.5rem;
-    background-color: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: var(--quiz-border-radius);
-    backdrop-filter: blur(10px);
+    opacity: 0.6;
 }
 
-.question-progress .progress-text {
-    color: var(--quiz-primary);
-    font-weight: 600;
-    font-size: 0.9rem;
-    font-family: var(--quiz-font-family);
+.timer-icon svg {
+    width: 16px;
+    height: 16px;
+    color: #6c757d;
 }
 
-.question-progress .current {
-    color: var(--quiz-primary);
-    font-weight: 700;
+.timer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
 }
 
-.question-progress .total {
-    color: var(--quiz-text-secondary);
+.timer-label {
+    font-size: 0.65rem;
+    opacity: 0.6;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
 }
 
-/* Timer Styles */
 .timer {
-    background-color: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    color: var(--quiz-primary);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--quiz-border-radius);
-}
-
-.timer i {
-    color: var(--quiz-primary);
     font-size: 1rem;
-}
-
-.timer-text {
-    color: var(--quiz-primary);
     font-weight: 700;
-    font-family: var(--quiz-font-family);
-    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+    color: #2c3e50;
+    text-shadow: none;
 }
 
-/* =============================================================================
- * RESPONSIVE DESIGN
- * ============================================================================= */
+/* Timer Animation for Low Time */
+.timer.warning {
+    color: #ffc107;
+    animation: pulse 1s infinite;
+}
 
+.timer.danger {
+    color: #dc3545;
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .navbar-container {
+    .quiz-topbar {
+        padding: 0.6rem 0;
+    }
+    
+    .topbar-content {
         padding: 0 1rem;
+        flex-direction: column;
+        gap: 0.8rem;
     }
     
-    .category {
-        padding: 0.4rem 0.8rem;
+    .topbar-left,
+    .topbar-center,
+    .topbar-right {
+        flex: none;
+        width: 100%;
     }
     
-    .category-text {
+    .topbar-left {
+        order: 1;
+    }
+    
+    .topbar-center {
+        order: 2;
+    }
+    
+    .topbar-right {
+        order: 3;
+        justify-content: center;
+    }
+    
+    .quiz-info {
+        align-items: center;
+        text-align: center;
+    }
+    
+    .subject-info {
         font-size: 0.8rem;
     }
     
-    .question-progress {
-        padding: 0.4rem 1rem;
+    .current-question-number {
+        font-size: 1.4rem;
     }
     
-    .question-progress .progress-text {
-        font-size: 0.8rem;
+    .total-question-number {
+        font-size: 0.9rem;
+    }
+    
+    .timer-container {
+        padding: 0.5rem 0.8rem;
+        min-width: 100px;
     }
     
     .timer {
-        padding: 0.4rem 0.8rem;
-    }
-    
-    .timer-text {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
 }
 
 @media (max-width: 480px) {
-    .navbar-container {
-        padding: 0 0.5rem;
+    .quiz-topbar {
+        padding: 0.5rem 0;
     }
     
-    .category {
-        padding: 0.3rem 0.6rem;
+    .topbar-content {
+        padding: 0 0.8rem;
+        gap: 0.6rem;
     }
     
-    .category-text {
+    .subject-info {
         font-size: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
-    .question-progress {
-        padding: 0.3rem 0.8rem;
+    .difficulty-badge {
+        padding: 0.15rem 0.5rem;
     }
     
-    .question-progress .progress-text {
-        font-size: 0.75rem;
+    .difficulty-text {
+        font-size: 0.65rem;
+    }
+    
+    .current-question-number {
+        font-size: 1.2rem;
+    }
+    
+    .total-question-number {
+        font-size: 0.85rem;
+    }
+    
+    .timer-container {
+        padding: 0.4rem 0.7rem;
+        min-width: 90px;
+        gap: 0.4rem;
+    }
+    
+    .timer-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .timer-label {
+        font-size: 0.6rem;
     }
     
     .timer {
-        padding: 0.3rem 0.6rem;
-    }
-    
-    .timer-text {
-        font-size: 0.75rem;
+        font-size: 0.85rem;
     }
 } 
