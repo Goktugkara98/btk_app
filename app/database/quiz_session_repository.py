@@ -1,17 +1,15 @@
 # =============================================================================
-# 1.0. MODÜL BAŞLIĞI VE AÇIKLAMASI
+# QUIZ SESSION REPOSITORY
 # =============================================================================
-# Bu modül, quiz session veritabanı işlemlerini yöneten QuizSessionRepository
-# sınıfını içerir. Quiz oturumları ve soruları ile ilgili CRUD işlemlerini yapar.
+# Quiz oturumları için veritabanı işlemlerini yöneten repository sınıfı
 # =============================================================================
 
 # =============================================================================
 # 2.0. İÇİNDEKİLER
 # =============================================================================
 # 3.0. GEREKLİ KÜTÜPHANELER VE MODÜLLER
-# 4.0. QUIZSESSIONREPOSITORY SINIFI
-#   4.1. Başlatma (Initialization)
-#     4.1.1. __init__(self)
+# 4.0. QUIZ SESSION REPOSITORY SINIFI
+#   4.1. Constructor ve Başlatma
 #   4.2. Quiz Session İşlemleri
 #     4.2.1. create_session(self, session_data)
 #     4.2.2. get_session(self, session_id)
@@ -24,42 +22,39 @@
 #     4.3.4. get_session_results(self, session_id)
 #   4.4. Soru Seçimi İşlemleri
 #     4.4.1. get_random_questions(self, topic_id, difficulty, count)
+#     4.4.2. get_random_questions_by_subject(self, subject_id, difficulty, count)
+#   4.5. Yardımcı İşlemler
+#     4.5.1. get_correct_answer(self, question_id)
+#     4.5.2. get_question_options(self, question_id)
+#     4.5.3. get_question_details(self, question_id)
 # =============================================================================
 
 # =============================================================================
 # 3.0. GEREKLİ KÜTÜPHANELER VE MODÜLLER
 # =============================================================================
-from typing import Dict, Any, List, Optional, Tuple
-from datetime import datetime
-import uuid
-import random
-
+from typing import Dict, List, Optional, Tuple, Any
 from app.database.db_connection import DatabaseConnection
 
 # =============================================================================
-# 4.0. QUIZSESSIONREPOSITORY SINIFI
+# 4.0. QUIZ SESSION REPOSITORY SINIFI
 # =============================================================================
+
 class QuizSessionRepository:
     """
-    Quiz session veritabanı işlemlerini yönetir.
+    Quiz oturumları için veritabanı işlemlerini yöneten repository sınıfı.
     """
-
-    # -------------------------------------------------------------------------
-    # 4.1. Başlatma (Initialization)
-    # -------------------------------------------------------------------------
+    
     def __init__(self):
-        """4.1.1. Repository'nin kurucu metodu."""
+        """Repository'yi başlatır."""
         self.db = DatabaseConnection()
 
     # -------------------------------------------------------------------------
     # 4.2. Quiz Session İşlemleri
     # -------------------------------------------------------------------------
+    
     def create_session(self, session_data: Dict[str, Any]) -> Tuple[bool, Optional[int]]:
-        """4.2.1. Yeni bir quiz session oluşturur."""
+        """4.2.1. Yeni quiz session'ı oluşturur."""
         try:
-            # Benzersiz session ID oluştur
-            session_id = f"quiz_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
-            
             with self.db as conn:
                 conn.cursor.execute("""
                     INSERT INTO quiz_sessions (
@@ -67,12 +62,12 @@ class QuizSessionRepository:
                         difficulty_level, timer_enabled, timer_duration, quiz_mode, question_count
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
-                    session_id,
+                    session_data['session_id'],
                     session_data['user_id'],
                     session_data['grade_id'],
                     session_data['subject_id'],
                     session_data.get('unit_id'),
-                    session_data.get('topic_id'),  # Artık None olabilir
+                    session_data['topic_id'],
                     session_data.get('difficulty_level', 'random'),
                     session_data.get('timer_enabled', True),
                     session_data.get('timer_duration', 30),
@@ -80,21 +75,21 @@ class QuizSessionRepository:
                     session_data.get('question_count', 10)
                 ))
                 
-                # Oluşturulan session'ın ID'sini al
                 session_db_id = conn.cursor.lastrowid
                 conn.connection.commit()
                 
+                print(f"✅ Quiz session oluşturuldu: {session_data['session_id']} (DB ID: {session_db_id})")
                 return True, session_db_id
                 
         except Exception as e:
             print(f"❌ Quiz session oluşturma hatası: {e}")
-            import traceback
-            traceback.print_exc()
             return False, None
 
     def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
         """4.2.2. Session ID'ye göre quiz session'ı getirir."""
         try:
+            print(f"🔍 [Repository] Session aranıyor: {session_id}")
+            
             with self.db as conn:
                 conn.cursor.execute("""
                     SELECT qs.*, 
@@ -111,6 +106,17 @@ class QuizSessionRepository:
                 """, (session_id,))
                 
                 session = conn.cursor.fetchone()
+                
+                if session:
+                    print(f"✅ [Repository] Session bulundu: {session['id']}")
+                else:
+                    print(f"❌ [Repository] Session bulunamadı: {session_id}")
+                    
+                    # Mevcut session'ları listele (debug için)
+                    conn.cursor.execute("SELECT session_id, id, status FROM quiz_sessions LIMIT 5")
+                    existing_sessions = conn.cursor.fetchall()
+                    print(f"📋 [Repository] Mevcut session'lar: {existing_sessions}")
+                
                 return session
                 
         except Exception as e:
@@ -163,6 +169,24 @@ class QuizSessionRepository:
             print(f"❌ Quiz session güncelleme hatası: {e}")
             return False
 
+    def update_session_timer(self, session_id: str, remaining_time_seconds: int) -> bool:
+        """4.2.3b. Quiz session timer'ını günceller."""
+        try:
+            with self.db as conn:
+                conn.cursor.execute("""
+                    UPDATE quiz_sessions 
+                    SET remaining_time_seconds = %s,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE session_id = %s
+                """, (remaining_time_seconds, session_id))
+                
+                conn.connection.commit()
+                return True
+                
+        except Exception as e:
+            print(f"❌ Quiz session timer güncelleme hatası: {e}")
+            return False
+
     def complete_session(self, session_id: str, results: Dict[str, Any]) -> bool:
         """4.2.4. Quiz session'ı tamamlar ve sonuçları kaydeder."""
         try:
@@ -193,6 +217,7 @@ class QuizSessionRepository:
     # -------------------------------------------------------------------------
     # 4.3. Quiz Session Questions İşlemleri
     # -------------------------------------------------------------------------
+    
     def add_session_questions(self, session_id: int, questions: List[Dict[str, Any]]) -> bool:
         """4.3.1. Session'a soruları ekler."""
         try:
@@ -276,12 +301,23 @@ class QuizSessionRepository:
                 if not session:
                     return {}
                 
-                # Soru sonuçlarını al
+                # Soru sonuçlarını al (is_correct ve points_earned dahil)
                 conn.cursor.execute("""
                     SELECT qsq.*, 
                            q.name as question_text,
+                           q.points,
+                           qo.id as correct_answer_id,
                            qo.name as correct_answer,
-                           uao.name as user_answer
+                           uao.id as user_answer_id,
+                           uao.name as user_answer,
+                           CASE 
+                               WHEN qsq.user_answer_option_id = qo.id THEN 1 
+                               ELSE 0 
+                           END as is_correct,
+                           CASE 
+                               WHEN qsq.user_answer_option_id = qo.id THEN q.points 
+                               ELSE 0 
+                           END as points_earned
                     FROM quiz_session_questions qsq
                     JOIN questions q ON qsq.question_id = q.id
                     LEFT JOIN question_options qo ON qo.question_id = q.id AND qo.is_correct = 1
@@ -304,6 +340,7 @@ class QuizSessionRepository:
     # -------------------------------------------------------------------------
     # 4.4. Soru Seçimi İşlemleri
     # -------------------------------------------------------------------------
+    
     def get_random_questions(self, topic_id: int, difficulty: str, count: int) -> List[Dict[str, Any]]:
         """4.4.1. Belirli kriterlere göre rasgele sorular getirir."""
         try:
@@ -364,9 +401,7 @@ class QuizSessionRepository:
                            COUNT(qo.id) as option_count
                     FROM questions q
                     LEFT JOIN question_options qo ON q.id = qo.question_id
-                    JOIN topics t ON q.topic_id = t.id
-                    JOIN units u ON t.unit_id = u.id
-                    WHERE u.subject_id = %s 
+                    WHERE q.subject_id = %s 
                     AND q.is_active = 1
                     {difficulty_filter}
                     GROUP BY q.id
@@ -392,15 +427,18 @@ class QuizSessionRepository:
             print(f"❌ Subject'e göre rasgele soru getirme hatası: {e}")
             return []
 
+    # -------------------------------------------------------------------------
+    # 4.5. Yardımcı İşlemler
+    # -------------------------------------------------------------------------
+    
     def get_correct_answer(self, question_id: int) -> Optional[Dict[str, Any]]:
-        """4.4.2. Sorunun doğru cevabını getirir."""
+        """4.5.1. Sorunun doğru cevabını getirir."""
         try:
             with self.db as conn:
                 conn.cursor.execute("""
-                    SELECT qo.*, q.points
-                    FROM question_options qo
-                    JOIN questions q ON qo.question_id = q.id
-                    WHERE qo.question_id = %s AND qo.is_correct = 1
+                    SELECT id, name, points
+                    FROM question_options 
+                    WHERE question_id = %s AND is_correct = 1
                     LIMIT 1
                 """, (question_id,))
                 
@@ -412,14 +450,13 @@ class QuizSessionRepository:
             return None
 
     def get_question_options(self, question_id: int) -> List[Dict[str, Any]]:
-        """4.4.3. Soru seçeneklerini getirir."""
+        """4.5.2. Soru seçeneklerini getirir."""
         try:
             with self.db as conn:
                 conn.cursor.execute("""
-                    SELECT id, name, name_id, option_order, description, is_correct
-                    FROM question_options 
+                    SELECT * FROM question_options 
                     WHERE question_id = %s AND is_active = 1
-                    ORDER BY option_order, RAND()
+                    ORDER BY RAND()
                 """, (question_id,))
                 
                 options = conn.cursor.fetchall()
@@ -430,18 +467,17 @@ class QuizSessionRepository:
             return []
 
     def get_question_details(self, question_id: int) -> Optional[Dict[str, Any]]:
-        """4.4.4. Soru detaylarını (açıklama dahil) getirir."""
+        """4.5.3. Soru detaylarını getirir."""
         try:
             with self.db as conn:
                 conn.cursor.execute("""
-                    SELECT q.id, q.name, q.description, q.difficulty_level, q.points, q.topic_id,
+                    SELECT q.*, 
                            t.name as topic_name,
                            s.name as subject_name
                     FROM questions q
                     JOIN topics t ON q.topic_id = t.id
-                    JOIN units u ON t.unit_id = u.id
-                    JOIN subjects s ON u.subject_id = s.id
-                    WHERE q.id = %s AND q.is_active = 1
+                    JOIN subjects s ON q.subject_id = s.id
+                    WHERE q.id = %s
                 """, (question_id,))
                 
                 question = conn.cursor.fetchone()

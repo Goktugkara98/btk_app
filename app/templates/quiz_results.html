@@ -4,119 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Sonuçları</title>
-
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz_results.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz/quiz_results.css') }}">
 </head>
 <body>
-    <!-- Header -->
-    <header class="results-header">
-        <div class="header-content">
-            <h1 class="header-title">
-                <i class="bi bi-trophy-fill"></i>
-                Quiz Tamamlandı!
-            </h1>
-            <p class="header-subtitle">Sonuçlarınızı inceleyin</p>
-        </div>
-    </header>
-
-    <!-- Main Results Content -->
-    <main class="results-container">
-        <!-- Score Card -->
-        <div class="score-card">
-            <div class="score-circle">
-                <div class="score-number" id="final-score">0</div>
-                <div class="score-total">/ <span id="total-questions">10</span></div>
-            </div>
-            <div class="score-info">
-                <h2 class="score-title" id="score-title">Harika!</h2>
-                <p class="score-message" id="score-message">Mükemmel bir performans gösterdiniz!</p>
+    <div class="quiz-results-container">
+        <div class="results-header">
+            <h1>Quiz Sonuçları</h1>
+            <div class="session-info">
+                <span id="session-id"></span>
             </div>
         </div>
 
-        <!-- Statistics Cards -->
-        <div class="stats-grid">
-            <div class="stat-card correct">
-                <div class="stat-icon">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="correct-count">0</div>
-                    <div class="stat-label">Doğru</div>
+        <div class="results-content">
+            <div class="score-section">
+                <div class="score-circle">
+                    <div class="score-percentage" id="score-percentage">0%</div>
+                    <div class="score-label">Başarı Oranı</div>
                 </div>
             </div>
-            
-            <div class="stat-card incorrect">
-                <div class="stat-icon">
-                    <i class="bi bi-x-circle-fill"></i>
+
+            <div class="stats-section">
+                <div class="stat-item">
+                    <div class="stat-label">Toplam Soru</div>
+                    <div class="stat-value" id="total-questions">0</div>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="incorrect-count">0</div>
-                    <div class="stat-label">Yanlış</div>
+                <div class="stat-item">
+                    <div class="stat-label">Doğru Cevap</div>
+                    <div class="stat-value correct" id="correct-answers">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Yanlış Cevap</div>
+                    <div class="stat-value incorrect" id="incorrect-answers">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Boş Bırakılan</div>
+                    <div class="stat-value skipped" id="skipped-answers">0</div>
                 </div>
             </div>
-            
-            <div class="stat-card unanswered">
-                <div class="stat-icon">
-                    <i class="bi bi-dash-circle-fill"></i>
+
+            <div class="score-details">
+                <div class="score-item">
+                    <span class="score-label">Toplam Puan:</span>
+                    <span class="score-value" id="total-score">0</span>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="unanswered-count">0</div>
-                    <div class="stat-label">Boş</div>
+                <div class="score-item">
+                    <span class="score-label">Maksimum Puan:</span>
+                    <span class="score-value" id="max-score">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">Tamamlanma Süresi:</span>
+                    <span class="score-value" id="completion-time">00:00</span>
                 </div>
             </div>
-            
-            <div class="stat-card percentage">
-                <div class="stat-icon">
-                    <i class="bi bi-percent"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number" id="percentage">0%</div>
-                    <div class="stat-label">Başarı</div>
-                </div>
+
+            <div class="actions-section">
+                <button id="new-quiz-btn" class="btn btn-primary">Yeni Quiz Başlat</button>
+                <button id="review-answers-btn" class="btn btn-secondary">Cevapları İncele</button>
+                <button id="back-to-home-btn" class="btn btn-outline">Ana Sayfaya Dön</button>
             </div>
         </div>
 
-        <!-- Detailed Results -->
-        <div class="results-section">
-            <h3 class="section-title">
-                <i class="bi bi-list-check"></i>
-                Detaylı Sonuçlar
-            </h3>
-            <div class="results-list" id="results-list">
-                <!-- Results will be populated by JavaScript -->
-            </div>
+        <div class="results-footer">
+            <p>Quiz tamamlandı. Sonuçlarınızı inceleyebilir veya yeni bir quiz başlatabilirsiniz.</p>
         </div>
+    </div>
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="action-btn secondary" id="review-btn">
-                <i class="bi bi-eye"></i>
-                Gözden Geçir
-            </button>
-            <button class="action-btn primary" id="restart-btn">
-                <i class="bi bi-arrow-clockwise"></i>
-                Yeniden Başla
-            </button>
-            <button class="action-btn success" id="share-btn">
-                <i class="bi bi-share"></i>
-                Paylaş
-            </button>
-        </div>
-    </main>
-
-    <!-- GSAP Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script src="{{ url_for('static', filename='js/quiz_results.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/quiz/quiz_results.js') }}"></script>
 </body>
 </html> 

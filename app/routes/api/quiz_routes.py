@@ -410,6 +410,8 @@ def get_session_status(session_id):
             start_time = session_info['session']['start_time']
             timer_duration = session_info['session']['timer_duration']
             
+            print(f"🔍 Timer debug: timer_enabled={session_info['session']['timer_enabled']}, timer_duration={timer_duration}")
+            
             if start_time:
                 try:
                     from datetime import datetime
@@ -421,15 +423,36 @@ def get_session_status(session_id):
                     else:
                         start_datetime = start_time
                     
-                    current_datetime = datetime.utcnow()
+                    current_datetime = datetime.now()
                     elapsed_seconds = int((current_datetime - start_datetime).total_seconds())
                     remaining_time_seconds = max(0, (timer_duration * 60) - elapsed_seconds)
                     
-                    print(f"⏰ Timer calculation: start={start_time}, duration={timer_duration}m, elapsed={elapsed_seconds}s, remaining={remaining_time_seconds}s")
+                    print(f"⏰ Timer calculation: start_time={start_time}")
+                    print(f"⏰ Timer calculation: start_datetime={start_datetime}")
+                    print(f"⏰ Timer calculation: current_datetime={current_datetime}")
+                    print(f"⏰ Timer calculation: timer_duration={timer_duration}m, elapsed={elapsed_seconds}s, remaining={remaining_time_seconds}s")
                     
                 except Exception as e:
                     print(f"❌ Timer calculation error: {e}")
                     remaining_time_seconds = 0
+            else:
+                print(f"❌ Timer debug: start_time is None or empty")
+        else:
+            print(f"❌ Timer debug: timer_enabled={session_info['session']['timer_enabled']}, timer_duration={session_info['session']['timer_duration']}")
+        
+        # Aktif sorunun bilgilerini al
+        current_question_info = None
+        if session_info['questions'] and answered_questions < total_questions:
+            current_question = session_info['questions'][answered_questions]
+            if current_question:
+                # Aktif sorunun detaylarını al
+                question_details = session_service.get_question_details(current_question['question_id'])
+                if question_details:
+                    current_question_info = {
+                        'subject_name': question_details.get('subject_name'),
+                        'topic_name': question_details.get('topic_name'),
+                        'difficulty_level': question_details.get('difficulty_level')
+                    }
         
         status_data = {
             'session_id': session_id,
@@ -440,10 +463,10 @@ def get_session_status(session_id):
             'answered_questions': answered_questions,
             'progress_percentage': progress_percentage,
             'current_question': answered_questions + 1 if answered_questions < total_questions else total_questions,
-            # Add subject, topic, and difficulty information
-            'subject': session_info['session'].get('subject_name'),
-            'topic': session_info['session'].get('topic_name'),
-            'difficulty': session_info['session'].get('difficulty_level'),
+            # Aktif sorunun bilgilerini kullan, yoksa session bilgilerini kullan
+            'subject': current_question_info.get('subject_name') if current_question_info else session_info['session'].get('subject_name'),
+            'topic': current_question_info.get('topic_name') if current_question_info else session_info['session'].get('topic_name'),
+            'difficulty': current_question_info.get('difficulty_level') if current_question_info else session_info['session'].get('difficulty_level'),
             'quiz_mode': session_info['session'].get('quiz_mode'),
             'remaining_time_seconds': remaining_time_seconds
         }
@@ -466,10 +489,10 @@ def get_session_status(session_id):
             'error': str(e)
         }), 500
 
-@quiz_bp.route('/quiz/session/<session_id>/questions', methods=['GET'])
+@quiz_bp.route('/quiz/session/<session_id>/timer', methods=['PUT'])
 # @login_required  # Temporarily disabled for testing
-def get_all_questions(session_id):
-    """5.2.2c. Tüm soruları getirir."""
+def update_session_timer(session_id):
+    """5.2.2c. Quiz session timer'ını günceller."""
     try:
         if not QuizSessionService:
             return jsonify({
@@ -477,13 +500,73 @@ def get_all_questions(session_id):
                 'message': 'Quiz session service not available'
             }), 500
         
+        data = request.get_json()
+        if not data or 'remaining_time_seconds' not in data:
+            return jsonify({
+                'status': 'error',
+                'message': 'remaining_time_seconds is required'
+            }), 400
+        
+        remaining_time_seconds = data['remaining_time_seconds']
+        
         session_service = QuizSessionService()
+        success = session_service.update_session_timer(session_id, remaining_time_seconds)
+        
+        if not success:
+            return jsonify({
+                'status': 'error',
+                'message': 'Session not found or update failed'
+            }), 404
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Timer updated successfully',
+            'data': {
+                'session_id': session_id,
+                'remaining_time_seconds': remaining_time_seconds
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to update timer',
+            'error': str(e)
+        }), 500
+
+@quiz_bp.route('/quiz/session/<session_id>/questions', methods=['GET'])
+# @login_required  # Temporarily disabled for testing
+def get_all_questions(session_id):
+    """5.2.2c. Tüm soruları getirir."""
+    try:
+        print(f"🔍 [API] Session ID kontrol ediliyor: {session_id}")
+        
+        if not QuizSessionService:
+            return jsonify({
+                'status': 'error',
+                'message': 'Quiz session service not available'
+            }), 500
+        
+        session_service = QuizSessionService()
+        
+        # Session'ın var olup olmadığını kontrol et
+        session = session_service.session_repo.get_session(session_id)
+        if not session:
+            print(f"❌ [API] Session bulunamadı: {session_id}")
+            return jsonify({
+                'status': 'error',
+                'message': f'Session not found: {session_id}'
+            }), 404
+        
+        print(f"✅ [API] Session bulundu: {session}")
+        
         session_info = session_service.get_session_info(session_id)
         
         if not session_info:
+            print(f"❌ [API] Session info alınamadı: {session_id}")
             return jsonify({
                 'status': 'error',
-                'message': 'Session not found'
+                'message': 'Session info not available'
             }), 404
         
         # Tüm soruları hazırla

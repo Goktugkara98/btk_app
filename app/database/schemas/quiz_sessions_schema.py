@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS quiz_sessions (
     difficulty_level ENUM('random', 'easy', 'medium', 'hard') DEFAULT 'random',
     timer_enabled BOOLEAN DEFAULT true,
     timer_duration INT DEFAULT 30,
+    remaining_time_seconds INT DEFAULT 0,
     quiz_mode ENUM('educational', 'exam') DEFAULT 'educational',
     question_count INT DEFAULT 10,
     status ENUM('active', 'completed', 'abandoned') DEFAULT 'active',

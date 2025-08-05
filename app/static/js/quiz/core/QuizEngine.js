@@ -23,7 +23,85 @@ export class QuizEngine {
     // 'option:selected' kaldırıldı, doğrudan 'answer:submit' dinleniyor.
     eventBus.subscribe('answer:submit', this.submitAnswer.bind(this));
     
+    // Cevap kaldırma olayını dinle
+    eventBus.subscribe('answer:remove', this.removeAnswer.bind(this));
+    
     eventBus.subscribe('quiz:complete', this.completeQuiz.bind(this));
+    
+    // Timer güncelleme için interval başlat
+    this.startTimerUpdate();
+  }
+
+  /**
+   * Timer'ı otomatik olarak günceller.
+   */
+  startTimerUpdate() {
+    console.log('[QuizEngine] Timer interval başlatılıyor...');
+    
+    let saveCounter = 0; // 10 saniyede bir kaydetmek için sayaç
+    
+    setInterval(() => {
+      const timer = stateManager.getState('timer');
+      console.log('[QuizEngine] Timer tick:', {
+        enabled: timer.enabled,
+        remainingTimeSeconds: timer.remainingTimeSeconds,
+        totalTime: timer.totalTime
+      });
+      
+      if (timer.enabled && timer.remainingTimeSeconds > 0) {
+        const newRemainingTime = timer.remainingTimeSeconds - 1;
+        console.log('[QuizEngine] Timer güncelleniyor:', {
+          old: timer.remainingTimeSeconds,
+          new: newRemainingTime
+        });
+        
+        stateManager.setState({
+          timer: {
+            ...timer,
+            remainingTimeSeconds: newRemainingTime
+          }
+        }, 'TIMER_TICK');
+        
+        // 10 saniyede bir veritabanına kaydet
+        saveCounter++;
+        if (saveCounter >= 10) {
+          this.saveTimerToDatabase(newRemainingTime);
+          saveCounter = 0;
+        }
+        
+        // Süre bittiğinde quiz'i otomatik tamamla
+        if (newRemainingTime <= 0) {
+          console.log('[QuizEngine] Süre doldu, quiz otomatik tamamlanıyor...');
+          eventBus.publish('quiz:complete');
+        }
+      }
+    }, 1000);
+  }
+  
+  /**
+   * Timer'ı veritabanına kaydeder.
+   */
+  async saveTimerToDatabase(remainingTimeSeconds) {
+    try {
+      const sessionId = stateManager.getState('sessionId');
+      if (!sessionId) {
+        console.warn('[QuizEngine] Timer kaydedilemedi: sessionId bulunamadı');
+        return;
+      }
+      
+      console.log('[QuizEngine] Timer veritabanına kaydediliyor:', {
+        sessionId,
+        remainingTimeSeconds
+      });
+      
+      // Timer'ı veritabanına kaydetmek için API çağrısı
+      await this.apiService.updateTimer({ sessionId, remainingTimeSeconds });
+      
+      console.log('[QuizEngine] Timer başarıyla kaydedildi');
+      
+    } catch (error) {
+      console.warn('[QuizEngine] Timer kaydedilirken hata:', error);
+    }
   }
 
   /**
@@ -33,26 +111,72 @@ export class QuizEngine {
     console.log('[QuizEngine] Sorular yükleniyor...');
     try {
       stateManager.setLoading(true);
-      const sessionId = stateManager.getState('sessionId');
+      let sessionId = stateManager.getState('sessionId');
       
+      console.log('[QuizEngine] State\'den alınan sessionId:', sessionId);
+      console.log('[QuizEngine] window.QUIZ_CONFIG:', window.QUIZ_CONFIG);
+      console.log('[QuizEngine] window.QUIZ_SESSION_ID:', window.QUIZ_SESSION_ID);
+      
+      // Session ID yoksa window'dan almayı dene
       if (!sessionId) {
-        throw new Error('Geçerli bir oturum ID bulunamadı.');
+        if (window.QUIZ_CONFIG && window.QUIZ_CONFIG.sessionId) {
+          sessionId = window.QUIZ_CONFIG.sessionId;
+          stateManager.setState({ sessionId });
+          console.log('[QuizEngine] SessionId window.QUIZ_CONFIG\'den alındı:', sessionId);
+        } else if (window.QUIZ_SESSION_ID) {
+          sessionId = window.QUIZ_SESSION_ID;
+          stateManager.setState({ sessionId });
+          console.log('[QuizEngine] SessionId window.QUIZ_SESSION_ID\'den alındı:', sessionId);
+        }
       }
       
+      if (!sessionId) {
+        throw new Error('Geçerli bir oturum ID bulunamadı. Lütfen sayfayı yenileyin.');
+      }
+      
+      console.log('[QuizEngine] Kullanılacak sessionId:', sessionId);
+      
       const response = await this.apiService.fetchQuestions({ sessionId });
+
+      console.log('[QuizEngine] API Response:', response);
 
       if (!response.data || !Array.isArray(response.data.questions)) {
         throw new Error('API yanıtı geçersiz formatta.');
       }
       
-      const questions = response.data.questions;
+      // API'den gelen soru formatını JavaScript'in beklediği formata dönüştür
+      const questions = response.data.questions.map(q => ({
+        question_number: q.question_number,
+        total_questions: q.total_questions,
+        question: {
+          id: q.question.id,
+          text: q.question.text,
+          explanation: q.question.explanation,
+          difficulty_level: q.question.difficulty_level,
+          points: q.question.points,
+          subject_name: q.question.subject_name,
+          topic_name: q.question.topic_name,
+          options: q.question.options || []
+        },
+        user_answer_option_id: q.user_answer_option_id,
+        progress: q.progress
+      }));
+      
       console.log(`[QuizEngine] ${questions.length} adet soru yüklendi.`);
       stateManager.setQuestions(questions);
       
-      // Gerekirse zamanlayıcıyı başlat.
-      if (response.data.timer) {
-        stateManager.setTimer(response.data.timer.remaining_time, response.data.timer.total_time);
+      // Session bilgilerini güncelle
+      if (response.data.session_id) {
+        stateManager.setState({ sessionId: response.data.session_id });
       }
+      
+      // Timer bilgilerini güncelle
+      if (response.data.total_questions) {
+        stateManager.setState({ totalQuestions: response.data.total_questions });
+      }
+      
+      // Session status'u al ve timer bilgilerini güncelle
+      await this.updateSessionStatus(sessionId);
       
       eventBus.publish('quiz:questionsLoaded');
       
@@ -98,9 +222,15 @@ export class QuizEngine {
    * Belirtilen index'teki soruya gider.
    * @param {number} index - Gidilecek sorunun index'i.
    */
-  goToQuestion(index) {
+  async goToQuestion(index) {
     stateManager.setCurrentQuestionIndex(index);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Soru değiştiğinde session status'u güncelle (navbar bilgileri için)
+    const sessionId = stateManager.getState('sessionId');
+    if (sessionId) {
+      await this.updateSessionStatus(sessionId);
+    }
   }
 
   /**
@@ -131,6 +261,9 @@ export class QuizEngine {
       
       console.log('[QuizEngine] Cevap başarıyla gönderildi.');
       
+      // Cevabı gönderdikten hemen sonra isSubmitting'i false yap
+      stateManager.setState({ isSubmitting: false }, 'SUBMIT_ANSWER_END');
+      
       // Kısa bir bekleme sonrası sonraki soruya geç.
       setTimeout(() => this.nextQuestion(), 300);
       
@@ -140,12 +273,74 @@ export class QuizEngine {
         message: 'Cevap gönderilirken bir hata oluştu.',
         details: error.message
       });
-    } finally {
-      // setTimeout içindeki işlem başlamadan önce isSubmitting'i false yapma riski var.
-      // Bu yüzden gecikmeyi de hesaba katarak state'i güncelliyoruz.
-      setTimeout(() => {
-        stateManager.setState({ isSubmitting: false }, 'SUBMIT_ANSWER_END');
-      }, 350);
+      // Hata durumunda da isSubmitting'i false yap
+      stateManager.setState({ isSubmitting: false }, 'SUBMIT_ANSWER_ERROR');
+    }
+  }
+
+  /**
+   * Bir cevabı kaldırır.
+   * @param {Object} answerData - { questionId }
+   */
+  async removeAnswer({ questionId }) {
+    // Eğer zaten bir gönderme işlemi varsa, tekrar göndermeyi engelle.
+    if (stateManager.getState('isSubmitting')) {
+      return;
+    }
+    
+    console.log(`[QuizEngine] Cevap kaldırılıyor: Soru ${questionId}`);
+    
+    try {
+      const sessionId = stateManager.getState('sessionId');
+      if (!sessionId || !questionId) {
+        throw new Error('Cevap kaldırmak için gerekli bilgiler eksik.');
+      }
+      
+      // Cevabı anında state'den kaldır (UI'ın hızlı güncellenmesi için).
+      stateManager.removeAnswer(questionId);
+      
+      // API'ye cevabı kaldırma isteği gönder (null değer)
+      await this.apiService.submitAnswer({ sessionId, questionId, answer: null });
+      
+      console.log('[QuizEngine] Cevap başarıyla kaldırıldı.');
+      
+    } catch (error) {
+      console.error('[QuizEngine] Cevap kaldırılırken hata oluştu:', error);
+      stateManager.setError({
+        message: 'Cevap kaldırılırken bir hata oluştu.',
+        details: error.message
+      });
+    }
+  }
+
+  /**
+   * Session status'unu günceller ve timer bilgilerini alır.
+   */
+  async updateSessionStatus(sessionId) {
+    try {
+      const response = await this.apiService.getSessionStatus(sessionId);
+      if (response.data) {
+        const statusData = response.data;
+        
+        console.log('[QuizEngine] Session status alındı:', {
+          timer_enabled: statusData.timer_enabled,
+          remaining_time_seconds: statusData.remaining_time_seconds,
+          timer_duration: statusData.timer_duration
+        });
+        
+        // Sadece timer bilgilerini güncelle (navbar bilgileri artık aktif sorudan alınıyor)
+        stateManager.setState({
+          timer: {
+            enabled: statusData.timer_enabled || false,
+            remainingTimeSeconds: statusData.remaining_time_seconds || 0,
+            totalTime: statusData.timer_duration || 0
+          }
+        }, 'UPDATE_SESSION_STATUS');
+        
+        console.log('[QuizEngine] Timer state güncellendi');
+      }
+    } catch (error) {
+      console.warn('[QuizEngine] Session status güncellenirken hata:', error);
     }
   }
 
@@ -169,8 +364,8 @@ export class QuizEngine {
       stateManager.setState({ quizCompleted: true, results }, 'QUIZ_COMPLETED');
       eventBus.publish('quiz:completed', { results });
       
-      // Sonuç sayfasına yönlendirme gibi bir işlem burada yapılabilir.
-      // Örneğin: window.location.href = results.result_url;
+      // Sonuç sayfasına yönlendir
+      window.location.href = `/quiz/results?session_id=${sessionId}`;
       
     } catch (error) {
       console.error('[QuizEngine] Quiz tamamlanırken hata oluştu:', error);

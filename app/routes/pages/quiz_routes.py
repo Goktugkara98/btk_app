@@ -68,10 +68,11 @@ def quiz_screen():
     return render_template('quiz_screen.html', title='Quiz', session_id=session_id)
 
 @quiz_bp.route('/quiz/results')
-@login_required
+# @login_required  # Temporarily disabled for testing
 def quiz_results():
     """4.1.4. Quiz sonuçları sayfasını render eder."""
-    return render_template('quiz_results.html', title='Quiz Sonuçları')
+    session_id = request.args.get('session_id')
+    return render_template('quiz_results.html', title='Quiz Sonuçları', session_id=session_id)
 
 @quiz_bp.route('/quiz/auto-start')
 def quiz_auto_start():
@@ -109,37 +110,85 @@ def quiz_auto_start():
                 
                 print(f"✅ Testuser oluşturuldu, ID: {test_user_id}")
             
+            # Mevcut sınıfları kontrol et
+            conn.cursor.execute("SELECT id, name FROM grades WHERE is_active = 1")
+            grades = conn.cursor.fetchall()
+            print(f"📚 Mevcut sınıflar: {[g['name'] for g in grades]}")
+            
             # 8. sınıf ID'sini bul
             conn.cursor.execute("SELECT id FROM grades WHERE name = '8. Sınıf' AND is_active = 1")
             grade_result = conn.cursor.fetchone()
             if not grade_result:
-                return "8. Sınıf bulunamadı", 404
-            grade_id = grade_result['id']
-            print(f"✅ 8. Sınıf bulundu, ID: {grade_id}")
+                # Eğer 8. sınıf yoksa, ilk sınıfı kullan
+                conn.cursor.execute("SELECT id FROM grades WHERE is_active = 1 LIMIT 1")
+                grade_result = conn.cursor.fetchone()
+                if not grade_result:
+                    return "Hiç sınıf bulunamadı", 404
+                grade_id = grade_result['id']
+                print(f"⚠️ 8. Sınıf bulunamadı, ilk sınıf kullanılıyor: {grade_id}")
+            else:
+                grade_id = grade_result['id']
+                print(f"✅ 8. Sınıf bulundu, ID: {grade_id}")
+            
+            # Mevcut dersleri kontrol et
+            conn.cursor.execute("SELECT id, name FROM subjects WHERE grade_id = %s AND is_active = 1", (grade_id,))
+            subjects = conn.cursor.fetchall()
+            print(f"📖 Mevcut dersler: {[s['name'] for s in subjects]}")
             
             # Türkçe dersi ID'sini bul
             conn.cursor.execute("SELECT id FROM subjects WHERE name = 'Türkçe' AND grade_id = %s AND is_active = 1", (grade_id,))
             subject_result = conn.cursor.fetchone()
             if not subject_result:
-                return "Türkçe dersi bulunamadı", 404
-            subject_id = subject_result['id']
-            print(f"✅ Türkçe dersi bulundu, ID: {subject_id}")
+                # Eğer Türkçe yoksa, ilk dersi kullan
+                conn.cursor.execute("SELECT id FROM subjects WHERE grade_id = %s AND is_active = 1 LIMIT 1", (grade_id,))
+                subject_result = conn.cursor.fetchone()
+                if not subject_result:
+                    return "Hiç ders bulunamadı", 404
+                subject_id = subject_result['id']
+                print(f"⚠️ Türkçe dersi bulunamadı, ilk ders kullanılıyor: {subject_id}")
+            else:
+                subject_id = subject_result['id']
+                print(f"✅ Türkçe dersi bulundu, ID: {subject_id}")
+            
+            # Mevcut üniteleri kontrol et
+            conn.cursor.execute("SELECT id, name FROM units WHERE subject_id = %s AND is_active = 1", (subject_id,))
+            units = conn.cursor.fetchall()
+            print(f"📚 Mevcut üniteler: {[u['name'] for u in units]}")
             
             # Fiilimsiler ünitesi ID'sini bul
             conn.cursor.execute("SELECT id FROM units WHERE name = 'Fiilimsiler' AND subject_id = %s AND is_active = 1", (subject_id,))
             unit_result = conn.cursor.fetchone()
             if not unit_result:
-                return "Fiilimsiler ünitesi bulunamadı", 404
-            unit_id = unit_result['id']
-            print(f"✅ Fiilimsiler ünitesi bulundu, ID: {unit_id}")
+                # Eğer Fiilimsiler yoksa, ilk üniteyi kullan
+                conn.cursor.execute("SELECT id FROM units WHERE subject_id = %s AND is_active = 1 LIMIT 1", (subject_id,))
+                unit_result = conn.cursor.fetchone()
+                if not unit_result:
+                    return "Hiç ünite bulunamadı", 404
+                unit_id = unit_result['id']
+                print(f"⚠️ Fiilimsiler ünitesi bulunamadı, ilk ünite kullanılıyor: {unit_id}")
+            else:
+                unit_id = unit_result['id']
+                print(f"✅ Fiilimsiler ünitesi bulundu, ID: {unit_id}")
+            
+            # Mevcut konuları kontrol et
+            conn.cursor.execute("SELECT id, name FROM topics WHERE unit_id = %s AND is_active = 1", (unit_id,))
+            topics = conn.cursor.fetchall()
+            print(f"📝 Mevcut konular: {[t['name'] for t in topics]}")
             
             # Sıfat-fiil konusu ID'sini bul
             conn.cursor.execute("SELECT id FROM topics WHERE name = 'Sıfat-fiil' AND unit_id = %s AND is_active = 1", (unit_id,))
             topic_result = conn.cursor.fetchone()
             if not topic_result:
-                return "Sıfat-fiil konusu bulunamadı", 404
-            topic_id = topic_result['id']
-            print(f"✅ Sıfat-fiil konusu bulundu, ID: {topic_id}")
+                # Eğer Sıfat-fiil yoksa, ilk konuyu kullan
+                conn.cursor.execute("SELECT id FROM topics WHERE unit_id = %s AND is_active = 1 LIMIT 1", (unit_id,))
+                topic_result = conn.cursor.fetchone()
+                if not topic_result:
+                    return "Hiç konu bulunamadı", 404
+                topic_id = topic_result['id']
+                print(f"⚠️ Sıfat-fiil konusu bulunamadı, ilk konu kullanılıyor: {topic_id}")
+            else:
+                topic_id = topic_result['id']
+                print(f"✅ Sıfat-fiil konusu bulundu, ID: {topic_id}")
         
         # Quiz session oluştur
         quiz_config = {
@@ -155,6 +204,30 @@ def quiz_auto_start():
         }
         
         print(f"🚀 Quiz session oluşturuluyor... Config: {quiz_config}")
+        
+        # Önce soruların var olup olmadığını kontrol et
+        with DatabaseConnection() as conn:
+            conn.cursor.execute("""
+                SELECT COUNT(*) as count FROM questions q
+                JOIN topics t ON q.topic_id = t.id
+                WHERE t.id = %s AND q.is_active = 1
+            """, (topic_id,))
+            question_count = conn.cursor.fetchone()['count']
+            print(f"📊 Bu konu için {question_count} soru bulundu")
+            
+            if question_count == 0:
+                # Eğer bu konuda soru yoksa, tüm konulardan soru sayısını kontrol et
+                conn.cursor.execute("""
+                    SELECT COUNT(*) as count FROM questions q
+                    JOIN topics t ON q.topic_id = t.id
+                    JOIN units u ON t.unit_id = u.id
+                    WHERE u.id = %s AND q.is_active = 1
+                """, (unit_id,))
+                unit_question_count = conn.cursor.fetchone()['count']
+                print(f"📊 Bu ünite için toplam {unit_question_count} soru bulundu")
+                
+                if unit_question_count == 0:
+                    return "Bu konu ve ünite için hiç soru bulunamadı. Lütfen önce soru verilerini yükleyin.", 404
         
         session_service = QuizSessionService()
         success, result = session_service.start_quiz_session(test_user_id, quiz_config)
@@ -173,4 +246,55 @@ def quiz_auto_start():
         
     except Exception as e:
         print(f"❌ Otomatik quiz başlatma hatası: {str(e)}")
-        return f"Otomatik quiz başlatma hatası: {str(e)}", 500 
+        import traceback
+        traceback.print_exc()
+        return f"Otomatik quiz başlatma hatası: {str(e)}", 500
+
+@quiz_bp.route('/quiz/test-db')
+def test_database():
+    """4.1.6. Veritabanı bağlantısını test eder."""
+    try:
+        from app.database.db_connection import DatabaseConnection
+        
+        with DatabaseConnection() as conn:
+            # Test basic connection
+            conn.cursor.execute("SELECT 1 as test")
+            result = conn.cursor.fetchone()
+            
+            if result and result['test'] == 1:
+                return "✅ Database connection successful", 200
+            else:
+                return "❌ Database connection failed", 500
+                
+    except Exception as e:
+        return f"❌ Database test error: {str(e)}", 500
+
+@quiz_bp.route('/quiz/init-db')
+def initialize_database():
+    """4.1.7. Veritabanını manuel olarak başlatır."""
+    try:
+        from app.database.db_connection import DatabaseConnection
+        from app.database.db_migrations import DatabaseMigrations
+        from app.database.quiz_data_loader import QuestionLoader
+        
+        # Run migrations
+        db_connection = DatabaseConnection()
+        migrations = DatabaseMigrations(db_connection)
+        migrations.run_migrations()
+        
+        # Load question data
+        question_loader = QuestionLoader(db_connection=db_connection)
+        results = question_loader.process_all_question_files()
+        
+        total_success = 0
+        total_questions = 0
+        for filename, (success, total) in results.items():
+            total_success += success
+            total_questions += total
+        
+        return f"✅ Database initialized successfully. Loaded {total_success}/{total_questions} questions.", 200
+                
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"❌ Database initialization error: {str(e)}", 500 

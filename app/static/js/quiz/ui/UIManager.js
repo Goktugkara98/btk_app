@@ -25,15 +25,15 @@ export class UIManager {
       prevBtn: $('#prev-button'),
       nextBtn: $('#next-button'),
       questionNav: $('#question-nav-list'),
-      subjectName: $('.subject-name'),
-      topicName: $('.topic-name'),
-      difficultyBadge: $('.difficulty-badge'),
-      currentQuestionNumber: $('.current-question-number'),
-      totalQuestionNumber: $('.total-questions'),
-      timerElement: $('.timer'),
-      loadingState: $('.loading-state'),
-      errorState: $('.error-state'),
-      errorMessage: $('.error-message'),
+      subjectName: $('#subject-name'),
+      topicName: $('#topic-name'),
+      difficultyBadge: $('#difficulty-badge'),
+      currentQuestionNumber: $('#current-question-number'),
+      totalQuestionNumber: $('#total-question-number'),
+      timerElement: $('#timer'),
+      loadingState: $('#loading-state'),
+      errorState: $('#error-state'),
+      errorMessage: $('#error-message'),
     };
 
     // Hangi elementlerin bulunamadığını kontrol et ve uyar.
@@ -78,6 +78,38 @@ export class UIManager {
         }
         
         const { questionId, optionId } = optionElement.dataset;
+        const currentAnswers = stateManager.getState('answers');
+        const currentAnswer = currentAnswers.get(parseInt(questionId, 10));
+        const numericOptionId = parseInt(optionId, 10);
+        
+        console.log('[UIManager] Seçenek tıklandı:', {
+          questionId,
+          optionId,
+          numericOptionId,
+          currentAnswer,
+          currentAnswerType: typeof currentAnswer,
+          numericOptionIdType: typeof numericOptionId,
+          isSameAnswer: currentAnswer === numericOptionId,
+          isSameAnswerStrict: currentAnswer === numericOptionId,
+          isSameAnswerLoose: currentAnswer == numericOptionId,
+          currentAnswers: Array.from(currentAnswers.entries())
+        });
+        
+        // Eğer tıklanan seçenek zaten seçiliyse, seçimi kaldır
+        if (String(currentAnswer) === String(numericOptionId)) {
+          console.log('[UIManager] Aynı seçenek tekrar tıklandı - Seçim kaldırılıyor:', { questionId, optionId });
+          
+          // State'den cevabı kaldır
+          eventBus.publish('answer:remove', { questionId });
+          
+          // Event'i durdur - diğer işlemlerin çalışmasını engelle
+          e.stopPropagation();
+          e.preventDefault();
+          return;
+        }
+        
+        // Farklı seçenek seçildi - normal seçim işlemi
+        console.log('[UIManager] Farklı seçenek seçildi - Normal seçim:', { questionId, optionId });
         
         // Diğer seçeneklerden 'selected' class'ını kaldır.
         this.elements.optionsContainer.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
@@ -88,6 +120,13 @@ export class UIManager {
         eventBus.publish('answer:submit', { questionId, answer: optionId });
       }
     });
+
+    // Retry Button
+    const retryButton = document.getElementById('retry-button');
+    retryButton?.addEventListener('click', () => {
+      console.log('[UIManager] Retry button clicked, reloading questions...');
+      eventBus.publish('quiz:start');
+    });
   }
 
   /**
@@ -95,6 +134,13 @@ export class UIManager {
    */
   initializeStateSubscriptions() {
     eventBus.subscribe('state:changed', ({ currentState, prevState }) => {
+      console.log('[UIManager] State changed:', {
+        action: 'state:changed',
+        currentQuestionChanged: prevState.currentQuestion !== currentState.currentQuestion,
+        answersChanged: prevState.answers !== currentState.answers,
+        currentQuestionId: currentState.currentQuestion?.question?.id
+      });
+      
       // Belirli state değişikliklerine göre UI güncelleme fonksiyonlarını çağır.
       if (prevState.isLoading !== currentState.isLoading) {
         this.toggleLoading(currentState.isLoading);
@@ -102,16 +148,40 @@ export class UIManager {
       if (prevState.error !== currentState.error) {
         this.showError(currentState.error);
       }
+      
+      // Soru değiştiğinde render et ve navbar'ı güncelle
       if (prevState.currentQuestion !== currentState.currentQuestion) {
+        console.log('[UIManager] Current question changed, rendering...');
         this.renderQuestion(currentState.currentQuestion);
+        this.updateNavbarFromQuestion(currentState.currentQuestion);
       }
-      if (prevState.questions !== currentState.questions || prevState.currentQuestionIndex !== currentState.currentQuestionIndex || prevState.answers !== currentState.answers) {
+      
+      // Navigation, buttons ve question number güncellemeleri
+      if (prevState.questions !== currentState.questions || 
+          prevState.currentQuestionIndex !== currentState.currentQuestionIndex || 
+          prevState.answers !== currentState.answers || 
+          prevState.visitedQuestions !== currentState.visitedQuestions) {
+        
         this.updateQuestionNavigation();
         this.updateNavButtons();
         this.updateQuestionNumber();
+        
+        // Sadece answers değiştiğinde ve currentQuestion varsa render et
+        // currentQuestion değişikliği yukarıda zaten handle ediliyor
+        if (prevState.answers !== currentState.answers && 
+            currentState.currentQuestion && 
+            prevState.currentQuestion === currentState.currentQuestion) {
+          console.log('[UIManager] Answers changed for same question, re-rendering...');
+          this.renderQuestion(currentState.currentQuestion);
+        }
       }
-       if (prevState.timer.remainingTime !== currentState.timer.remainingTime) {
+      
+      if (prevState.timer.remainingTimeSeconds !== currentState.timer.remainingTimeSeconds) {
         this.updateTimer(currentState.timer);
+      }
+      
+      if (prevState.totalQuestions !== currentState.totalQuestions) {
+        this.updateTotalQuestions(currentState.totalQuestions);
       }
     });
   }
@@ -152,6 +222,7 @@ export class UIManager {
    */
   renderQuestion(question) {
     if (!question || !this.elements.questionText || !this.elements.optionsContainer) {
+      console.warn('[UIManager] renderQuestion: Missing required elements or question');
       return;
     }
     
@@ -163,11 +234,31 @@ export class UIManager {
     
     const options = question.question?.options || [];
     const questionId = question.question?.id;
-    const selectedAnswer = stateManager.getState('answers').get(questionId);
+    const answers = stateManager.getState('answers');
+    const selectedAnswer = answers.get(questionId);
+
+    console.log('[UIManager] Rendering question:', {
+      questionId,
+      questionIdType: typeof questionId,
+      selectedAnswer,
+      totalAnswers: answers.size,
+      answers: Array.from(answers.entries()),
+      hasAnswer: answers.has(questionId),
+      allKeys: Array.from(answers.keys())
+    });
 
     options.forEach((option, index) => {
       const optionElement = document.createElement('div');
-      const isSelected = selectedAnswer === option.id;
+      // Tip uyumsuzluğunu çöz: her ikisini de string'e çevir
+      const isSelected = String(selectedAnswer) === String(option.id);
+      
+      console.log(`[UIManager] Option ${index + 1} (${option.id}):`, {
+        optionId: option.id,
+        optionIdType: typeof option.id,
+        selectedAnswer,
+        selectedAnswerType: typeof selectedAnswer,
+        isSelected
+      });
       
       optionElement.className = 'option-item' + (isSelected ? ' selected' : '');
       optionElement.dataset.questionId = questionId;
@@ -189,17 +280,33 @@ export class UIManager {
    * Soru navigasyonunu günceller.
    */
   updateQuestionNavigation() {
-    const { questions, currentQuestionIndex, answers } = stateManager.getState();
+    const { questions, currentQuestionIndex, answers, visitedQuestions } = stateManager.getState();
     if (!this.elements.questionNav) return;
+    
+
     
     this.elements.questionNav.innerHTML = questions.map((q, index) => {
       const isCurrent = index === currentQuestionIndex;
-      const isAnswered = answers.has(q.question.id);
+      const questionId = parseInt(q.question.id, 10);
+      const isAnswered = answers.has(questionId);
+      const isVisited = visitedQuestions.has(index);
+      const isSkipped = isVisited && !isAnswered; // Ziyaret edilmiş ama cevaplanmamış
+      
+      // CSS'te 'current' class'ı kullanılıyor, 'active' değil
+      // Class'ları öncelik sırasına göre uygula
       const classes = [
         'question-nav-item',
-        isCurrent ? 'active' : '',
-        isAnswered ? 'answered' : ''
+        isCurrent ? 'current' : '',
+        isAnswered ? 'answered' : (isSkipped ? 'skipped' : '') // Cevap verilmişse answered, yoksa skipped
       ].filter(Boolean).join(' ');
+      
+      console.log(`[UIManager] Question ${index + 1} (ID: ${q.question.id}):`, {
+        isCurrent,
+        isAnswered,
+        isVisited,
+        isSkipped,
+        classes
+      });
       
       return `<div class="${classes}" data-index="${index}">${index + 1}</div>`;
     }).join('');
@@ -211,14 +318,28 @@ export class UIManager {
   updateNavButtons() {
     const { currentQuestionIndex, questions, isSubmitting } = stateManager.getState();
     
+    console.log('[UIManager] Updating nav buttons:', {
+      currentQuestionIndex,
+      totalQuestions: questions.length,
+      isSubmitting
+    });
+    
     if (this.elements.prevBtn) {
-      this.elements.prevBtn.disabled = currentQuestionIndex === 0 || isSubmitting;
+      const prevDisabled = currentQuestionIndex === 0 || isSubmitting;
+      this.elements.prevBtn.disabled = prevDisabled;
+      console.log('[UIManager] Prev button:', { disabled: prevDisabled });
     }
     
     if (this.elements.nextBtn) {
-      this.elements.nextBtn.disabled = isSubmitting;
+      const nextDisabled = isSubmitting;
+      this.elements.nextBtn.disabled = nextDisabled;
       const isLastQuestion = currentQuestionIndex === questions.length - 1;
       this.elements.nextBtn.textContent = isLastQuestion ? 'Quizi Bitir' : 'Sonraki Soru';
+      console.log('[UIManager] Next button:', { 
+        disabled: nextDisabled, 
+        text: this.elements.nextBtn.textContent,
+        isLastQuestion 
+      });
     }
   }
 
@@ -239,11 +360,65 @@ export class UIManager {
    * Zamanlayıcıyı günceller.
    */
   updateTimer(timer) {
-    if (!this.elements.timerElement || !timer?.enabled) return;
+    if (!this.elements.timerElement) return;
     
-    const minutes = Math.floor(timer.remainingTime / 60);
-    const seconds = timer.remainingTime % 60;
-    this.elements.timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    this.elements.timerElement.classList.toggle('warning', timer.remainingTime < 60);
+    if (timer?.enabled && timer.remainingTimeSeconds > 0) {
+      const minutes = Math.floor(timer.remainingTimeSeconds / 60);
+      const seconds = timer.remainingTimeSeconds % 60;
+      this.elements.timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      this.elements.timerElement.classList.toggle('warning', timer.remainingTimeSeconds < 60);
+    } else {
+      this.elements.timerElement.textContent = '--:--';
+      this.elements.timerElement.classList.remove('warning');
+    }
+  }
+
+
+
+  /**
+   * Zorluk seviyesini Türkçe metne çevirir.
+   */
+  getDifficultyText(difficulty) {
+    const difficultyMap = {
+      'easy': 'Kolay',
+      'medium': 'Orta',
+      'hard': 'Zor',
+      'random': 'Karışık'
+    };
+    return difficultyMap[difficulty] || difficulty;
+  }
+
+  /**
+   * Toplam soru sayısını günceller.
+   */
+  updateTotalQuestions(totalQuestions) {
+    if (this.elements.totalQuestionNumber) {
+      this.elements.totalQuestionNumber.textContent = totalQuestions;
+    }
+  }
+
+  /**
+   * Aktif sorudan navbar bilgilerini günceller.
+   */
+  updateNavbarFromQuestion(question) {
+    if (!question || !question.question) return;
+    
+    const questionData = question.question;
+    
+    // Ders adını güncelle
+    if (this.elements.subjectName && questionData.subject_name) {
+      this.elements.subjectName.textContent = questionData.subject_name;
+    }
+    
+    // Konu adını güncelle
+    if (this.elements.topicName && questionData.topic_name) {
+      this.elements.topicName.textContent = questionData.topic_name;
+    }
+    
+    // Zorluk seviyesini güncelle
+    if (this.elements.difficultyBadge && questionData.difficulty_level) {
+      const difficultyText = this.getDifficultyText(questionData.difficulty_level);
+      this.elements.difficultyBadge.textContent = difficultyText;
+    }
   }
 }

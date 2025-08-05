@@ -30,6 +30,12 @@ function initApp() {
   console.log('🚀 Quiz Uygulaması Başlatılıyor...');
   
   try {
+    // Session ID'yi state'e ayarla
+    if (window.QUIZ_CONFIG && window.QUIZ_CONFIG.sessionId) {
+      stateManager.setState({ sessionId: window.QUIZ_CONFIG.sessionId });
+      console.log('📋 Session ID ayarlandı:', window.QUIZ_CONFIG.sessionId);
+    }
+    
     // Gerekli modüllerin varlığını kontrol et.
     if (!stateManager || !eventBus) {
       throw new Error('Çekirdek modüller (StateManager, EventBus) yüklenemedi.');

@@ -3,7 +3,7 @@
  */
 export class ApiService {
   constructor() {
-    this.baseUrl = '/api/quiz';
+    this.baseUrl = '/api';  // /api/quiz yerine /api kullanıyoruz
     this.defaultHeaders = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -78,10 +78,20 @@ export class ApiService {
    * Quiz için soruları getirir.
    */
   async fetchQuestions({ sessionId }) {
-    return this._fetch({
-      endpoint: `/session/${sessionId}/questions`,
-      method: 'GET'
-    });
+    console.log('[ApiService] fetchQuestions çağrıldı, sessionId:', sessionId);
+    
+    try {
+      const result = await this._fetch({
+        endpoint: `/quiz/session/${sessionId}/questions`,
+        method: 'GET'
+      });
+      
+      console.log('[ApiService] fetchQuestions başarılı:', result);
+      return result;
+    } catch (error) {
+      console.error('[ApiService] fetchQuestions hatası:', error);
+      throw error;
+    }
   }
 
   /**
@@ -89,7 +99,7 @@ export class ApiService {
    */
   async submitAnswer({ sessionId, questionId, answer }) {
     return this._fetch({
-      endpoint: `/session/${sessionId}/answer`,
+      endpoint: `/quiz/session/${sessionId}/answer`,
       method: 'POST',
       data: { 
         question_id: questionId, 
@@ -105,7 +115,7 @@ export class ApiService {
     // Map'i sunucuya göndermeden önce [key, value] dizisine dönüştür
     const formattedAnswers = Array.from(answers.entries());
     return this._fetch({
-      endpoint: `/session/${sessionId}/complete`,
+      endpoint: `/quiz/session/${sessionId}/complete`,
       method: 'POST',
       data: { answers: formattedAnswers }
     });
@@ -116,8 +126,19 @@ export class ApiService {
    */
   async getSessionStatus(sessionId) {
     return this._fetch({
-      endpoint: `/${sessionId}/status`,
+      endpoint: `/quiz/session/${sessionId}/status`,
       method: 'GET'
+    });
+  }
+  
+  /**
+   * Timer'ı günceller.
+   */
+  async updateTimer({ sessionId, remainingTimeSeconds }) {
+    return this._fetch({
+      endpoint: `/quiz/session/${sessionId}/timer`,
+      method: 'PUT',
+      data: { remaining_time_seconds: remainingTimeSeconds }
     });
   }
 }

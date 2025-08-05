@@ -59,8 +59,13 @@ class QuizSessionService:
                 if field not in quiz_config:
                     return False, {'error': f'Missing required field: {field}'}
 
+            # Session ID oluştur
+            import uuid
+            session_id = str(uuid.uuid4())
+            
             # Session verilerini hazırla
             session_data = {
+                'session_id': session_id,
                 'user_id': user_id,
                 'grade_id': quiz_config['grade_id'],
                 'subject_id': quiz_config['subject_id'],
@@ -74,14 +79,20 @@ class QuizSessionService:
             }
 
             # Session'ı veritabanında oluştur
+            print(f"🔧 Session verileri: {session_data}")
             success, session_db_id = self.session_repo.create_session(session_data)
             if not success:
+                print(f"❌ Session oluşturulamadı. Session DB ID: {session_db_id}")
                 return False, {'error': 'Failed to create session'}
+            print(f"✅ Session oluşturuldu. Session DB ID: {session_db_id}")
 
             # Rasgele soruları seç - topic_id None ise subject_id kullan
             topic_id = quiz_config.get('topic_id')
+            print(f"🔍 Soru seçimi - Topic ID: {topic_id}, Subject ID: {quiz_config['subject_id']}")
+            
             if topic_id is None:
                 # Topic seçilmemişse, subject'e göre soru seç
+                print(f"📚 Subject'e göre soru seçiliyor...")
                 questions = self.session_repo.get_random_questions_by_subject(
                     subject_id=quiz_config['subject_id'],
                     difficulty=quiz_config.get('difficulty_level', 'random'),
@@ -89,13 +100,17 @@ class QuizSessionService:
                 )
             else:
                 # Topic seçilmişse, topic'e göre soru seç
+                print(f"📚 Topic'e göre soru seçiliyor...")
                 questions = self.session_repo.get_random_questions(
                     topic_id=topic_id,
                     difficulty=quiz_config.get('difficulty_level', 'random'),
                     count=quiz_config.get('question_count', 10)
                 )
+            
+            print(f"📊 Seçilen soru sayısı: {len(questions) if questions else 0}")
 
             if not questions:
+                print(f"❌ Seçilen kriterler için soru bulunamadı. Topic ID: {topic_id}, Subject ID: {quiz_config['subject_id']}")
                 return False, {'error': 'No questions available for the selected criteria'}
 
             # Session'a soruları ekle
@@ -103,17 +118,22 @@ class QuizSessionService:
                 return False, {'error': 'Failed to add questions to session'}
 
             # Session bilgilerini getir
+            print(f"🔍 Session bilgileri getiriliyor... Session DB ID: {session_db_id}")
             session_info = self.session_repo.get_session_by_id(session_db_id)
             if not session_info:
+                print(f"❌ Session bilgileri getirilemedi. Session DB ID: {session_db_id}")
                 return False, {'error': 'Failed to retrieve session info'}
+            print(f"✅ Session bilgileri getirildi. Session ID: {session_info.get('session_id', 'N/A')}")
 
-            return True, {
+            result_data = {
                 'session_id': session_info['session_id'],
                 'session_db_id': session_db_id,
                 'questions_count': len(questions),
                 'timer_duration': session_data['timer_duration'],
                 'quiz_mode': session_data['quiz_mode']
             }
+            print(f"✅ Quiz session başarıyla oluşturuldu. Result: {result_data}")
+            return True, result_data
 
         except Exception as e:
             print(f"❌ Quiz session başlatma hatası: {e}")
@@ -299,4 +319,20 @@ class QuizSessionService:
 
         except Exception as e:
             print(f"❌ Session sonuçları hesaplama hatası: {e}")
-            return None 
+            return None
+    
+    def update_session_timer(self, session_id: str, remaining_time_seconds: int) -> bool:
+        """4.2.4. Session timer'ını günceller."""
+        try:
+            # Session'ın var olup olmadığını kontrol et
+            session_info = self.get_session_info(session_id)
+            if not session_info:
+                return False
+            
+            # Timer'ı güncelle
+            success = self.session_repo.update_session_timer(session_id, remaining_time_seconds)
+            return success
+            
+        except Exception as e:
+            print(f"❌ Timer update error: {e}")
+            return False 
