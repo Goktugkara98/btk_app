@@ -71,22 +71,25 @@
 }
 
 /* Difficulty Colors */
-.difficulty-badge.easy {
-    background: rgba(40, 167, 69, 0.1);
-    border-color: rgba(40, 167, 69, 0.2);
-    color: #28a745;
+.difficulty-badge.easy,
+.difficulty-badge.difficulty-easy {
+    background: #d4edda !important;
+    border-color: #c3e6cb !important;
+    color: #155724 !important;
 }
 
-.difficulty-badge.medium {
-    background: rgba(255, 193, 7, 0.1);
-    border-color: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
+.difficulty-badge.medium,
+.difficulty-badge.difficulty-medium {
+    background: #fff3cd !important;
+    border-color: #ffeaa7 !important;
+    color: #856404 !important;
 }
 
-.difficulty-badge.hard {
-    background: rgba(220, 53, 69, 0.1);
-    border-color: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
+.difficulty-badge.hard,
+.difficulty-badge.difficulty-hard {
+    background: #f8d7da !important;
+    border-color: #f5c6cb !important;
+    color: #721c24 !important;
 }
 
 /* Topbar Center - Question Indicator */

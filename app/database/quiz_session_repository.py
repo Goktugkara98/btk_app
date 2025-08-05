@@ -72,7 +72,7 @@ class QuizSessionRepository:
                     session_data['grade_id'],
                     session_data['subject_id'],
                     session_data.get('unit_id'),
-                    session_data['topic_id'],
+                    session_data.get('topic_id'),  # Artık None olabilir
                     session_data.get('difficulty_level', 'random'),
                     session_data.get('timer_enabled', True),
                     session_data.get('timer_duration', 30),
@@ -88,6 +88,8 @@ class QuizSessionRepository:
                 
         except Exception as e:
             print(f"❌ Quiz session oluşturma hatası: {e}")
+            import traceback
+            traceback.print_exc()
             return False, None
 
     def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
@@ -104,7 +106,7 @@ class QuizSessionRepository:
                     JOIN grades g ON qs.grade_id = g.id
                     JOIN subjects s ON qs.subject_id = s.id
                     LEFT JOIN units u ON qs.unit_id = u.id
-                    JOIN topics t ON qs.topic_id = t.id
+                    LEFT JOIN topics t ON qs.topic_id = t.id
                     WHERE qs.session_id = %s
                 """, (session_id,))
                 
@@ -129,7 +131,7 @@ class QuizSessionRepository:
                     JOIN grades g ON qs.grade_id = g.id
                     JOIN subjects s ON qs.subject_id = s.id
                     LEFT JOIN units u ON qs.unit_id = u.id
-                    JOIN topics t ON qs.topic_id = t.id
+                    LEFT JOIN topics t ON qs.topic_id = t.id
                     WHERE qs.id = %s
                 """, (session_db_id,))
                 
@@ -345,6 +347,51 @@ class QuizSessionRepository:
             print(f"❌ Rasgele soru getirme hatası: {e}")
             return []
 
+    def get_random_questions_by_subject(self, subject_id: int, difficulty: str, count: int) -> List[Dict[str, Any]]:
+        """4.4.1b. Subject ID'ye göre rasgele sorular getirir."""
+        try:
+            with self.db as conn:
+                # Zorluk seviyesine göre filtreleme
+                if difficulty == 'random':
+                    difficulty_filter = ""
+                    params = (subject_id, count)
+                else:
+                    difficulty_filter = "AND q.difficulty_level = %s"
+                    params = (subject_id, difficulty, count)
+                
+                conn.cursor.execute(f"""
+                    SELECT q.*, 
+                           COUNT(qo.id) as option_count
+                    FROM questions q
+                    LEFT JOIN question_options qo ON q.id = qo.question_id
+                    JOIN topics t ON q.topic_id = t.id
+                    JOIN units u ON t.unit_id = u.id
+                    WHERE u.subject_id = %s 
+                    AND q.is_active = 1
+                    {difficulty_filter}
+                    GROUP BY q.id
+                    HAVING option_count >= 2
+                    ORDER BY RAND()
+                    LIMIT %s
+                """, params)
+                
+                questions = conn.cursor.fetchall()
+                
+                # Her soru için seçenekleri al
+                for question in questions:
+                    conn.cursor.execute("""
+                        SELECT * FROM question_options 
+                        WHERE question_id = %s AND is_active = 1
+                        ORDER BY RAND()
+                    """, (question['id'],))
+                    question['options'] = conn.cursor.fetchall()
+                
+                return questions
+                
+        except Exception as e:
+            print(f"❌ Subject'e göre rasgele soru getirme hatası: {e}")
+            return []
+
     def get_correct_answer(self, question_id: int) -> Optional[Dict[str, Any]]:
         """4.4.2. Sorunun doğru cevabını getirir."""
         try:
@@ -392,7 +439,8 @@ class QuizSessionRepository:
                            s.name as subject_name
                     FROM questions q
                     JOIN topics t ON q.topic_id = t.id
-                    JOIN subjects s ON t.subject_id = s.id
+                    JOIN units u ON t.unit_id = u.id
+                    JOIN subjects s ON u.subject_id = s.id
                     WHERE q.id = %s AND q.is_active = 1
                 """, (question_id,))
                 

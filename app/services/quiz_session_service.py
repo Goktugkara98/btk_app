@@ -53,8 +53,8 @@ class QuizSessionService:
     def start_quiz_session(self, user_id: int, quiz_config: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
         """4.2.1. Yeni bir quiz session başlatır."""
         try:
-            # Gerekli alanları kontrol et
-            required_fields = ['grade_id', 'subject_id', 'topic_id']
+            # Gerekli alanları kontrol et - sadece grade_id ve subject_id zorunlu
+            required_fields = ['grade_id', 'subject_id']
             for field in required_fields:
                 if field not in quiz_config:
                     return False, {'error': f'Missing required field: {field}'}
@@ -65,7 +65,7 @@ class QuizSessionService:
                 'grade_id': quiz_config['grade_id'],
                 'subject_id': quiz_config['subject_id'],
                 'unit_id': quiz_config.get('unit_id'),
-                'topic_id': quiz_config['topic_id'],
+                'topic_id': quiz_config.get('topic_id'),  # Artık opsiyonel
                 'difficulty_level': quiz_config.get('difficulty_level', 'random'),
                 'timer_enabled': quiz_config.get('timer_enabled', True),
                 'timer_duration': quiz_config.get('timer_duration', 30),
@@ -78,15 +78,25 @@ class QuizSessionService:
             if not success:
                 return False, {'error': 'Failed to create session'}
 
-            # Rasgele soruları seç
-            questions = self.session_repo.get_random_questions(
-                topic_id=quiz_config['topic_id'],
-                difficulty=quiz_config.get('difficulty_level', 'random'),
-                count=quiz_config.get('question_count', 10)
-            )
+            # Rasgele soruları seç - topic_id None ise subject_id kullan
+            topic_id = quiz_config.get('topic_id')
+            if topic_id is None:
+                # Topic seçilmemişse, subject'e göre soru seç
+                questions = self.session_repo.get_random_questions_by_subject(
+                    subject_id=quiz_config['subject_id'],
+                    difficulty=quiz_config.get('difficulty_level', 'random'),
+                    count=quiz_config.get('question_count', 10)
+                )
+            else:
+                # Topic seçilmişse, topic'e göre soru seç
+                questions = self.session_repo.get_random_questions(
+                    topic_id=topic_id,
+                    difficulty=quiz_config.get('difficulty_level', 'random'),
+                    count=quiz_config.get('question_count', 10)
+                )
 
             if not questions:
-                return False, {'error': 'No questions available for this topic'}
+                return False, {'error': 'No questions available for the selected criteria'}
 
             # Session'a soruları ekle
             if not self.session_repo.add_session_questions(session_db_id, questions):
@@ -107,7 +117,9 @@ class QuizSessionService:
 
         except Exception as e:
             print(f"❌ Quiz session başlatma hatası: {e}")
-            return False, {'error': 'Internal server error'}
+            import traceback
+            traceback.print_exc()
+            return False, {'error': f'Internal server error: {str(e)}'}
 
     def get_session_info(self, session_id: str) -> Optional[Dict[str, Any]]:
         """4.2.2. Session bilgilerini getirir."""

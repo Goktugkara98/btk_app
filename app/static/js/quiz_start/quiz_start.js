@@ -29,23 +29,47 @@ class QuizStartManager {
 
     async init() {
         console.log('🚀 QuizStartManager başlatılıyor...');
-        await this.loadGrades();
-        this.bindEvents();
-        this.updatePreview();
-        this.validateStep1();
-        console.log('✅ QuizStartManager başlatıldı');
+        try {
+            await this.loadGrades();
+            this.bindEvents();
+            this.updatePreview();
+            this.validateStep1();
+            console.log('✅ QuizStartManager başlatıldı');
+        } catch (error) {
+            console.error('❌ QuizStartManager başlatılırken hata:', error);
+        }
     }
 
     bindEvents() {
         // Step navigation
-        document.getElementById('next-step-btn')?.addEventListener('click', () => this.nextStep());
-        document.getElementById('prev-step-btn')?.addEventListener('click', () => this.prevStep());
+        const nextBtn = document.getElementById('next-step-btn');
+        const prevBtn = document.getElementById('prev-step-btn');
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextStep());
+        }
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.prevStep());
+        }
 
         // Form controls
-        document.getElementById('class-select')?.addEventListener('change', (e) => this.handleClassChange(e));
-        document.getElementById('subject-select')?.addEventListener('change', (e) => this.handleSubjectChange(e));
-        document.getElementById('unit-select')?.addEventListener('change', (e) => this.handleUnitChange(e));
-        document.getElementById('topic-select')?.addEventListener('change', (e) => this.handleTopicChange(e));
+        const classSelect = document.getElementById('class-select');
+        const subjectSelect = document.getElementById('subject-select');
+        const unitSelect = document.getElementById('unit-select');
+        const topicSelect = document.getElementById('topic-select');
+        
+        if (classSelect) {
+            classSelect.addEventListener('change', (e) => this.handleClassChange(e));
+        }
+        if (subjectSelect) {
+            subjectSelect.addEventListener('change', (e) => this.handleSubjectChange(e));
+        }
+        if (unitSelect) {
+            unitSelect.addEventListener('change', (e) => this.handleUnitChange(e));
+        }
+        if (topicSelect) {
+            topicSelect.addEventListener('change', (e) => this.handleTopicChange(e));
+        }
 
         // Difficulty selection
         document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
@@ -53,10 +77,16 @@ class QuizStartManager {
         });
 
         // Timer settings
-        document.getElementById('timer-minutes')?.addEventListener('change', (e) => this.handleTimerDurationChange(e));
+        const timerInput = document.getElementById('timer-minutes');
+        if (timerInput) {
+            timerInput.addEventListener('change', (e) => this.handleTimerDurationChange(e));
+        }
 
         // Question count
-        document.getElementById('question-count')?.addEventListener('change', (e) => this.handleQuestionCountChange(e));
+        const questionCountInput = document.getElementById('question-count');
+        if (questionCountInput) {
+            questionCountInput.addEventListener('change', (e) => this.handleQuestionCountChange(e));
+        }
 
         // Action buttons
         const startBtn = document.getElementById('start-quiz-btn');
@@ -79,6 +109,7 @@ class QuizStartManager {
 
     // Step Navigation
     nextStep() {
+        console.log('📋 Step 1 validation:', this.validateStep1());
         if (this.currentStep === 1 && this.validateStep1()) {
             this.showStep(2);
         }
@@ -91,13 +122,18 @@ class QuizStartManager {
     }
 
     showStep(stepNumber) {
+        console.log(`🔄 Step ${stepNumber} gösteriliyor...`);
+        
         // Hide all steps
         document.querySelectorAll('.form-step').forEach(step => {
             step.classList.remove('active');
         });
 
         // Show target step
-        document.getElementById(`step-${stepNumber}`).classList.add('active');
+        const targetStep = document.getElementById(`step-${stepNumber}`);
+        if (targetStep) {
+            targetStep.classList.add('active');
+        }
 
         // Update step indicator
         document.querySelectorAll('.step').forEach((step, index) => {
@@ -117,6 +153,7 @@ class QuizStartManager {
     // Form Handlers
     handleClassChange(event) {
         const gradeId = event.target.value;
+        console.log('🏫 Sınıf değişti:', gradeId);
         this.formData.grade_id = gradeId;
         
         if (gradeId) {
@@ -137,6 +174,7 @@ class QuizStartManager {
 
     handleSubjectChange(event) {
         const subjectId = event.target.value;
+        console.log('📚 Ders değişti:', subjectId);
         this.formData.subject_id = subjectId;
         
         if (subjectId && subjectId !== 'random') {
@@ -155,6 +193,7 @@ class QuizStartManager {
 
     handleUnitChange(event) {
         const unitId = event.target.value;
+        console.log('📖 Ünite değişti:', unitId);
         this.formData.unit_id = unitId;
         
         if (unitId && unitId !== 'random') {
@@ -171,6 +210,7 @@ class QuizStartManager {
 
     handleTopicChange(event) {
         const topicId = event.target.value;
+        console.log('📝 Konu değişti:', topicId);
         this.formData.topic_id = topicId;
         this.updatePreview();
         this.validateStep1();
@@ -196,7 +236,13 @@ class QuizStartManager {
         try {
             console.log('📚 Sınıflar yükleniyor...');
             const response = await fetch('/api/quiz/grades');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
+            console.log('📄 API yanıtı:', data);
             
             if (data.status === 'success') {
                 this.grades = data.data;
@@ -204,9 +250,11 @@ class QuizStartManager {
                 console.log('✅ Sınıflar yüklendi:', this.grades.length);
             } else {
                 console.error('❌ Sınıflar yüklenirken hata:', data.message);
+                this.showError('Sınıflar yüklenirken hata oluştu: ' + data.message);
             }
         } catch (error) {
             console.error('❌ Sınıflar yüklenirken hata:', error);
+            this.showError('Sınıflar yüklenirken hata oluştu: ' + error.message);
         }
     }
 
@@ -214,6 +262,11 @@ class QuizStartManager {
         try {
             console.log('📖 Dersler yükleniyor... (grade_id:', gradeId, ')');
             const response = await fetch(`/api/quiz/subjects?grade_id=${gradeId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (data.status === 'success') {
@@ -232,6 +285,11 @@ class QuizStartManager {
         try {
             console.log('📚 Üniteler yükleniyor... (subject_id:', subjectId, ')');
             const response = await fetch(`/api/quiz/units?subject_id=${subjectId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (data.status === 'success') {
@@ -250,6 +308,11 @@ class QuizStartManager {
         try {
             console.log('📝 Konular yükleniyor... (unit_id:', unitId, ')');
             const response = await fetch(`/api/quiz/topics?unit_id=${unitId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (data.status === 'success') {
@@ -357,12 +420,16 @@ class QuizStartManager {
         select.disabled = false;
     }
 
-    // Validation
+    // Validation - Made less strict
     validateStep1() {
-        const isValid = this.formData.grade_id && 
-                       this.formData.subject_id && 
-                       this.formData.unit_id && 
-                       this.formData.topic_id;
+        // Only require grade_id and subject_id for step 1
+        const isValid = this.formData.grade_id && this.formData.subject_id;
+        
+        console.log('🔍 Step 1 validation:', {
+            grade_id: this.formData.grade_id,
+            subject_id: this.formData.subject_id,
+            isValid: isValid
+        });
         
         const nextBtn = document.getElementById('next-step-btn');
         if (nextBtn) {
@@ -446,10 +513,14 @@ class QuizStartManager {
     }
 
     validateForm() {
-        const isValid = this.formData.grade_id && 
-                       this.formData.subject_id && 
-                       this.formData.unit_id && 
-                       this.formData.topic_id;
+        // For final validation, require at least grade_id and subject_id
+        const isValid = this.formData.grade_id && this.formData.subject_id;
+        
+        console.log('🔍 Final validation:', {
+            grade_id: this.formData.grade_id,
+            subject_id: this.formData.subject_id,
+            isValid: isValid
+        });
         
         const startBtn = document.getElementById('start-quiz-btn');
         if (startBtn) {
@@ -471,7 +542,7 @@ class QuizStartManager {
             container.innerHTML = `
                 <div class="validation-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Sınav başlatmak için tüm gerekli alanları doldurun
+                    Sınav başlatmak için en az sınıf ve ders seçimi yapın
                 </div>
             `;
         }
@@ -534,7 +605,7 @@ class QuizStartManager {
             }
         } catch (error) {
             console.error('❌ Quiz başlatılırken hata:', error);
-            this.showError('Sınav başlatılırken bir hata oluştu');
+            this.showError('Sınav başlatılırken bir hata oluştu: ' + error.message);
         } finally {
             if (startBtn) {
                 startBtn.disabled = false;
@@ -558,25 +629,38 @@ class QuizStartManager {
         };
 
         // Form elemanlarını sıfırla
-        document.getElementById('class-select').value = '';
-        document.getElementById('subject-select').value = '';
-        document.getElementById('subject-select').disabled = true;
-        document.getElementById('unit-select').value = '';
-        document.getElementById('unit-select').disabled = true;
-        document.getElementById('topic-select').value = '';
-        document.getElementById('topic-select').disabled = true;
+        const classSelect = document.getElementById('class-select');
+        const subjectSelect = document.getElementById('subject-select');
+        const unitSelect = document.getElementById('unit-select');
+        const topicSelect = document.getElementById('topic-select');
         
-        // Placeholder'ları ayarla
-        document.getElementById('subject-select').innerHTML = '<option value="">Ders seçiniz</option>';
-        document.getElementById('unit-select').innerHTML = '<option value="">Ünite seçiniz</option>';
-        document.getElementById('topic-select').innerHTML = '<option value="">Konu seçiniz</option>';
+        if (classSelect) classSelect.value = '';
+        if (subjectSelect) {
+            subjectSelect.value = '';
+            subjectSelect.disabled = true;
+            subjectSelect.innerHTML = '<option value="">Ders seçiniz</option>';
+        }
+        if (unitSelect) {
+            unitSelect.value = '';
+            unitSelect.disabled = true;
+            unitSelect.innerHTML = '<option value="">Ünite seçiniz</option>';
+        }
+        if (topicSelect) {
+            topicSelect.value = '';
+            topicSelect.disabled = true;
+            topicSelect.innerHTML = '<option value="">Konu seçiniz</option>';
+        }
 
         // Radio button'ları sıfırla
-        document.querySelector('input[name="difficulty"][value="random"]').checked = true;
+        const randomDifficulty = document.querySelector('input[name="difficulty"][value="random"]');
+        if (randomDifficulty) randomDifficulty.checked = true;
 
         // Input değerlerini sıfırla
-        document.getElementById('timer-minutes').value = 30;
-        document.getElementById('question-count').value = 20;
+        const timerInput = document.getElementById('timer-minutes');
+        const questionCountInput = document.getElementById('question-count');
+        
+        if (timerInput) timerInput.value = 30;
+        if (questionCountInput) questionCountInput.value = 20;
 
         // UI'yi güncelle
         this.hideElement('subject-group');

@@ -294,8 +294,8 @@ def start_quiz():
     if not data:
         return jsonify({'status': 'error', 'message': 'Invalid JSON'}), 400
     
-    # Required fields
-    required_fields = ['grade_id', 'subject_id', 'topic_id']
+    # Required fields - only grade_id and subject_id are required
+    required_fields = ['grade_id', 'subject_id']
     for field in required_fields:
         if field not in data:
             return jsonify({
@@ -303,9 +303,15 @@ def start_quiz():
                 'message': f'Missing required field: {field}'
             }), 400
     
+    # Set default values for optional fields
+    if 'unit_id' not in data:
+        data['unit_id'] = None
+    if 'topic_id' not in data:
+        data['topic_id'] = None
+    
     try:
         # Use default user ID for testing
-        user_id = session.get('user_id', 1)  # Default to user ID 1 for testing
+        user_id = session.get('user_id', 4)  # Default to user ID 4 for testing (existing user)
         
         if not QuizSessionService:
             return jsonify({
@@ -438,6 +444,7 @@ def get_session_status(session_id):
             'subject': session_info['session'].get('subject_name'),
             'topic': session_info['session'].get('topic_name'),
             'difficulty': session_info['session'].get('difficulty_level'),
+            'quiz_mode': session_info['session'].get('quiz_mode'),
             'remaining_time_seconds': remaining_time_seconds
         }
         
