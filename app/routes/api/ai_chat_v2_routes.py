@@ -281,6 +281,7 @@ def send_chat_message():
         message = data['message']
         chat_session_id = data['chat_session_id']
         question_id = data.get('question_id')
+        question_context = data.get('question_context')  # Yeni: Soru ve şıkların içeriği
         
         # Mesaj validasyonu
         is_valid, error_msg = chat_message_service.validate_message(message)
@@ -311,8 +312,29 @@ def send_chat_message():
             action_type='general', metadata=user_metadata
         )
         
-        # AI için prompt oluştur
-        prompt = chat_session_service.build_prompt(chat_session_id, sanitized_message, 'general')
+        # AI için prompt oluştur - question_context varsa ekle
+        if question_context:
+            # Soru ve şıkların içeriğini prompt'a ekle
+            context_message = f"""
+SORU İÇERİĞİ:
+{question_context.get('question_text', 'Soru metni bulunamadı')}
+
+ŞIKLAR:
+"""
+            for i, option in enumerate(question_context.get('options', []), 1):
+                context_message += f"{i}. {option.get('option_text', 'Şık metni bulunamadı')}\n"
+            
+            context_message += f"\nKULLANICI MESAJI: {sanitized_message}"
+            
+            print(f"[AI_CHAT_V2] First message with question context: {context_message}")
+            
+            prompt = chat_session_service.build_prompt(chat_session_id, context_message, 'general')
+        else:
+            # Normal prompt oluştur
+            prompt = chat_session_service.build_prompt(chat_session_id, sanitized_message, 'general')
+        
+        # Token sınırı uyarısını prompt'un sonuna ekle
+        prompt += "\n\nÖNEMLİ: Cevabında 5000 token geçmemeye çalış. Kısa ve öz cevaplar ver."
         
         # AI'dan yanıt al
         ai_response = gemini_service.generate_content(prompt)
@@ -387,6 +409,7 @@ def quick_action():
         action = data['action']
         chat_session_id = data['chat_session_id']
         question_id = data['question_id']
+        question_context = data.get('question_context')  # Yeni: Soru ve şıkların içeriği
         
         # Chat session kontrol
         session_info = chat_session_service.get_session(chat_session_id)
@@ -396,8 +419,16 @@ def quick_action():
                 'message': 'Chat session not found'
             }), 404
         
-        # Quiz session'dan soru bilgilerini al
-        if QuizSessionService:
+        # Soru bilgilerini al - önce question_context'ten, yoksa veritabanından
+        if question_context:
+            # Frontend'den gelen soru bilgilerini kullan
+            question_data = {
+                'question_text': question_context.get('question_text', ''),
+                'topic_name': session_info['user_context'].get('topic', ''),
+                'options': question_context.get('options', [])
+            }
+        elif QuizSessionService:
+            # Veritabanından soru bilgilerini al
             quiz_service = QuizSessionService()
             question_details = quiz_service.get_question_details(question_id)
             question_options = quiz_service.get_question_options(question_id)
@@ -429,6 +460,9 @@ def quick_action():
         
         # Context ekle
         full_prompt = chat_session_service.get_conversation_context(chat_session_id, question_id) + "\n\n" + prompt
+        
+        # Token sınırı uyarısını prompt'un sonuna ekle
+        full_prompt += "\n\nÖNEMLİ: Cevabında 20000 token geçmemeye çalış. Kısa ve öz cevaplar ver."
         
         # AI'dan yanıt al
         ai_response = gemini_service.generate_content(full_prompt)

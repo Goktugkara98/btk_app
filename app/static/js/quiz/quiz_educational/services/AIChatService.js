@@ -116,10 +116,11 @@ class AIChatService {
      * Chat mesajı gönderir ve AI yanıtı alır
      * @param {string} message - Gönderilecek mesaj
      * @param {number} currentQuestionId - Mevcut soru ID (opsiyonel)
+     * @param {boolean} isFirstMessage - İlk mesaj mı (soru ve şıkları eklemek için)
      * @returns {Promise<Object>} AI yanıtı
      */
-    async sendChatMessage(message, currentQuestionId = null) {
-        console.log('[AIChatService] sendChatMessage called with:', { message, currentQuestionId });
+    async sendChatMessage(message, currentQuestionId = null, isFirstMessage = false) {
+        console.log('[AIChatService] sendChatMessage called with:', { message, currentQuestionId, isFirstMessage });
         
         if (!this.isEnabled) {
             throw new Error('AI Chat servisi kullanılamıyor');
@@ -141,6 +142,18 @@ class AIChatService {
 
             if (currentQuestionId) {
                 requestBody.question_id = currentQuestionId;
+            }
+
+            // İlk mesaj ise soru ve şıkların içeriğini ekle
+            if (isFirstMessage && currentQuestionId) {
+                const questionData = this.getCurrentQuestionData();
+                if (questionData) {
+                    requestBody.question_context = {
+                        question_text: questionData.question_text,
+                        options: questionData.options
+                    };
+                    console.log('[AIChatService] Added question context for first message:', requestBody.question_context);
+                }
             }
 
             console.log('[AIChatService] Sending chat message:', requestBody);
@@ -171,13 +184,69 @@ class AIChatService {
     }
 
     /**
+     * Mevcut sorunun verilerini alır
+     * @returns {Object|null} Soru ve şıkların içeriği
+     */
+    getCurrentQuestionData() {
+        try {
+            // StateManager'dan mevcut soru bilgilerini al
+            if (window.quizApp && window.quizApp.stateManager) {
+                const state = window.quizApp.stateManager.getState();
+                const currentQuestion = state.currentQuestion;
+                
+                console.log('[AIChatService] Current question from state:', currentQuestion);
+                
+                if (currentQuestion && currentQuestion.question) {
+                    // QuizEngine'den gelen format: question.text
+                    // Ama biz question_text arıyoruz
+                    const questionText = currentQuestion.question.text || currentQuestion.question.question_text;
+                    
+                    // Options'ları al - farklı formatları kontrol et
+                    let options = [];
+                    if (currentQuestion.question.options && Array.isArray(currentQuestion.question.options)) {
+                        options = currentQuestion.question.options;
+                    } else if (currentQuestion.options && Array.isArray(currentQuestion.options)) {
+                        options = currentQuestion.options;
+                    }
+                    
+                    console.log('[AIChatService] Question text:', questionText);
+                    console.log('[AIChatService] Options found:', options.length);
+                    console.log('[AIChatService] First option sample:', options[0]);
+                    
+                    if (questionText && options.length > 0) {
+                        const mappedOptions = options.map(option => ({
+                            id: option.id,
+                            option_text: option.text || option.option_text || option.name,
+                            is_correct: option.is_correct
+                        }));
+                        
+                        console.log('[AIChatService] Mapped options:', mappedOptions);
+                        
+                        return {
+                            question_text: questionText,
+                            options: mappedOptions
+                        };
+                    }
+                }
+            }
+            
+            console.warn('[AIChatService] Could not get current question data - missing required fields');
+            return null;
+        } catch (error) {
+            console.error('[AIChatService] Error getting current question data:', error);
+            return null;
+        }
+    }
+
+    /**
      * Hızlı eylemler için AI yanıtı alır (açıkla, ipucu)
      * @param {string} action - 'explain' veya 'hint'
      * @param {number} questionId - Soru ID
+     * @param {boolean} isFirstMessage - İlk mesaj mı (soru ve şıkları eklemek için)
      * @returns {Promise<Object>} AI yanıtı
      */
-    async sendQuickAction(action, questionId) {
-        console.log('[AIChatService] sendQuickAction called with:', { action, questionId });
+    async sendQuickAction(action, questionId, isFirstMessage = false) {
+        console.log('[AIChatService] sendQuickAction called with:', { action, questionId, isFirstMessage });
         
         if (!this.isEnabled) {
             console.warn('[AIChatService] Cannot send quick action - service not enabled');
@@ -201,6 +270,18 @@ class AIChatService {
                 chat_session_id: this.chatSessionId,
                 question_id: questionId
             };
+            
+            // İlk mesaj ise soru ve şıkların içeriğini ekle
+            if (isFirstMessage && questionId) {
+                const questionData = this.getCurrentQuestionData();
+                if (questionData) {
+                    requestBody.question_context = {
+                        question_text: questionData.question_text,
+                        options: questionData.options
+                    };
+                    console.log('[AIChatService] Added question context for quick action first message:', requestBody.question_context);
+                }
+            }
             
             console.log('[AIChatService] Sending quick action request:', requestBody);
 

@@ -14,6 +14,9 @@ class AIChatManager {
         this.pendingRequests = new Map(); // questionId -> requestId mapping
         this.requestCounter = 0; // Unique request ID'ler için
         
+        // İlk mesaj takibi için yeni özellikler
+        this.firstMessageSent = new Set(); // Her soru için ilk mesaj gönderilip gönderilmediğini takip eder
+        
         // UI elementleri
         this.chatContainer = document.getElementById('ai-chat-container');
         this.messagesContainer = document.getElementById('ai-chat-messages');
@@ -170,12 +173,18 @@ class AIChatManager {
                     this.addMessage(msg.role, msg.content, msg.label);
                 });
                 
+                // Bu soru için ilk mesaj gönderilmiş olarak işaretle
+                this.firstMessageSent.add(this.currentQuestionId);
+                
                 console.log('[AIChatManager] Chat history loaded successfully');
             } else {
                 console.log('[AIChatManager] No chat history found, showing welcome message');
                 
                 // Chat'i temizle
                 this.clearChat();
+                
+                // Bu soru için ilk mesaj gönderilmemiş olarak işaretle
+                this.firstMessageSent.delete(this.currentQuestionId);
                 
                 // Karşılama mesajını göster
                 this.showWelcomeMessage();
@@ -518,11 +527,16 @@ class AIChatManager {
         // Loading durumu göster
         this.showTyping();
         
+        // İlk mesaj kontrolü
+        const isFirstMessage = !this.firstMessageSent.has(this.currentQuestionId);
+        console.log('[AIChatManager] Is first message for this question:', isFirstMessage);
+        
         try {
             // AI'dan yanıt al
             const response = await this.aiChatService.sendChatMessage(
                 message, 
-                this.currentQuestionId
+                this.currentQuestionId,
+                isFirstMessage
             );
             
             this.hideTyping();
@@ -538,6 +552,12 @@ class AIChatManager {
             // Request'i temizle
             this.pendingRequests.delete(this.currentQuestionId);
             console.log('[AIChatManager] Request completed and cleared for question:', this.currentQuestionId);
+            
+            // İlk mesaj başarıyla gönderildiyse işaretle
+            if (isFirstMessage) {
+                this.firstMessageSent.add(this.currentQuestionId);
+                console.log('[AIChatManager] First message sent for question:', this.currentQuestionId);
+            }
             
             // AI cevabını göster
             if (response.success && response.message) {
@@ -580,8 +600,12 @@ class AIChatManager {
         // Loading durumu göster
         this.showTyping();
         
+        // İlk mesaj kontrolü (hızlı eylemler de ilk mesaj sayılabilir)
+        const isFirstMessage = !this.firstMessageSent.has(this.currentQuestionId);
+        console.log('[AIChatManager] Is first message for quick action:', isFirstMessage);
+        
         try {
-            const response = await this.aiChatService.sendQuickAction(action, this.currentQuestionId);
+            const response = await this.aiChatService.sendQuickAction(action, this.currentQuestionId, isFirstMessage);
             
             this.hideTyping();
             
@@ -596,6 +620,12 @@ class AIChatManager {
             // Request'i temizle
             this.pendingRequests.delete(this.currentQuestionId);
             console.log('[AIChatManager] Quick action request completed and cleared for question:', this.currentQuestionId);
+            
+            // İlk mesaj başarıyla gönderildiyse işaretle
+            if (isFirstMessage) {
+                this.firstMessageSent.add(this.currentQuestionId);
+                console.log('[AIChatManager] First message sent for quick action on question:', this.currentQuestionId);
+            }
             
             // AI cevabını göster
             if (response.success && response.message) {
@@ -633,10 +663,18 @@ class AIChatManager {
             messageDiv.innerHTML = `
                 <div class="ai-message-content">
                     ${label ? `<div class="ai-message-label">${label}</div>` : ''}
-                    <div class="ai-message-text">${this.formatMessage(content)}</div>
+                    <div class="ai-message-text" id="ai-text-${Date.now()}"></div>
                     <div class="ai-message-time">${time}</div>
                 </div>
             `;
+            
+            this.messagesContainer?.appendChild(messageDiv);
+            this.scrollToBottom();
+            
+            // Typewriter efekti için AI mesajını animasyonlu yaz
+            const textElement = messageDiv.querySelector('.ai-message-text');
+            this.typewriterEffect(textElement, this.formatMessage(content));
+            
         } else if (type === 'user') {
             messageDiv.innerHTML = `
                 <div class="user-message-content">
@@ -644,6 +682,9 @@ class AIChatManager {
                     <div class="user-message-time">${time}</div>
                 </div>
             `;
+            
+            this.messagesContainer?.appendChild(messageDiv);
+            this.scrollToBottom();
         } else if (type === 'system') {
             messageDiv.innerHTML = `
                 <div class="system-message-content">
@@ -651,10 +692,45 @@ class AIChatManager {
                     <div class="system-message-time">${time}</div>
                 </div>
             `;
+            
+            this.messagesContainer?.appendChild(messageDiv);
+            this.scrollToBottom();
         }
+    }
+
+    /**
+     * Typewriter efekti ile metni yazar
+     */
+    typewriterEffect(element, text, speed = 15) {
+        // Metni HTML etiketlerine göre parçalara böl
+        const parts = text.split(/(<br>|<strong>|<\/strong>|<em>|<\/em>)/);
+        let currentIndex = 0;
+        let currentPart = 0;
         
-        this.messagesContainer?.appendChild(messageDiv);
-        this.scrollToBottom();
+        const typeInterval = setInterval(() => {
+            if (currentPart < parts.length) {
+                const part = parts[currentPart];
+                
+                // HTML etiketi ise direkt ekle
+                if (part === '<br>' || part === '<strong>' || part === '</strong>' || part === '<em>' || part === '</em>') {
+                    element.innerHTML += part;
+                    currentPart++;
+                } else {
+                    // Normal metin ise karakter karakter yaz
+                    if (currentIndex < part.length) {
+                        element.innerHTML += part.charAt(currentIndex);
+                        currentIndex++;
+                    } else {
+                        currentPart++;
+                        currentIndex = 0;
+                    }
+                }
+                
+                this.scrollToBottom();
+            } else {
+                clearInterval(typeInterval);
+            }
+        }, speed);
     }
 
     /**
@@ -746,6 +822,7 @@ class AIChatManager {
         console.log('[AIChatManager] Current question ID:', this.currentQuestionId);
         console.log('[AIChatManager] Pending requests:', Array.from(this.pendingRequests.entries()));
         console.log('[AIChatManager] Request counter:', this.requestCounter);
+        console.log('[AIChatManager] First message sent for questions:', Array.from(this.firstMessageSent));
         console.log('[AIChatManager] ================================');
     }
 }

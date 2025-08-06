@@ -28,7 +28,7 @@ class GeminiAPIService:
             "temperature": 0.7,
             "topK": 40,
             "topP": 0.8,
-            "maxOutputTokens": 2048,  # Increased from 1024 to allow longer responses
+            "maxOutputTokens": 35000,  # Increased from 1024 to allow longer responses
         }
     
     def _check_configuration(self) -> bool:
