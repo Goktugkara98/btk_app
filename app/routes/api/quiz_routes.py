@@ -580,6 +580,20 @@ def get_all_questions(session_id):
             # Her soru için detayları (açıklama dahil) yükle
             question_details = session_service.get_question_details(question['question_id'])
             
+            # Educational features için veri hazırla
+            hint = None
+            related_topics = []
+            
+            # Quiz modu educational ise ek verileri ekle
+            if session.get('quiz_mode') == 'educational':
+                # İpucu - şimdilik açıklamadan türet
+                if question_details and question_details.get('description'):
+                    hint = f"Bu soru için ipucu: {question_details['description'][:100]}..."
+                
+                # İlgili konular - şimdilik topic adından türet
+                if question_details and question_details.get('topic_name'):
+                    related_topics = [question_details['topic_name']]
+            
             question_data = {
                 'question_number': i + 1,
                 'total_questions': len(questions),
@@ -587,6 +601,8 @@ def get_all_questions(session_id):
                     'id': question['question_id'],
                     'text': question['question_text'],
                     'explanation': question_details['description'] if question_details else None,
+                    'hint': hint,
+                    'related_topics': related_topics,
                     'difficulty_level': question_details['difficulty_level'] if question_details else None,
                     'points': question_details['points'] if question_details else None,
                     'subject_name': question_details['subject_name'] if question_details else None,
@@ -645,12 +661,32 @@ def get_current_question(session_id):
         
         for i, question in enumerate(questions):
             if question['user_answer_option_id'] is None:
+                # Soru detaylarını al
+                question_details = session_service.get_question_details(question['question_id'])
+                
+                # Educational features için veri hazırla
+                hint = None
+                related_topics = []
+                
+                # Quiz modu educational ise ek verileri ekle
+                if session_info['session'].get('quiz_mode') == 'educational':
+                    # İpucu - şimdilik açıklamadan türet
+                    if question_details and question_details.get('description'):
+                        hint = f"Bu soru için ipucu: {question_details['description'][:100]}..."
+                    
+                    # İlgili konular - şimdilik topic adından türet
+                    if question_details and question_details.get('topic_name'):
+                        related_topics = [question_details['topic_name']]
+                
                 current_question = {
                     'question_number': i + 1,
                     'total_questions': len(questions),
                     'question': {
                         'id': question['question_id'],
                         'text': question['question_text'],
+                        'explanation': question_details['description'] if question_details else None,
+                        'hint': hint,
+                        'related_topics': related_topics,
                         'options': []  # Seçenekleri ayrıca yüklenecek
                     },
                     'progress': {

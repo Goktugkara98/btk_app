@@ -185,22 +185,12 @@ class QuestionLoader:
             print(f"❌ Topic bulunamadı: {file_path}")
             return 0, len(questions)
         
-        print(f"📝 {file_path} dosyası işleniyor...")
-        print(f"   Grade: {grade}, Subject: {subject}, Unit: {unit}, Topic: {topic}")
-        print(f"   Topic ID: {topic_id}")
-        print(f"   Question sayısı: {len(questions)}")
-        
         success_count = 0
         
         for i, question in enumerate(questions, 1):
             question_id = self.insert_question(question, topic_id)
             if question_id:
                 success_count += 1
-                print(f"   ✅ Question {i} eklendi (ID: {question_id})")
-            else:
-                print(f"   ❌ Question {i} eklenemedi")
-        
-        print(f"📊 Sonuç: {success_count}/{len(questions)} question başarıyla eklendi")
         return success_count, len(questions)
     
     def process_all_question_files(self) -> Dict[str, Tuple[int, int]]:
@@ -223,7 +213,7 @@ class QuestionLoader:
             print(f"❌ Question JSON dosyası bulunamadı: {self.data_dir}")
             return {}
         
-        print(f"🔍 {len(json_files)} question dosyası bulundu")
+
         
         for file_path in json_files:
             success, total = self.process_question_file(str(file_path))
@@ -252,16 +242,9 @@ if __name__ == "__main__":
         total_success = 0
         total_questions = 0
         
-        print("\n" + "="*50)
-        print("SONUÇ ÖZETİ")
-        print("="*50)
-        
         for filename, (success, total) in results.items():
-            print(f"{filename}: {success}/{total} question eklendi")
             total_success += success
             total_questions += total
-        
-        print(f"\nToplam: {total_success}/{total_questions} question başarıyla eklendi")
         
     except Exception as e:
         print(f"❌ Genel hata: {e}")

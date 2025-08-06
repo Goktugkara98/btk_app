@@ -27,6 +27,8 @@ from app.database.schemas import (
     QUIZ_SESSIONS_TABLE_SQL, QUIZ_SESSIONS_SAMPLE_DATA,
     QUIZ_SESSION_QUESTIONS_TABLE_SQL, QUIZ_SESSION_QUESTIONS_SAMPLE_DATA
 )
+from app.database.schemas.chat_sessions_schema import get_chat_sessions_schema
+from app.database.schemas.chat_messages_schema import get_chat_messages_schema
 
 class DatabaseMigrations:
     """
@@ -57,11 +59,13 @@ class DatabaseMigrations:
             'question_options': (QUESTION_OPTIONS_TABLE_SQL, QUESTION_OPTIONS_SAMPLE_DATA),
             'users': (USERS_TABLE_SQL, USERS_SAMPLE_DATA),
             'quiz_sessions': (QUIZ_SESSIONS_TABLE_SQL, QUIZ_SESSIONS_SAMPLE_DATA),
-            'quiz_session_questions': (QUIZ_SESSION_QUESTIONS_TABLE_SQL, QUIZ_SESSION_QUESTIONS_SAMPLE_DATA)
+            'quiz_session_questions': (QUIZ_SESSION_QUESTIONS_TABLE_SQL, QUIZ_SESSION_QUESTIONS_SAMPLE_DATA),
+            'chat_sessions': (get_chat_sessions_schema(), ""),  # Chat sessions
+            'chat_messages': (get_chat_messages_schema(), "")  # Chat messages
         }
         
         # Tablo oluşturma sırası (foreign key bağımlılıklarına göre)
-        self.table_order = ['grades', 'subjects', 'units', 'topics', 'questions', 'question_options', 'users', 'quiz_sessions', 'quiz_session_questions']
+        self.table_order = ['grades', 'subjects', 'units', 'topics', 'questions', 'question_options', 'users', 'quiz_sessions', 'quiz_session_questions', 'chat_sessions', 'chat_messages']
 
     def __del__(self):
         """Destructor - bağlantıyı temizle."""

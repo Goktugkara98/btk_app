@@ -50,6 +50,14 @@ try:
 except ImportError as e:
     print(f"⚠️  Warning: Could not import quiz routes: {e}")
 
+# Import AI chat routes
+try:
+    from .ai_chat_v2_routes import ai_chat_v2_bp
+    api_bp.register_blueprint(ai_chat_v2_bp)
+    print("✅ AI chat routes registered successfully")
+except ImportError as e:
+    print(f"⚠️  Warning: Could not import AI chat routes: {e}")
+
 # =============================================================================
 # 5.0. ANA API ROTALARI (MAIN API ROUTES)
 # =============================================================================

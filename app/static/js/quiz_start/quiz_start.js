@@ -1,5 +1,5 @@
 // =============================================================================
-// Quiz Start JavaScript - Exam Mode Focus
+// Quiz Start JavaScript - Multi-Mode Support
 // Sınav başlatma ekranı için JavaScript modülü
 // =============================================================================
 
@@ -7,13 +7,13 @@ class QuizStartManager {
     constructor() {
         this.currentStep = 1;
         this.formData = {
+            quiz_mode: 'normal', // Default to normal mode
             grade_id: '',
             subject_id: '',
             unit_id: '',
             topic_id: '',
             difficulty: 'random',
-            quiz_mode: 'exam', // Always exam mode
-            timer_enabled: true, // Always enabled for exam mode
+            timer_enabled: true,
             timer_duration: 30,
             question_count: 20
         };
@@ -43,14 +43,27 @@ class QuizStartManager {
     bindEvents() {
         // Step navigation
         const nextBtn = document.getElementById('next-step-btn');
+        const nextBtn2 = document.getElementById('next-step-btn-2');
         const prevBtn = document.getElementById('prev-step-btn');
+        const prevBtn2 = document.getElementById('prev-step-btn-2');
         
         if (nextBtn) {
             nextBtn.addEventListener('click', () => this.nextStep());
         }
+        if (nextBtn2) {
+            nextBtn2.addEventListener('click', () => this.nextStep());
+        }
         if (prevBtn) {
             prevBtn.addEventListener('click', () => this.prevStep());
         }
+        if (prevBtn2) {
+            prevBtn2.addEventListener('click', () => this.prevStep());
+        }
+
+        // Quiz mode selection
+        document.querySelectorAll('input[name="quiz_mode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => this.handleQuizModeChange(e));
+        });
 
         // Form controls
         const classSelect = document.getElementById('class-select');
@@ -109,15 +122,22 @@ class QuizStartManager {
 
     // Step Navigation
     nextStep() {
-        console.log('📋 Step 1 validation:', this.validateStep1());
-        if (this.currentStep === 1 && this.validateStep1()) {
-            this.showStep(2);
+        if (this.currentStep === 1) {
+            if (this.validateStep1()) {
+                this.showStep(2);
+            }
+        } else if (this.currentStep === 2) {
+            if (this.validateStep2()) {
+                this.showStep(3);
+            }
         }
     }
 
     prevStep() {
         if (this.currentStep === 2) {
             this.showStep(1);
+        } else if (this.currentStep === 3) {
+            this.showStep(2);
         }
     }
 
@@ -151,6 +171,24 @@ class QuizStartManager {
     }
 
     // Form Handlers
+    handleQuizModeChange(event) {
+        const quizMode = event.target.value;
+        console.log('🎮 Quiz modu değişti:', quizMode);
+        this.formData.quiz_mode = quizMode;
+        
+        // Educational modda timer'ı devre dışı bırak
+        if (quizMode === 'educational') {
+            this.formData.timer_enabled = false;
+            this.hideElement('timer-group');
+        } else {
+            this.formData.timer_enabled = true;
+            this.showElement('timer-group');
+        }
+        
+        this.updatePreview();
+        this.validateStep1();
+    }
+
     handleClassChange(event) {
         const gradeId = event.target.value;
         console.log('🏫 Sınıf değişti:', gradeId);
@@ -169,7 +207,7 @@ class QuizStartManager {
         }
         
         this.updatePreview();
-        this.validateStep1();
+        this.validateStep2();
     }
 
     handleSubjectChange(event) {
@@ -188,7 +226,7 @@ class QuizStartManager {
         }
         
         this.updatePreview();
-        this.validateStep1();
+        this.validateStep2();
     }
 
     handleUnitChange(event) {
@@ -205,7 +243,7 @@ class QuizStartManager {
         }
         
         this.updatePreview();
-        this.validateStep1();
+        this.validateStep2();
     }
 
     handleTopicChange(event) {
@@ -213,7 +251,7 @@ class QuizStartManager {
         console.log('📝 Konu değişti:', topicId);
         this.formData.topic_id = topicId;
         this.updatePreview();
-        this.validateStep1();
+        this.validateStep2();
     }
 
     handleDifficultyChange(event) {
@@ -420,14 +458,13 @@ class QuizStartManager {
         select.disabled = false;
     }
 
-    // Validation - Made less strict
+    // Validation
     validateStep1() {
-        // Only require grade_id and subject_id for step 1
-        const isValid = this.formData.grade_id && this.formData.subject_id;
+        // Step 1 only requires quiz mode selection
+        const isValid = this.formData.quiz_mode;
         
         console.log('🔍 Step 1 validation:', {
-            grade_id: this.formData.grade_id,
-            subject_id: this.formData.subject_id,
+            quiz_mode: this.formData.quiz_mode,
             isValid: isValid
         });
         
@@ -439,15 +476,36 @@ class QuizStartManager {
         return isValid;
     }
 
+    validateStep2() {
+        // Step 2 requires grade_id and subject_id
+        const isValid = this.formData.grade_id && this.formData.subject_id;
+        
+        console.log('🔍 Step 2 validation:', {
+            grade_id: this.formData.grade_id,
+            subject_id: this.formData.subject_id,
+            isValid: isValid
+        });
+        
+        const nextBtn = document.getElementById('next-step-btn-2');
+        if (nextBtn) {
+            nextBtn.disabled = !isValid;
+        }
+        
+        return isValid;
+    }
+
     validateCurrentStep() {
         if (this.currentStep === 1) {
             return this.validateStep1();
+        } else if (this.currentStep === 2) {
+            return this.validateStep2();
         }
         return true;
     }
 
     // Preview Updates
     updatePreview() {
+        this.updatePreviewItem('mode', this.getQuizModeName(this.formData.quiz_mode));
         this.updatePreviewItem('class', this.getGradeName(this.formData.grade_id));
         this.updatePreviewItem('subject', this.getSubjectName(this.formData.subject_id));
         this.updatePreviewItem('unit', this.getUnitName(this.formData.unit_id));
@@ -455,7 +513,6 @@ class QuizStartManager {
         this.updatePreviewItem('difficulty', this.getDifficultyName(this.formData.difficulty));
         this.updatePreviewItem('timer', this.getTimerText());
         this.updatePreviewItem('question-count', this.getQuestionCountText());
-        this.updatePreviewItem('mode', 'Sınav Modu');
         
         this.validateForm();
     }
@@ -465,6 +522,14 @@ class QuizStartManager {
         if (element) {
             element.textContent = value || '-';
         }
+    }
+
+    getQuizModeName(quizMode) {
+        const modeMap = {
+            'normal': 'Normal Quiz',
+            'educational': 'Öğretici Quiz'
+        };
+        return modeMap[quizMode] || 'Normal Quiz';
     }
 
     getGradeName(gradeId) {
@@ -505,6 +570,9 @@ class QuizStartManager {
     }
 
     getTimerText() {
+        if (this.formData.quiz_mode === 'educational') {
+            return 'Süresiz';
+        }
         return `${this.formData.timer_duration} dakika`;
     }
 
@@ -513,10 +581,11 @@ class QuizStartManager {
     }
 
     validateForm() {
-        // For final validation, require at least grade_id and subject_id
-        const isValid = this.formData.grade_id && this.formData.subject_id;
+        // For final validation, require quiz mode, grade_id and subject_id
+        const isValid = this.formData.quiz_mode && this.formData.grade_id && this.formData.subject_id;
         
         console.log('🔍 Final validation:', {
+            quiz_mode: this.formData.quiz_mode,
             grade_id: this.formData.grade_id,
             subject_id: this.formData.subject_id,
             isValid: isValid
@@ -542,7 +611,7 @@ class QuizStartManager {
             container.innerHTML = `
                 <div class="validation-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Sınav başlatmak için en az sınıf ve ders seçimi yapın
+                    Sınav başlatmak için quiz modu, sınıf ve ders seçimi yapın
                 </div>
             `;
         }
@@ -597,8 +666,11 @@ class QuizStartManager {
 
             if (data.status === 'success') {
                 console.log('✅ Quiz oturumu oluşturuldu, yönlendiriliyor...');
-                // Quiz oturumu oluşturuldu, quiz sayfasına yönlendir
-                window.location.href = `/quiz/screen?session_id=${data.data.session_id}`;
+                // Quiz moduna göre doğru sayfaya yönlendir
+                const quizUrl = this.formData.quiz_mode === 'educational' 
+                    ? `/quiz/educational?session_id=${data.data.session_id}`
+                    : `/quiz/normal?session_id=${data.data.session_id}`;
+                window.location.href = quizUrl;
             } else {
                 console.log('❌ API hatası:', data.message);
                 this.showError(data.message || 'Sınav başlatılırken bir hata oluştu');
@@ -617,18 +689,21 @@ class QuizStartManager {
     resetSettings() {
         // Form verilerini sıfırla
         this.formData = {
+            quiz_mode: 'normal',
             grade_id: '',
             subject_id: '',
             unit_id: '',
             topic_id: '',
             difficulty: 'random',
-            quiz_mode: 'exam',
             timer_enabled: true,
             timer_duration: 30,
             question_count: 20
         };
 
         // Form elemanlarını sıfırla
+        const normalModeRadio = document.querySelector('input[name="quiz_mode"][value="normal"]');
+        if (normalModeRadio) normalModeRadio.checked = true;
+
         const classSelect = document.getElementById('class-select');
         const subjectSelect = document.getElementById('subject-select');
         const unitSelect = document.getElementById('unit-select');
@@ -663,6 +738,7 @@ class QuizStartManager {
         if (questionCountInput) questionCountInput.value = 20;
 
         // UI'yi güncelle
+        this.showElement('timer-group');
         this.hideElement('subject-group');
         this.hideElement('unit-group');
         this.hideElement('topic-group');

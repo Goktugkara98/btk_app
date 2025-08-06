@@ -13,8 +13,12 @@
 #   4.1. Quiz Sayfaları
 #     4.1.1. GET /quiz
 #     4.1.2. GET /quiz/start
-#     4.1.3. GET /quiz/session/<session_id>
-#     4.1.4. GET /quiz/results
+#     4.1.3. GET /quiz/normal
+#     4.1.4. GET /quiz/educational
+#     4.1.5. GET /quiz/session/<session_id>
+#     4.1.6. GET /quiz/results
+#     4.1.7. GET /quiz/auto-start (Normal mode)
+#     4.1.8. GET /quiz/auto-start-educational (Educational mode)
 # =============================================================================
 
 # =============================================================================
@@ -52,31 +56,86 @@ def quiz_start():
     """4.1.2. Quiz başlatma sayfasını render eder."""
     return render_template('quiz_start.html', title='Quiz Başlat')
 
+@quiz_bp.route('/quiz/normal')
+# @login_required  # Temporarily disabled for testing
+def quiz_normal():
+    """4.1.3. Normal quiz ekranını render eder."""
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return redirect(url_for('quiz.quiz_start'))
+    return render_template('quiz_normal.html', title='Normal Quiz', session_id=session_id)
+
+@quiz_bp.route('/quiz/educational')
+# @login_required  # Temporarily disabled for testing
+def quiz_educational():
+    """4.1.4. Öğretici quiz ekranını render eder."""
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return redirect(url_for('quiz.quiz_start'))
+    return render_template('quiz_educational.html', title='Öğretici Quiz', session_id=session_id)
+
 @quiz_bp.route('/quiz/session/<session_id>')
 # @login_required  # Temporarily disabled for testing
 def quiz_session(session_id):
-    """4.1.3. Quiz oturum sayfasını render eder."""
-    return render_template('quiz_screen.html', title='Quiz', session_id=session_id)
+    """4.1.5. Quiz oturum sayfasını render eder (legacy - redirects to appropriate mode)."""
+    # Session bilgilerini al ve quiz moduna göre yönlendir
+    try:
+        from app.services.quiz_session_service import QuizSessionService
+        session_service = QuizSessionService()
+        session_info = session_service.get_session_info(session_id)
+        
+        if session_info and session_info.get('session'):
+            quiz_mode = session_info['session'].get('quiz_mode', 'normal')
+            if quiz_mode == 'educational':
+                return redirect(url_for('quiz.quiz_educational', session_id=session_id))
+            else:
+                return redirect(url_for('quiz.quiz_normal', session_id=session_id))
+        else:
+            # Session bulunamadıysa normal moda yönlendir
+            return redirect(url_for('quiz.quiz_normal', session_id=session_id))
+    except Exception as e:
+        print(f"Session routing error: {e}")
+        # Hata durumunda normal moda yönlendir
+        return redirect(url_for('quiz.quiz_normal', session_id=session_id))
 
 @quiz_bp.route('/quiz/screen')
 # @login_required  # Temporarily disabled for testing
 def quiz_screen():
-    """4.1.3b. Quiz ekranı sayfasını render eder (session_id query parameter ile)."""
+    """4.1.6. Quiz ekranı sayfasını render eder (session_id query parameter ile) - legacy."""
     session_id = request.args.get('session_id')
     if not session_id:
         return redirect(url_for('quiz.quiz_start'))
-    return render_template('quiz_screen.html', title='Quiz', session_id=session_id)
+    
+    # Session bilgilerini al ve quiz moduna göre yönlendir
+    try:
+        from app.services.quiz_session_service import QuizSessionService
+        session_service = QuizSessionService()
+        session_info = session_service.get_session_info(session_id)
+        
+        if session_info and session_info.get('session'):
+            quiz_mode = session_info['session'].get('quiz_mode', 'normal')
+            if quiz_mode == 'educational':
+                return redirect(url_for('quiz.quiz_educational', session_id=session_id))
+            else:
+                return redirect(url_for('quiz.quiz_normal', session_id=session_id))
+        else:
+            # Session bulunamadıysa normal moda yönlendir
+            return redirect(url_for('quiz.quiz_normal', session_id=session_id))
+    except Exception as e:
+        print(f"Session routing error: {e}")
+        # Hata durumunda normal moda yönlendir
+        return redirect(url_for('quiz.quiz_normal', session_id=session_id))
 
 @quiz_bp.route('/quiz/results')
 # @login_required  # Temporarily disabled for testing
 def quiz_results():
-    """4.1.4. Quiz sonuçları sayfasını render eder."""
+    """4.1.7. Quiz sonuçları sayfasını render eder."""
     session_id = request.args.get('session_id')
     return render_template('quiz_results.html', title='Quiz Sonuçları', session_id=session_id)
 
 @quiz_bp.route('/quiz/auto-start')
 def quiz_auto_start():
-    """4.1.5. Otomatik quiz başlatma - testuser ile 8. sınıf Türkçe sıfat-fiil konusu."""
+    """4.1.7. Otomatik quiz başlatma - testuser ile 8. sınıf Türkçe sıfat-fiil konusu."""
     try:
         from app.database.db_connection import DatabaseConnection
         from app.database.user_repository import UserRepository
@@ -197,7 +256,7 @@ def quiz_auto_start():
             'unit_id': unit_id,
             'topic_id': topic_id,
             'difficulty_level': 'random',
-            'quiz_mode': 'exam',
+            'quiz_mode': 'normal',  # Default to normal mode
             'timer_enabled': True,
             'timer_duration': 30,
             'question_count': 5
@@ -240,9 +299,9 @@ def quiz_auto_start():
         # Quiz screen'e yönlendir
         session_id = result['session_id']
         print(f"✅ Quiz session oluşturuldu, Session ID: {session_id}")
-        print(f"🔄 Quiz screen'e yönlendiriliyor: /quiz/screen?session_id={session_id}")
+        print(f"🔄 Quiz screen'e yönlendiriliyor: /quiz/normal?session_id={session_id}")
         
-        return redirect(f'/quiz/screen?session_id={session_id}')
+        return redirect(f'/quiz/normal?session_id={session_id}')
         
     except Exception as e:
         print(f"❌ Otomatik quiz başlatma hatası: {str(e)}")
@@ -250,9 +309,185 @@ def quiz_auto_start():
         traceback.print_exc()
         return f"Otomatik quiz başlatma hatası: {str(e)}", 500
 
+@quiz_bp.route('/quiz/auto-start-educational')
+def quiz_auto_start_educational():
+    """4.1.9. Otomatik öğretici quiz başlatma - testuser ile 8. sınıf Türkçe sıfat-fiil konusu."""
+    try:
+        from app.database.db_connection import DatabaseConnection
+        from app.database.user_repository import UserRepository
+        from app.services.quiz_session_service import QuizSessionService
+        import hashlib
+        
+        # Testuser'ı oluştur veya mevcut olanı bul
+        with DatabaseConnection() as conn:
+            # Önce testuser'ın var olup olmadığını kontrol et
+            conn.cursor.execute("SELECT id FROM users WHERE username = 'testuser'")
+            user_result = conn.cursor.fetchone()
+            
+            if user_result:
+                test_user_id = user_result['id']
+                print(f"✅ Testuser bulundu, ID: {test_user_id}")
+            else:
+                # Testuser yoksa oluştur
+                print("🆕 Testuser oluşturuluyor...")
+                
+                # Basit şifre hash'i oluştur
+                password_hash = hashlib.sha256("test123".encode()).hexdigest()
+                
+                # Direkt SQL ile kullanıcı oluştur
+                conn.cursor.execute("""
+                    INSERT INTO users (username, name_id, email, password_hash, first_name, last_name)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, ('testuser', 'testuser', 'testuser@example.com', password_hash, 'Test', 'User'))
+                
+                test_user_id = conn.cursor.lastrowid
+                conn.connection.commit()
+                
+                print(f"✅ Testuser oluşturuldu, ID: {test_user_id}")
+            
+            # Mevcut sınıfları kontrol et
+            conn.cursor.execute("SELECT id, name FROM grades WHERE is_active = 1")
+            grades = conn.cursor.fetchall()
+            print(f"📚 Mevcut sınıflar: {[g['name'] for g in grades]}")
+            
+            # 8. sınıf ID'sini bul
+            conn.cursor.execute("SELECT id FROM grades WHERE name = '8. Sınıf' AND is_active = 1")
+            grade_result = conn.cursor.fetchone()
+            if not grade_result:
+                # Eğer 8. sınıf yoksa, ilk sınıfı kullan
+                conn.cursor.execute("SELECT id FROM grades WHERE is_active = 1 LIMIT 1")
+                grade_result = conn.cursor.fetchone()
+                if not grade_result:
+                    return "Hiç sınıf bulunamadı", 404
+                grade_id = grade_result['id']
+                print(f"⚠️ 8. Sınıf bulunamadı, ilk sınıf kullanılıyor: {grade_id}")
+            else:
+                grade_id = grade_result['id']
+                print(f"✅ 8. Sınıf bulundu, ID: {grade_id}")
+            
+            # Mevcut dersleri kontrol et
+            conn.cursor.execute("SELECT id, name FROM subjects WHERE grade_id = %s AND is_active = 1", (grade_id,))
+            subjects = conn.cursor.fetchall()
+            print(f"📖 Mevcut dersler: {[s['name'] for s in subjects]}")
+            
+            # Türkçe dersi ID'sini bul
+            conn.cursor.execute("SELECT id FROM subjects WHERE name = 'Türkçe' AND grade_id = %s AND is_active = 1", (grade_id,))
+            subject_result = conn.cursor.fetchone()
+            if not subject_result:
+                # Eğer Türkçe yoksa, ilk dersi kullan
+                conn.cursor.execute("SELECT id FROM subjects WHERE grade_id = %s AND is_active = 1 LIMIT 1", (grade_id,))
+                subject_result = conn.cursor.fetchone()
+                if not subject_result:
+                    return "Hiç ders bulunamadı", 404
+                subject_id = subject_result['id']
+                print(f"⚠️ Türkçe dersi bulunamadı, ilk ders kullanılıyor: {subject_id}")
+            else:
+                subject_id = subject_result['id']
+                print(f"✅ Türkçe dersi bulundu, ID: {subject_id}")
+            
+            # Mevcut üniteleri kontrol et
+            conn.cursor.execute("SELECT id, name FROM units WHERE subject_id = %s AND is_active = 1", (subject_id,))
+            units = conn.cursor.fetchall()
+            print(f"📚 Mevcut üniteler: {[u['name'] for u in units]}")
+            
+            # Fiilimsiler ünitesi ID'sini bul
+            conn.cursor.execute("SELECT id FROM units WHERE name = 'Fiilimsiler' AND subject_id = %s AND is_active = 1", (subject_id,))
+            unit_result = conn.cursor.fetchone()
+            if not unit_result:
+                # Eğer Fiilimsiler yoksa, ilk üniteyi kullan
+                conn.cursor.execute("SELECT id FROM units WHERE subject_id = %s AND is_active = 1 LIMIT 1", (subject_id,))
+                unit_result = conn.cursor.fetchone()
+                if not unit_result:
+                    return "Hiç ünite bulunamadı", 404
+                unit_id = unit_result['id']
+                print(f"⚠️ Fiilimsiler ünitesi bulunamadı, ilk ünite kullanılıyor: {unit_id}")
+            else:
+                unit_id = unit_result['id']
+                print(f"✅ Fiilimsiler ünitesi bulundu, ID: {unit_id}")
+            
+            # Mevcut konuları kontrol et
+            conn.cursor.execute("SELECT id, name FROM topics WHERE unit_id = %s AND is_active = 1", (unit_id,))
+            topics = conn.cursor.fetchall()
+            print(f"📝 Mevcut konular: {[t['name'] for t in topics]}")
+            
+            # Sıfat-fiil konusu ID'sini bul
+            conn.cursor.execute("SELECT id FROM topics WHERE name = 'Sıfat-fiil' AND unit_id = %s AND is_active = 1", (unit_id,))
+            topic_result = conn.cursor.fetchone()
+            if not topic_result:
+                # Eğer Sıfat-fiil yoksa, ilk konuyu kullan
+                conn.cursor.execute("SELECT id FROM topics WHERE unit_id = %s AND is_active = 1 LIMIT 1", (unit_id,))
+                topic_result = conn.cursor.fetchone()
+                if not topic_result:
+                    return "Hiç konu bulunamadı", 404
+                topic_id = topic_result['id']
+                print(f"⚠️ Sıfat-fiil konusu bulunamadı, ilk konu kullanılıyor: {topic_id}")
+            else:
+                topic_id = topic_result['id']
+                print(f"✅ Sıfat-fiil konusu bulundu, ID: {topic_id}")
+        
+        # Quiz session oluştur
+        quiz_config = {
+            'grade_id': grade_id,
+            'subject_id': subject_id,
+            'unit_id': unit_id,
+            'topic_id': topic_id,
+            'difficulty_level': 'random',
+            'quiz_mode': 'educational',  # Educational mode
+            'timer_enabled': False,  # Educational mode doesn't use timer
+            'timer_duration': 0,
+            'question_count': 5
+        }
+        
+        print(f"🚀 Öğretici quiz session oluşturuluyor... Config: {quiz_config}")
+        
+        # Önce soruların var olup olmadığını kontrol et
+        with DatabaseConnection() as conn:
+            conn.cursor.execute("""
+                SELECT COUNT(*) as count FROM questions q
+                JOIN topics t ON q.topic_id = t.id
+                WHERE t.id = %s AND q.is_active = 1
+            """, (topic_id,))
+            question_count = conn.cursor.fetchone()['count']
+            print(f"📊 Bu konu için {question_count} soru bulundu")
+            
+            if question_count == 0:
+                # Eğer bu konuda soru yoksa, tüm konulardan soru sayısını kontrol et
+                conn.cursor.execute("""
+                    SELECT COUNT(*) as count FROM questions q
+                    JOIN topics t ON q.topic_id = t.id
+                    JOIN units u ON t.unit_id = u.id
+                    WHERE u.id = %s AND q.is_active = 1
+                """, (unit_id,))
+                unit_question_count = conn.cursor.fetchone()['count']
+                print(f"📊 Bu ünite için toplam {unit_question_count} soru bulundu")
+                
+                if unit_question_count == 0:
+                    return "Bu konu ve ünite için hiç soru bulunamadı. Lütfen önce soru verilerini yükleyin.", 404
+        
+        session_service = QuizSessionService()
+        success, result = session_service.start_quiz_session(test_user_id, quiz_config)
+        
+        if not success:
+            error_msg = result.get('error', 'Bilinmeyen hata')
+            print(f"❌ Öğretici quiz session oluşturulamadı: {error_msg}")
+            return f"Öğretici quiz session oluşturulamadı: {error_msg}", 500
+        
+        # Quiz screen'e yönlendir
+        session_id = result['session_id']
+        print(f"✅ Öğretici quiz session oluşturuldu, Session ID: {session_id}")
+        print(f"🔄 Öğretici quiz screen'e yönlendiriliyor: /quiz/educational?session_id={session_id}")
+        
+        return redirect(f'/quiz/educational?session_id={session_id}')
+        
+    except Exception as e:
+        print(f"❌ Otomatik öğretici quiz başlatma hatası: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return f"Otomatik öğretici quiz başlatma hatası: {str(e)}", 500
+
 @quiz_bp.route('/quiz/test-db')
 def test_database():
-    """4.1.6. Veritabanı bağlantısını test eder."""
+    """4.1.9. Veritabanı bağlantısını test eder."""
     try:
         from app.database.db_connection import DatabaseConnection
         
@@ -271,7 +506,7 @@ def test_database():
 
 @quiz_bp.route('/quiz/init-db')
 def initialize_database():
-    """4.1.7. Veritabanını manuel olarak başlatır."""
+    """4.1.10. Veritabanını manuel olarak başlatır."""
     try:
         from app.database.db_connection import DatabaseConnection
         from app.database.db_migrations import DatabaseMigrations

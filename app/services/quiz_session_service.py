@@ -177,10 +177,11 @@ class QuizSessionService:
             answer_result = self.calculate_answer_result(question_id, answer_data.get('user_answer_option_id'))
             
             # Cevap verilerini hazırla
+            # Puan hesaplama session_results'da yapılacak, burada sadece doğru/yanlış kaydediyoruz
             answer_update_data = {
                 'user_answer_option_id': answer_data.get('user_answer_option_id'),
                 'is_correct': answer_result['is_correct'],
-                'points_earned': answer_result['points_earned'],
+                'points_earned': 0,  # Puan hesaplama session_results'da yapılacak
                 'time_spent_seconds': answer_data.get('time_spent_seconds', 0)
             }
 
@@ -190,7 +191,7 @@ class QuizSessionService:
 
             return True, {
                 'is_correct': answer_result['is_correct'],
-                'points_earned': answer_result['points_earned'],
+                'points_earned': 0,  # Puan hesaplama session_results'da yapılacak
                 'correct_answer': answer_result['correct_answer']
             }
 
@@ -206,8 +207,14 @@ class QuizSessionService:
             if not results:
                 return False, {'error': 'Failed to calculate results'}
 
-            # Session'ı tamamla
-            if not self.session_repo.complete_session(session_id, results):
+            # Session'ı tamamla - eski format için uyumlu veri hazırla
+            session_completion_data = {
+                'total_score': int(results.get('totalScore', 0)),  # Puanı tam sayıya çevir
+                'correct_answers': results.get('correctAnswers', 0),
+                'completion_time_seconds': results.get('completionTime', 0)
+            }
+            
+            if not self.session_repo.complete_session(session_id, session_completion_data):
                 return False, {'error': 'Failed to complete session'}
 
             return True, results
@@ -266,8 +273,9 @@ class QuizSessionService:
             # Kullanıcının cevabını kontrol et
             is_correct = user_answer_id == correct_answer['id'] if user_answer_id else False
             
-            # Puan hesapla
-            points_earned = correct_answer['points'] if is_correct else 0
+            # Puan hesaplama artık session_results'da yapılıyor
+            # Burada sadece doğru/yanlış kontrolü yapıyoruz
+            points_earned = 0  # Puan hesaplama session_results'da yapılacak
 
             return {
                 'is_correct': is_correct,
@@ -298,8 +306,11 @@ class QuizSessionService:
             total_questions = len(questions)
             answered_questions = len([q for q in questions if q['user_answer_option_id'] is not None])
             correct_answers = len([q for q in questions if q['is_correct']])
-            total_score = sum([q['points_earned'] for q in questions])
-            max_possible_score = sum([q['points'] for q in questions])
+            
+            # Puan hesaplama: Her soru 100/toplam_soru puanına sahip
+            points_per_question = 100 / total_questions if total_questions > 0 else 0
+            total_score = correct_answers * points_per_question
+            max_possible_score = 100  # Toplam 100 puan
 
             # Tamamlanma süresini hesapla
             if session['start_time'] and session['end_time']:
@@ -307,19 +318,181 @@ class QuizSessionService:
             else:
                 completion_time = 0
 
+            # Başarı yüzdesi hesapla
+            score_percentage = round(total_score, 2)  # Zaten yüzde olarak hesaplandı
+            correct_percentage = round((correct_answers / total_questions * 100) if total_questions > 0 else 0, 2)
+
+            # Ders bazlı analiz
+            subjects_analysis = {}
+            difficulty_analysis = {'easy': 0, 'medium': 0, 'hard': 0}
+            
+            # Soru detaylarını hazırla
+            questions_details = []
+            for i, question in enumerate(questions):
+                # Soru durumunu belirle
+                if question['user_answer_option_id'] is None:
+                    status = 'skipped'
+                elif question['is_correct']:
+                    status = 'correct'
+                else:
+                    status = 'incorrect'
+                
+                # Soru detaylarını al
+                question_details = self.get_question_details(question['question_id'])
+                
+                # Ders analizi için
+                subject_name = question_details.get('subject_name') if question_details else question.get('subject_name', 'Bilinmeyen')
+                topic_name = question_details.get('topic_name') if question_details else question.get('topic_name', 'Bilinmeyen')
+                difficulty = question_details.get('difficulty_level') if question_details else question.get('difficulty_level', 'medium')
+                
+                if subject_name and subject_name != 'Bilinmeyen':
+                    if subject_name not in subjects_analysis:
+                        subjects_analysis[subject_name] = {'total': 0, 'correct': 0}
+                    subjects_analysis[subject_name]['total'] += 1
+                    if status == 'correct':
+                        subjects_analysis[subject_name]['correct'] += 1
+                
+                # Zorluk analizi için
+                if difficulty in difficulty_analysis:
+                    difficulty_analysis[difficulty] += 1
+                
+                # Cevap bilgilerini al
+                user_answer_text = question.get('user_answer_text', 'Cevaplanmadı')
+                correct_answer_text = question.get('correct_answer_text', 'Bilinmiyor')
+                explanation = question_details.get('description', 'Açıklama bulunamadı') if question_details else 'Açıklama bulunamadı'
+                
+                # Eğer session_results'dan gelen veriler yoksa, ayrı ayrı al
+                if user_answer_text == 'Cevaplanmadı' and question['user_answer_option_id'] is not None:
+                    user_answer = self.session_repo.get_answer_option_text(question['user_answer_option_id'])
+                    user_answer_text = user_answer if user_answer else 'Bilinmiyor'
+                
+                if correct_answer_text == 'Bilinmiyor':
+                    correct_answer = self.session_repo.get_correct_answer(question['question_id'])
+                    if correct_answer:
+                        correct_answer_text = correct_answer.get('name', 'Bilinmiyor')
+                
+                # Soru detayları
+                question_detail = {
+                    'text': question.get('question_text', 'Soru metni bulunamadı'),
+                    'subject': subject_name or 'Bilinmeyen',
+                    'topic': topic_name or 'Bilinmeyen',
+                    'difficulty': difficulty or 'medium',
+                    'status': status,
+                    'timeSpent': question.get('time_spent', 0),
+                    'userAnswer': user_answer_text,
+                    'correctAnswer': correct_answer_text,
+                    'explanation': explanation
+                }
+                questions_details.append(question_detail)
+
+            # Ders yüzdelerini hesapla
+            subjects_percentages = {}
+            for subject, data in subjects_analysis.items():
+                percentage = round((data['correct'] / data['total'] * 100) if data['total'] > 0 else 0, 2)
+                subjects_percentages[subject] = percentage
+
+            # Zorluk yüzdelerini hesapla
+            difficulty_percentages = {}
+            for difficulty, count in difficulty_analysis.items():
+                if count > 0:
+                    difficulty_percentages[difficulty] = round((count / total_questions * 100), 2)
+                else:
+                    difficulty_percentages[difficulty] = 0
+
+            # Kişisel öneriler
+            recommendations = self._generate_recommendations(
+                score_percentage, correct_percentage, subjects_percentages, difficulty_percentages
+            )
+
             return {
-                'total_score': total_score,
-                'max_possible_score': max_possible_score,
-                'correct_answers': correct_answers,
-                'total_questions': total_questions,
-                'answered_questions': answered_questions,
-                'completion_time_seconds': int(completion_time),
-                'percentage': round((total_score / max_possible_score * 100) if max_possible_score > 0 else 0, 2)
+                # Temel istatistikler
+                'totalScore': total_score,
+                'scorePercentage': score_percentage,
+                'correctAnswers': correct_answers,
+                'correctPercentage': correct_percentage,
+                'totalQuestions': total_questions,
+                'answeredQuestions': answered_questions,
+                'completionTime': int(completion_time),
+                
+                # Sıralama bilgileri (mock data)
+                'rank': 3,
+                'percentile': 10,
+                
+                # Detaylı analizler
+                'questions': questions_details,
+                'subjects': subjects_percentages,
+                'difficulty': difficulty_percentages,
+                'recommendations': recommendations,
+                
+                # Ek bilgiler
+                'sessionInfo': {
+                    'sessionId': session_id,
+                    'startTime': session.get('start_time'),
+                    'endTime': session.get('end_time'),
+                    'quizMode': session.get('quiz_mode', 'educational')
+                }
             }
 
         except Exception as e:
             print(f"❌ Session sonuçları hesaplama hatası: {e}")
             return None
+
+    def _generate_recommendations(self, score_percentage: float, correct_percentage: float, 
+                                subjects_percentages: Dict[str, float], 
+                                difficulty_percentages: Dict[str, float]) -> List[Dict[str, Any]]:
+        """Kişisel öneriler oluşturur."""
+        recommendations = []
+        
+        # Genel performans önerisi
+        if score_percentage < 60:
+            recommendations.append({
+                'icon': 'bi-exclamation-triangle',
+                'title': 'Daha Fazla Çalışma Gerekli',
+                'description': f'%{score_percentage} başarı oranınızı artırmak için daha fazla pratik yapmanızı öneriyoruz.',
+                'actionText': 'Tekrar Çalış',
+                'actionUrl': '/quiz/start?mode=practice'
+            })
+        elif score_percentage >= 85:
+            recommendations.append({
+                'icon': 'bi-star',
+                'title': 'Mükemmel Performans!',
+                'description': f'%{score_percentage} başarı oranınızla harika bir iş çıkardınız. Bu seviyeyi koruyun!',
+                'actionText': 'Daha Zor Sorular',
+                'actionUrl': '/quiz/start?difficulty=hard'
+            })
+        
+        # En zayıf ders önerisi
+        weakest_subject = min(subjects_percentages.items(), key=lambda x: x[1])
+        if weakest_subject[1] < 70:
+            recommendations.append({
+                'icon': 'bi-book',
+                'title': f'{weakest_subject[0]} Konularını Tekrar Et',
+                'description': f'{weakest_subject[0]} dersinde %{weakest_subject[1]} başarı oranınız var. Bu konuyu tekrar çalışmanızı öneriyoruz.',
+                'actionText': f'{weakest_subject[0]} Çalış',
+                'actionUrl': f'/quiz/start?subject={weakest_subject[0].lower()}'
+            })
+        
+        # Zorluk seviyesi önerisi
+        if difficulty_percentages.get('hard', 0) > 50:
+            recommendations.append({
+                'icon': 'bi-lightning',
+                'title': 'Zor Sorularda Başarılısınız',
+                'description': 'Zor sorularda iyi performans gösteriyorsunuz. Bu yeteneğinizi geliştirmeye devam edin.',
+                'actionText': 'Daha Zor Sorular',
+                'actionUrl': '/quiz/start?difficulty=hard'
+            })
+        
+        # En az 3 öneri olmasını sağla
+        while len(recommendations) < 3:
+            recommendations.append({
+                'icon': 'bi-graph-up',
+                'title': 'Sürekli Gelişim',
+                'description': 'Düzenli pratik yaparak performansınızı artırabilirsiniz.',
+                'actionText': 'Yeni Quiz Başlat',
+                'actionUrl': '/quiz/start'
+            })
+        
+        return recommendations[:3]  # En fazla 3 öneri döndür
     
     def update_session_timer(self, session_id: str, remaining_time_seconds: int) -> bool:
         """4.2.4. Session timer'ını günceller."""

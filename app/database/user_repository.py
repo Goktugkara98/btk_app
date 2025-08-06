@@ -75,7 +75,6 @@ class UserRepository:
     # -------------------------------------------------------------------------
     def create_user(self, username: str, email: str, hashed_password: str, **kwargs) -> Optional[int]:
         """4.3.1. Veritabanına yeni bir kullanıcı ekler."""
-        print(f"Creating user: username={username}, email={email}")  # Debug log
         self._ensure_connection()
         try:
             with self.db as conn:
@@ -95,19 +94,13 @@ class UserRepository:
                         values.append(kwargs[field])
                 
                 query = f"INSERT INTO users ({', '.join(fields)}) VALUES ({', '.join(['%s'] * len(fields))})"
-                print(f"Executing query: {query}")  # Debug log
-                print(f"With values: {values}")  # Debug log
                 conn.cursor.execute(query, values)
                 conn.connection.commit()
                 user_id = conn.cursor.lastrowid
-                print(f"Created user with ID: {user_id}")  # Debug log
                 return user_id
         except MySQLError as e:
-            print(f"MySQL error in create_user: {e}")  # Debug log
             if e.errno == 1062: # Duplicate entry
-                print(f"Duplicate entry error: {e}")
                 return None
-            print(f"Other MySQL error: {e}")
             return None
         finally:
             self._close_if_owned()
@@ -152,7 +145,6 @@ class UserRepository:
 
     def get_user_by_id(self, user_id: int) -> Optional[Dict]:
         """4.3.4. ID'ye göre bir kullanıcıyı getirir."""
-        print(f"Getting user by ID: {user_id}")  # Debug log
         self._ensure_connection()
         try:
             with self.db as conn:
@@ -165,10 +157,8 @@ class UserRepository:
                 """
                 conn.cursor.execute(query, (user_id,))
                 result = conn.cursor.fetchone()
-                print(f"Query result: {result}")  # Debug log
                 return result
         except MySQLError as e:
-            print(f"MySQL error in get_user_by_id: {e}")  # Debug log
             return None
         finally:
             self._close_if_owned()
@@ -290,7 +280,6 @@ class UserRepository:
 
     def check_username_or_email_exists(self, username: str, email: str) -> Tuple[bool, bool]:
         """4.3.11. Hem kullanıcı adı hem de email'in var olup olmadığını kontrol eder."""
-        print(f"Checking username/email exists: username={username}, email={email}")  # Debug log
         self._ensure_connection()
         try:
             with self.db as conn:
@@ -306,10 +295,8 @@ class UserRepository:
                 email_result = conn.cursor.fetchone()
                 email_exists = email_result['count'] > 0
 
-                print(f"Username exists: {username_exists}, Email exists: {email_exists}")  # Debug log
                 return username_exists, email_exists
         except MySQLError as e:
-            print(f"MySQL error in check_username_or_email_exists: {e}")  # Debug log
             return False, False
         finally:
             self._close_if_owned()

@@ -76,6 +76,11 @@
 }
 
 /* Mode Icons */
+.option-icon.normal {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48bb78;
+}
+
 .option-icon.educational {
     background: rgba(102, 126, 234, 0.1);
     color: #667eea;

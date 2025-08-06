@@ -55,9 +55,6 @@ class JSONDataLoader:
                     
                     if grade_level:
                         self.grades_data[grade_level] = grade_info
-                        print(f"✅ Grade {grade_level} yüklendi: {file_path.name}")
-                    else:
-                        print(f"⚠️  Grade seviyesi bulunamadı: {file_path.name}")
                         
             except Exception as e:
                 print(f"❌ Dosya okuma hatası {file_path.name}: {e}")
@@ -315,8 +312,6 @@ ON DUPLICATE KEY UPDATE
         Returns:
             (grades_sql, subjects_sql, units_sql, topics_sql) tuple
         """
-        print("📚 JSON verileri işleniyor...")
-        
         # 1. Grade dosyalarını yükle
         self.load_all_grade_files()
         
@@ -334,11 +329,6 @@ ON DUPLICATE KEY UPDATE
         subjects_sql = ""  # grade_id_map gerektirir
         units_sql = ""     # subject_id_map gerektirir
         topics_sql = ""    # unit_id_map gerektirir
-        
-        print(f"✅ {len(self.grades_data)} grade yüklendi")
-        print(f"✅ {len(self.subjects_data)} ders çıkarıldı")
-        print(f"✅ {len(self.units_data)} ünite çıkarıldı")
-        print(f"✅ {len(self.topics_data)} konu çıkarıldı")
         
         return grades_sql, subjects_sql, units_sql, topics_sql
     
@@ -364,9 +354,6 @@ ON DUPLICATE KEY UPDATE
                     result = conn.cursor.fetchone()
                     if result:
                         grade_id_map[grade_level] = result['id']
-                        print(f"   🔗 Grade {grade_level} -> ID {result['id']}")
-                    else:
-                        print(f"   ⚠️  Grade {grade_level} için ID bulunamadı")
                         
         except Exception as e:
             print(f"❌ Grade ID map oluşturma hatası: {e}")
@@ -395,9 +382,6 @@ ON DUPLICATE KEY UPDATE
                     result = conn.cursor.fetchone()
                     if result:
                         subject_id_map[subject_code] = result['id']
-                        print(f"   🔗 {subject_code} (Grade {grade_level}) -> ID {result['id']}")
-                    else:
-                        print(f"   ⚠️  {subject_code} (Grade {grade_level}) için ID bulunamadı")
                         
         except Exception as e:
             print(f"❌ Subject ID map oluşturma hatası: {e}")
@@ -426,9 +410,6 @@ ON DUPLICATE KEY UPDATE
                     result = conn.cursor.fetchone()
                     if result:
                         unit_id_map[unit_id] = result['id']
-                        print(f"   🔗 {unit_id} -> ID {result['id']}")
-                    else:
-                        print(f"   ⚠️  {unit_id} için ID bulunamadı")
                         
         except Exception as e:
             print(f"❌ Unit ID map oluşturma hatası: {e}")

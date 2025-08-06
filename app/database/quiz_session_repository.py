@@ -78,18 +78,16 @@ class QuizSessionRepository:
                 session_db_id = conn.cursor.lastrowid
                 conn.connection.commit()
                 
-                print(f"✅ Quiz session oluşturuldu: {session_data['session_id']} (DB ID: {session_db_id})")
                 return True, session_db_id
                 
         except Exception as e:
+            # Keep only critical error
             print(f"❌ Quiz session oluşturma hatası: {e}")
             return False, None
 
     def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
         """4.2.2. Session ID'ye göre quiz session'ı getirir."""
         try:
-            print(f"🔍 [Repository] Session aranıyor: {session_id}")
-            
             with self.db as conn:
                 conn.cursor.execute("""
                     SELECT qs.*, 
@@ -106,21 +104,9 @@ class QuizSessionRepository:
                 """, (session_id,))
                 
                 session = conn.cursor.fetchone()
-                
-                if session:
-                    print(f"✅ [Repository] Session bulundu: {session['id']}")
-                else:
-                    print(f"❌ [Repository] Session bulunamadı: {session_id}")
-                    
-                    # Mevcut session'ları listele (debug için)
-                    conn.cursor.execute("SELECT session_id, id, status FROM quiz_sessions LIMIT 5")
-                    existing_sessions = conn.cursor.fetchall()
-                    print(f"📋 [Repository] Mevcut session'lar: {existing_sessions}")
-                
                 return session
                 
         except Exception as e:
-            print(f"❌ Quiz session getirme hatası: {e}")
             return None
 
     def get_session_by_id(self, session_db_id: int) -> Optional[Dict[str, Any]]:
@@ -145,7 +131,6 @@ class QuizSessionRepository:
                 return session
                 
         except Exception as e:
-            print(f"❌ Quiz session getirme hatası: {e}")
             return None
 
     def update_session(self, session_id: str, update_data: Dict[str, Any]) -> bool:
@@ -166,7 +151,6 @@ class QuizSessionRepository:
                 return True
                 
         except Exception as e:
-            print(f"❌ Quiz session güncelleme hatası: {e}")
             return False
 
     def update_session_timer(self, session_id: str, remaining_time_seconds: int) -> bool:
@@ -184,7 +168,6 @@ class QuizSessionRepository:
                 return True
                 
         except Exception as e:
-            print(f"❌ Quiz session timer güncelleme hatası: {e}")
             return False
 
     def complete_session(self, session_id: str, results: Dict[str, Any]) -> bool:
@@ -211,7 +194,6 @@ class QuizSessionRepository:
                 return True
                 
         except Exception as e:
-            print(f"❌ Quiz session tamamlama hatası: {e}")
             return False
 
     # -------------------------------------------------------------------------
@@ -233,7 +215,6 @@ class QuizSessionRepository:
                 return True
                 
         except Exception as e:
-            print(f"❌ Session soruları ekleme hatası: {e}")
             return False
 
     def get_session_questions(self, session_id: int) -> List[Dict[str, Any]]:
@@ -256,7 +237,6 @@ class QuizSessionRepository:
                 return questions
                 
         except Exception as e:
-            print(f"❌ Session soruları getirme hatası: {e}")
             return []
 
     def update_answer(self, session_id: int, question_id: int, answer_data: Dict[str, Any]) -> bool:
@@ -285,7 +265,6 @@ class QuizSessionRepository:
                 return True
                 
         except Exception as e:
-            print(f"❌ Cevap güncelleme hatası: {e}")
             return False
 
     def get_session_results(self, session_id: str) -> Dict[str, Any]:
@@ -307,9 +286,9 @@ class QuizSessionRepository:
                            q.name as question_text,
                            q.points,
                            qo.id as correct_answer_id,
-                           qo.name as correct_answer,
+                           qo.name as correct_answer_text,
                            uao.id as user_answer_id,
-                           uao.name as user_answer,
+                           uao.name as user_answer_text,
                            CASE 
                                WHEN qsq.user_answer_option_id = qo.id THEN 1 
                                ELSE 0 
@@ -334,7 +313,6 @@ class QuizSessionRepository:
                 }
                 
         except Exception as e:
-            print(f"❌ Session sonuçları getirme hatası: {e}")
             return {}
 
     # -------------------------------------------------------------------------
@@ -381,7 +359,6 @@ class QuizSessionRepository:
                 return questions
                 
         except Exception as e:
-            print(f"❌ Rasgele soru getirme hatası: {e}")
             return []
 
     def get_random_questions_by_subject(self, subject_id: int, difficulty: str, count: int) -> List[Dict[str, Any]]:
@@ -426,7 +403,6 @@ class QuizSessionRepository:
                 return questions
                 
         except Exception as e:
-            print(f"❌ Subject'e göre rasgele soru getirme hatası: {e}")
             return []
 
     # -------------------------------------------------------------------------
@@ -438,7 +414,7 @@ class QuizSessionRepository:
         try:
             with self.db as conn:
                 conn.cursor.execute("""
-                    SELECT id, name, points
+                    SELECT id, name
                     FROM question_options 
                     WHERE question_id = %s AND is_correct = 1
                     LIMIT 1
@@ -448,7 +424,6 @@ class QuizSessionRepository:
                 return correct_answer
                 
         except Exception as e:
-            print(f"❌ Doğru cevap getirme hatası: {e}")
             return None
 
     def get_question_options(self, question_id: int) -> List[Dict[str, Any]]:
@@ -465,7 +440,6 @@ class QuizSessionRepository:
                 return options
                 
         except Exception as e:
-            print(f"❌ Soru seçenekleri getirme hatası: {e}")
             return []
 
     def get_question_details(self, question_id: int) -> Optional[Dict[str, Any]]:
@@ -487,5 +461,21 @@ class QuizSessionRepository:
                 return question
                 
         except Exception as e:
-            print(f"❌ Soru detayları getirme hatası: {e}")
+            return None
+
+    def get_answer_option_text(self, answer_option_id: int) -> Optional[str]:
+        """4.5.4. Cevap seçeneği metnini getirir."""
+        try:
+            with self.db as conn:
+                conn.cursor.execute("""
+                    SELECT name FROM question_options 
+                    WHERE id = %s
+                """, (answer_option_id,))
+                
+                result = conn.cursor.fetchone()
+                if result:
+                    return result[0]
+                return None
+                
+        except Exception as e:
             return None 

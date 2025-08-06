@@ -76,7 +76,6 @@ def main():
     try:
         if args.dry_run:
             print("🔍 DRY RUN MODU - Gerçek veritabanı işlemi yapılmayacak")
-            print("="*60)
         
         if args.file:
             # Tek dosya yükle
@@ -85,9 +84,7 @@ def main():
                 print(f"❌ Dosya bulunamadı: {file_path}")
                 return 1
             
-            print(f"📁 Tek dosya yükleniyor: {file_path}")
             success, total = loader.process_question_file(str(file_path))
-            print(f"\n📊 Sonuç: {success}/{total} question başarıyla eklendi")
             
         elif args.dir:
             # Belirli dizindeki dosyaları yükle
@@ -96,7 +93,6 @@ def main():
                 print(f"❌ Dizin bulunamadı: {dir_path}")
                 return 1
             
-            print(f"📁 Dizin yükleniyor: {dir_path}")
             json_files = list(dir_path.rglob("*.json"))
             
             if not json_files:
@@ -111,27 +107,17 @@ def main():
                 total_success += success
                 total_questions += total
             
-            print(f"\n📊 Dizin Sonucu: {total_success}/{total_questions} question başarıyla eklendi")
-            
         else:
             # Tüm dosyaları yükle
-            print("📁 Tüm question dosyaları yükleniyor...")
             results = loader.process_all_question_files()
             
             # Sonuçları özetle
             total_success = 0
             total_questions = 0
             
-            print("\n" + "="*60)
-            print("SONUÇ ÖZETİ")
-            print("="*60)
-            
             for filename, (success, total) in results.items():
-                print(f"{filename}: {success}/{total} question eklendi")
                 total_success += success
                 total_questions += total
-            
-            print(f"\n📊 Toplam: {total_success}/{total_questions} question başarıyla eklendi")
         
         return 0
         
