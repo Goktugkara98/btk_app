@@ -1,6 +1,6 @@
-# 🎓 BTK Uygulaması
+# 🎓 BTK Quiz App - AI-Powered Educational Platform
 
-Modern web teknolojileri ile geliştirilmiş, eğitim odaklı quiz uygulaması. Flask framework'ü kullanılarak geliştirilmiş, modüler yapıda ve ölçeklenebilir bir eğitim platformu.
+Modern web teknolojileri ile geliştirilmiş, yapay zeka destekli eğitim odaklı quiz uygulaması. Flask framework'ü kullanılarak geliştirilmiş, modüler yapıda ve ölçeklenebilir bir eğitim platformu.
 
 ## 📋 İçindekiler
 
@@ -20,18 +20,25 @@ Modern web teknolojileri ile geliştirilmiş, eğitim odaklı quiz uygulaması. 
 ## 🚀 Özellikler
 
 ### 🎯 **Temel Özellikler**
-- ✅ **Kullanıcı Yönetimi**: Kayıt, giriş, profil yönetimi
+- ✅ **Kullanıcı Yönetimi**: Kayıt, giriş, profil yönetimi, avatar yükleme
 - ✅ **Quiz Sistemi**: Dinamik soru yükleme ve puanlama
 - ✅ **Konu Bazlı Öğrenme**: Sınıf, ders, ünite ve konu organizasyonu
 - ✅ **Gerçek Zamanlı İlerleme**: Quiz sırasında anlık takip
-- ✅ **Sonuç Analizi**: Detaylı performans raporları
+- ✅ **Sonuç Analizi**: Detaylı performans raporları ve öneriler
 - ✅ **Responsive Tasarım**: Mobil uyumlu arayüz
+
+### 🤖 **AI Destekli Özellikler**
+- ✅ **AI Chat Sistemi**: Gemini API entegrasyonu ile akıllı asistan
+- ✅ **Eğitici Mod**: AI destekli açıklamalı quiz modu
+- ✅ **Akıllı Rehberlik**: Soru çözümünde AI yardımı
+- ✅ **Kişiselleştirilmiş Öğrenme**: AI tabanlı öneriler
+- ✅ **Gerçek Zamanlı Destek**: Quiz sırasında AI sohbet
 
 ### 🔧 **Teknik Özellikler**
 - ✅ **Modüler Mimari**: Blueprint tabanlı yapı
-- ✅ **Service Layer**: İş mantığı ayrımı
+- ✅ **Service Layer**: İş mantığı ayrımı (Repository-Service-Controller)
 - ✅ **Veritabanı Migrasyonu**: Otomatik tablo oluşturma
-- ✅ **Güvenlik**: JWT token, şifre hashleme, CSRF koruması
+- ✅ **Güvenlik**: Session yönetimi, şifre hashleme, CSRF koruması
 - ✅ **Hata Yönetimi**: Kapsamlı error handling
 - ✅ **Logging**: Detaylı log sistemi
 
@@ -41,6 +48,7 @@ Modern web teknolojileri ile geliştirilmiş, eğitim odaklı quiz uygulaması. 
 - ✅ **Açıklamalı Cevaplar**: Öğrenme için detaylı açıklamalar
 - ✅ **İstatistikler**: Kullanıcı performans analizi
 - ✅ **Konu Bazlı Filtreleme**: Hedefli öğrenme
+- ✅ **İki Quiz Modu**: Normal (zamanlı) ve Educational (AI destekli)
 
 ## 🏗️ Teknoloji Stack'i
 
@@ -48,7 +56,13 @@ Modern web teknolojileri ile geliştirilmiş, eğitim odaklı quiz uygulaması. 
 - **Flask 2.3.3** - Web framework
 - **Python 3.8+** - Programlama dili
 - **MySQL 8.0+** - Veritabanı
-- **mysql-connector-python** - Veritabanı bağlantısı
+- **mysql-connector-python 8.1.0** - Veritabanı bağlantısı
+- **Werkzeug 2.3.7** - WSGI utilities
+- **Jinja2 3.1.2** - Template engine
+
+### **AI & External Services**
+- **Google Gemini API** - AI chat ve asistan özellikleri
+- **Requests 2.31.0** - HTTP client
 
 ### **Frontend**
 - **HTML5/CSS3** - Yapı ve stil
@@ -57,10 +71,8 @@ Modern web teknolojileri ile geliştirilmiş, eğitim odaklı quiz uygulaması. 
 - **GSAP** - Animasyonlar
 
 ### **Araçlar**
-- **python-dotenv** - Ortam değişkenleri
-- **psutil** - Sistem monitörü
-- **Werkzeug** - WSGI utilities
-- **Jinja2** - Template engine
+- **python-dotenv 1.0.0** - Ortam değişkenleri
+- **psutil 5.9.5** - Sistem monitörü
 
 ## 📁 Proje Yapısı
 
@@ -71,18 +83,20 @@ btk_app/
 ├── config.py                    # Konfigürasyon ayarları
 ├── requirements.txt             # Python bağımlılıkları
 ├── .env_example                 # Ortam değişkenleri örneği
-├── DATABASE_STRUCTURE.md        # Veritabanı yapısı dokümantasyonu
+├── deploy_setup.py              # Deployment yardımcısı
 │
 ├── app/                         # Ana uygulama klasörü
 │   ├── __init__.py             # Uygulama başlatıcı
 │   │
 │   ├── database/               # Veritabanı modülü
-│   │   ├── README.md           # Veritabanı dokümantasyonu
 │   │   ├── db_connection.py    # Veritabanı bağlantısı
 │   │   ├── db_migrations.py    # Tablo oluşturma
 │   │   ├── quiz_data_loader.py  # Quiz veri yükleme
 │   │   ├── curriculum_data_loader.py # Müfredat veri yükleme
 │   │   ├── user_repository.py  # Kullanıcı repository
+│   │   ├── quiz_repository.py  # Quiz repository
+│   │   ├── quiz_session_repository.py # Quiz session repository
+│   │   ├── chat_repository.py  # AI chat repository
 │   │   └── schemas/            # Veritabanı şemaları
 │   │       ├── grades_schema.py
 │   │       ├── subjects_schema.py
@@ -90,16 +104,19 @@ btk_app/
 │   │       ├── topics_schema.py
 │   │       ├── questions_schema.py
 │   │       ├── question_options_schema.py
-│   │       └── users_schema.py
+│   │       ├── users_schema.py
+│   │       ├── quiz_sessions_schema.py
+│   │       ├── chat_sessions_schema.py
+│   │       └── chat_messages_schema.py
 │   │
 │   ├── routes/                 # Route modülü
-│   │   ├── README.md           # Routes dokümantasyonu
 │   │   ├── __init__.py         # Route başlatıcı
 │   │   ├── api/                # API rotaları
 │   │   │   ├── api_routes.py   # Ana API blueprint
 │   │   │   ├── user_routes.py  # Kullanıcı API
 │   │   │   ├── quiz_routes.py  # Quiz API
-│   │   │   └── system_routes.py # Sistem API
+│   │   │   ├── system_routes.py # Sistem API
+│   │   │   └── ai_chat_v2_routes.py # AI Chat API
 │   │   └── pages/              # Sayfa rotaları
 │   │       ├── routes.py       # Ana sayfa blueprint
 │   │       ├── main_routes.py  # Ana sayfa rotaları
@@ -108,12 +125,16 @@ btk_app/
 │   │       └── user_routes.py  # Kullanıcı sayfa rotaları
 │   │
 │   ├── services/               # Servis modülü
-│   │   ├── README.md           # Services dokümantasyonu
 │   │   ├── __init__.py         # Servis başlatıcı
 │   │   ├── services.py         # Servis fabrikası
 │   │   ├── user_service.py     # Kullanıcı servisi
 │   │   ├── quiz_service.py     # Quiz servisi
-│   │   └── system_service.py   # Sistem servisi
+│   │   ├── quiz_session_service.py # Quiz session servisi
+│   │   ├── system_service.py   # Sistem servisi
+│   │   ├── auth_service.py     # Kimlik doğrulama servisi
+│   │   ├── gemini_api_service.py # Gemini AI servisi
+│   │   ├── chat_session_service.py # AI chat session servisi
+│   │   └── chat_message_service.py # AI chat message servisi
 │   │
 │   ├── static/                 # Statik dosyalar
 │   │   ├── css/                # Stil dosyaları
@@ -122,6 +143,9 @@ btk_app/
 │   │   │   ├── index/          # Ana sayfa stilleri
 │   │   │   ├── login/          # Giriş sayfası stilleri
 │   │   │   ├── quiz/           # Quiz sayfası stilleri
+│   │   │   ├── quiz_educational/ # AI destekli quiz stilleri
+│   │   │   ├── quiz_normal/    # Normal quiz stilleri
+│   │   │   ├── quiz_results/   # Quiz sonuç stilleri
 │   │   │   ├── profile/        # Profil sayfası stilleri
 │   │   │   └── register/       # Kayıt sayfası stilleri
 │   │   ├── js/                 # JavaScript dosyaları
@@ -130,6 +154,9 @@ btk_app/
 │   │   │   ├── index/          # Ana sayfa scriptleri
 │   │   │   ├── login/          # Giriş sayfası scriptleri
 │   │   │   ├── quiz/           # Quiz scriptleri
+│   │   │   ├── quiz_educational/ # AI destekli quiz scriptleri
+│   │   │   ├── quiz_normal/    # Normal quiz scriptleri
+│   │   │   ├── quiz_results/   # Quiz sonuç scriptleri
 │   │   │   ├── profile/        # Profil scriptleri
 │   │   │   ├── register/       # Kayıt scriptleri
 │   │   │   └── utils/          # Yardımcı fonksiyonlar
@@ -145,21 +172,15 @@ btk_app/
 │   │   ├── register.html       # Kayıt sayfası
 │   │   ├── profile.html        # Profil sayfası
 │   │   ├── quiz_start.html     # Quiz başlatma
-│   │   ├── quiz_screen.html    # Quiz ekranı
+│   │   ├── quiz_normal.html    # Normal quiz ekranı
+│   │   ├── quiz_educational.html # AI destekli quiz ekranı
 │   │   └── quiz_results.html   # Quiz sonuçları
 │   │
 │   ├── data/                   # Veri dosyaları
-<<<<<<< HEAD
 │   │   ├── curriculum_structure/ # Müfredat yapısı
 │   │   │   ├── grade_8.json    # 8. sınıf müfredatı
 │   │   │   └── grade_9.json    # 9. sınıf müfredatı
 │   │   ├── quiz_banks/         # Soru bankaları
-=======
-│   │   ├── lessons/            # Ders verileri
-│   │   │   ├── grade_8.json    # 8. sınıf dersleri
-│   │   │   └── grade_9.json    # 9. sınıf dersleri
-│   │   ├── question_banks/     # Soru bankaları
->>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
 │   │   │   ├── grade_8/        # 8. sınıf soruları
 │   │   │   │   └── turkish/    # Türkçe soruları
 │   │   │   │       └── verbals/ # Fiilimsiler
@@ -170,10 +191,6 @@ btk_app/
 │   │   └── quiz-data.json      # Quiz verileri
 │   │
 │   └── utils/                  # Yardımcı modüller
-<<<<<<< HEAD
-=======
-│       └── auth_utils.py       # Kimlik doğrulama yardımcıları
->>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
 │
 └── instance/                   # Instance klasörü (Flask)
 ```
@@ -232,6 +249,9 @@ DB_PORT=3306
 # Uygulama Konfigürasyonu
 SECRET_KEY=your-secret-key-here
 FLASK_DEBUG=True
+
+# AI Servisleri (Opsiyonel)
+GEMINI_API_KEY=your-gemini-api-key-here
 ```
 
 ### **2. Veritabanı Ayarları**
@@ -278,21 +298,22 @@ python main.py
 ### **Otomatik Kurulum**
 Uygulama ilk çalıştırıldığında:
 1. Veritabanı tabloları otomatik oluşturulur
-2. Örnek veriler yüklenir
+2. Müfredat verileri JSON dosyalarından yüklenir
 3. Soru bankaları otomatik yüklenir
-
-### **Manuel Veri Yükleme**
-```bash
-# Soru verilerini manuel yüklemek için
-<<<<<<< HEAD
-python -m app.database.quiz_data_cli
-=======
-python -m app.database.load_questions
->>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
-```
+4. Chat session ve message tabloları oluşturulur
 
 ### **Veritabanı Yapısı**
-Detaylı veritabanı yapısı için: [DATABASE_STRUCTURE.md](DATABASE_STRUCTURE.md)
+- **grades**: Sınıf bilgileri
+- **subjects**: Ders bilgileri
+- **units**: Ünite bilgileri
+- **topics**: Konu bilgileri
+- **questions**: Soru bilgileri
+- **question_options**: Soru seçenekleri
+- **users**: Kullanıcı bilgileri
+- **quiz_sessions**: Quiz oturumları
+- **quiz_session_questions**: Quiz oturum soruları
+- **chat_sessions**: AI chat oturumları
+- **chat_messages**: AI chat mesajları
 
 ## 🔧 API Dokümantasyonu
 
@@ -300,17 +321,33 @@ Detaylı veritabanı yapısı için: [DATABASE_STRUCTURE.md](DATABASE_STRUCTURE.
 ```http
 POST /api/register          # Kullanıcı kaydı
 POST /api/login             # Kullanıcı girişi
+POST /api/logout            # Kullanıcı çıkışı
 GET  /api/users/profile     # Profil bilgileri
 PUT  /api/users/profile     # Profil güncelleme
+POST /api/users/avatar      # Avatar yükleme
 ```
 
 ### **Quiz API'leri**
 ```http
+GET  /api/quiz/grades       # Sınıf listesi
+GET  /api/quiz/subjects     # Ders listesi
+GET  /api/quiz/units        # Ünite listesi
 GET  /api/quiz/topics       # Konu listesi
 POST /api/quiz/start        # Quiz başlatma
-GET  /api/quiz/questions    # Soru listesi
-POST /api/quiz/submit       # Quiz gönderme
-GET  /api/quiz/results      # Sonuçlar
+GET  /api/quiz/session/{id} # Quiz oturum bilgisi
+POST /api/quiz/answer       # Cevap gönderme
+POST /api/quiz/complete     # Quiz tamamlama
+GET  /api/quiz/results      # Quiz sonuçları
+```
+
+### **AI Chat API'leri**
+```http
+GET  /api/ai/system/status  # AI sistem durumu
+GET  /api/ai/system/health  # AI sistem sağlığı
+POST /api/ai/session/start  # AI chat oturumu başlatma
+POST /api/ai/chat/message   # AI mesaj gönderme
+GET  /api/ai/chat/history   # AI chat geçmişi
+POST /api/ai/chat/quick-action # AI hızlı aksiyon
 ```
 
 ### **Sistem API'leri**
@@ -319,8 +356,6 @@ GET /api/health             # Sistem sağlığı
 GET /api/status             # Sistem durumu
 GET /api/version            # Uygulama versiyonu
 ```
-
-Detaylı API dokümantasyonu için: [app/routes/README.md](app/routes/README.md)
 
 ## 🧪 Test
 
@@ -341,7 +376,7 @@ python main.py
 ```bash
 # API endpoint'lerini test edin
 curl http://localhost:5000/api/health
-curl http://localhost:5000/api/quiz/topics
+curl http://localhost:5000/api/quiz/grades
 ```
 
 ## 📦 Deployment
@@ -374,18 +409,19 @@ MYSQL_HOST=your-db-host
 MYSQL_USER=your-db-user
 MYSQL_PASSWORD=your-db-password
 MYSQL_DB=your-db-name
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
 ## 🔒 Güvenlik
 
 ### **Uygulanan Güvenlik Önlemleri**
-- ✅ **JWT Token Authentication**
-- ✅ **Password Hashing (bcrypt)**
+- ✅ **Session Management**
+- ✅ **Password Hashing (Werkzeug)**
 - ✅ **CSRF Protection**
 - ✅ **SQL Injection Prevention**
 - ✅ **XSS Protection**
 - ✅ **Input Validation**
-- ✅ **Session Management**
+- ✅ **Secure File Uploads**
 
 ### **Güvenlik Kontrol Listesi**
 - [ ] SECRET_KEY production'da değiştirildi
@@ -407,6 +443,15 @@ sudo systemctl status mysql
 python -c "from app.database.db_connection import DatabaseConnection; db = DatabaseConnection(); print('Bağlantı başarılı')"
 ```
 
+#### **AI Servisleri Hatası**
+```bash
+# Gemini API key'ini kontrol edin
+echo $GEMINI_API_KEY
+
+# AI servislerini test edin
+curl http://localhost:5000/api/ai/system/health
+```
+
 #### **Port Çakışması**
 ```bash
 # Port 5000'i kullanan işlemleri kontrol edin
@@ -415,16 +460,6 @@ netstat -tulpn | grep :5000
 # Farklı port kullanın
 export FLASK_RUN_PORT=5001
 python main.py
-```
-
-#### **Import Hatası**
-```bash
-# Python path'ini kontrol edin
-export PYTHONPATH="${PYTHONPATH}:/path/to/btk_app"
-
-# Sanal ortamı yeniden aktifleştirin
-deactivate
-source venv/bin/activate
 ```
 
 ### **Log Dosyaları**
@@ -472,11 +507,8 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 - **Email**: ferdigoktugkara@gmail.com
 - **GitHub**: https://github.com/goktugkara98
 
+---
 
 **Son Güncelleme**: 2025-01-27  
-**Versiyon**: 2.0.0  
-<<<<<<< HEAD
-**Durum**: Developement
-=======
-**Durum**: Developement
->>>>>>> d57a980d0339824723b3feb8a0f668bcef7e27af
+**Versiyon**: 3.0.0  
+**Durum**: Production Ready
