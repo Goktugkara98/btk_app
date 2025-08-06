@@ -38,7 +38,6 @@ try:
     from app.services import get_user_service
     from app.services.auth_service import logout_user
 except ImportError as e:
-    print(f"Warning: Could not import services: {e}")
     get_user_service = None
 
 # =============================================================================
@@ -127,12 +126,8 @@ def register():
     if not data:
         return jsonify({'status': 'error', 'message': 'Invalid JSON'}), 400
 
-    print(f"Register data received: {data}")  # Debug log
-
     # Register iş mantığı servis katmanına devredildi.
     success, result = user_service.register_user(data)
-    
-    print(f"Register result: success={success}, result={result}")  # Debug log
 
     if success:
         return jsonify({
@@ -240,8 +235,6 @@ def update_profile():
     data = request.get_json()
     if not data:
         return jsonify({'status': 'error', 'message': 'Invalid JSON'}), 400
-
-    print(f"Profile update data received: {data}")  # Debug log
 
     user_id = session.get('user_id')
     success, result = user_service.update_user_profile(user_id, data)

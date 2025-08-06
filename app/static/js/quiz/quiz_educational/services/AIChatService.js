@@ -9,6 +9,7 @@ class AIChatService {
         this.baseUrl = '/api/ai';
         this.isEnabled = false;
         this.chatSessionId = null;
+        console.log('[AIChatService] Constructor initialized');
         this.checkServiceStatus();
     }
 
@@ -16,22 +17,23 @@ class AIChatService {
      * AI servisinin durumunu kontrol eder
      */
     async checkServiceStatus() {
+        console.log('[AIChatService] checkServiceStatus called');
+        
         try {
             const response = await fetch(`${this.baseUrl}/system/status`);
             const data = await response.json();
             
-            console.log('🔍 Full AI Chat Response:', data);
+            console.log('[AIChatService] Status check response:', data);
             
             if (data.status === 'success') {
                 this.isEnabled = data.data.available;
-                console.log('🤖 AI Chat Service Status:', data.data);
-                console.log('✅ AI Chat Enabled:', this.isEnabled);
+                console.log('[AIChatService] Service enabled:', this.isEnabled);
             } else {
-                console.warn('⚠️ AI Chat Service check failed:', data.message);
+                console.warn('[AIChatService] Service check failed:', data.message);
                 this.isEnabled = false;
             }
         } catch (error) {
-            console.error('❌ AI Chat Service status check error:', error);
+            console.error('[AIChatService] Status check error:', error);
             this.isEnabled = false;
         }
     }
@@ -40,6 +42,7 @@ class AIChatService {
      * Servisin aktif olup olmadığını döndürür
      */
     isServiceEnabled() {
+        console.log('[AIChatService] isServiceEnabled called, returning:', this.isEnabled);
         return this.isEnabled;
     }
 
@@ -51,7 +54,10 @@ class AIChatService {
      * @returns {Promise<Object>} Session bilgileri
      */
     async startChatSession(quizSessionId, questionId, context = {}) {
+        console.log('[AIChatService] startChatSession called with:', { quizSessionId, questionId, context });
+        
         if (!this.isEnabled) {
+            console.warn('[AIChatService] Cannot start chat session - service not enabled');
             return {
                 success: false,
                 error: 'AI Chat service is not available'
@@ -61,37 +67,44 @@ class AIChatService {
         try {
             // Quiz session + question ID kombinasyonu olarak chat session ID oluştur
             const chatSessionId = `chat_${quizSessionId}_${questionId}`;
+            console.log('[AIChatService] Generated chat session ID:', chatSessionId);
+            
+            const requestBody = {
+                quiz_session_id: quizSessionId,
+                question_id: questionId,
+                chat_session_id: chatSessionId, // Önceden oluşturulan session ID
+                context: context
+            };
+            
+            console.log('[AIChatService] Sending start session request:', requestBody);
             
             const response = await fetch(`${this.baseUrl}/session/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    quiz_session_id: quizSessionId,
-                    question_id: questionId,
-                    chat_session_id: chatSessionId, // Önceden oluşturulan session ID
-                    context: context
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();
+            console.log('[AIChatService] Start session response:', data);
             
             if (data.status === 'success') {
                 this.chatSessionId = chatSessionId;
-                console.log('✅ Chat session started:', this.chatSessionId);
+                console.log('[AIChatService] Chat session started successfully:', this.chatSessionId);
                 return {
                     success: true,
                     chatSessionId: this.chatSessionId
                 };
             } else {
+                console.error('[AIChatService] Failed to start chat session:', data.message);
                 return {
                     success: false,
                     error: data.message || 'Failed to start chat session'
                 };
             }
         } catch (error) {
-            console.error('❌ Start Chat Session Error:', error);
+            console.error('[AIChatService] Start chat session error:', error);
             return {
                 success: false,
                 error: 'Network error occurred'
@@ -106,6 +119,8 @@ class AIChatService {
      * @returns {Promise<Object>} AI yanıtı
      */
     async sendChatMessage(message, currentQuestionId = null) {
+        console.log('[AIChatService] sendChatMessage called with:', { message, currentQuestionId });
+        
         if (!this.isEnabled) {
             throw new Error('AI Chat servisi kullanılamıyor');
         }
@@ -128,6 +143,8 @@ class AIChatService {
                 requestBody.question_id = currentQuestionId;
             }
 
+            console.log('[AIChatService] Sending chat message:', requestBody);
+
             const response = await fetch(`${this.baseUrl}/chat/message`, {
                 method: 'POST',
                 headers: {
@@ -137,6 +154,7 @@ class AIChatService {
             });
 
             const data = await response.json();
+            console.log('[AIChatService] Chat message response:', data);
 
             if (data.status === 'success') {
                 return {
@@ -147,7 +165,7 @@ class AIChatService {
                 throw new Error(data.message || 'AI yanıtı alınamadı');
             }
         } catch (error) {
-            console.error('❌ AI Chat Message Error:', error);
+            console.error('[AIChatService] Send chat message error:', error);
             throw error;
         }
     }
@@ -159,7 +177,10 @@ class AIChatService {
      * @returns {Promise<Object>} AI yanıtı
      */
     async sendQuickAction(action, questionId) {
+        console.log('[AIChatService] sendQuickAction called with:', { action, questionId });
+        
         if (!this.isEnabled) {
+            console.warn('[AIChatService] Cannot send quick action - service not enabled');
             return {
                 success: false,
                 error: 'AI Chat service is not available'
@@ -167,6 +188,7 @@ class AIChatService {
         }
 
         if (!this.chatSessionId) {
+            console.warn('[AIChatService] Cannot send quick action - no chat session');
             return {
                 success: false,
                 error: 'Chat session not started'
@@ -174,19 +196,24 @@ class AIChatService {
         }
 
         try {
+            const requestBody = {
+                action: action,
+                chat_session_id: this.chatSessionId,
+                question_id: questionId
+            };
+            
+            console.log('[AIChatService] Sending quick action request:', requestBody);
+
             const response = await fetch(`${this.baseUrl}/chat/quick-action`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    action: action,
-                    chat_session_id: this.chatSessionId,
-                    question_id: questionId
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();
+            console.log('[AIChatService] Quick action response:', data);
             
             if (data.status === 'success') {
                 return {
@@ -195,13 +222,14 @@ class AIChatService {
                     action: action
                 };
             } else {
+                console.error('[AIChatService] Quick action failed:', data.message);
                 return {
                     success: false,
                     error: data.message || 'Unknown error occurred'
                 };
             }
         } catch (error) {
-            console.error('❌ AI Quick Action Error:', error);
+            console.error('[AIChatService] Quick action error:', error);
             return {
                 success: false,
                 error: 'Network error occurred'
@@ -214,15 +242,18 @@ class AIChatService {
      * @returns {boolean} Session aktif mi
      */
     isSessionActive() {
-        return this.chatSessionId !== null;
+        const isActive = this.chatSessionId !== null;
+        console.log('[AIChatService] isSessionActive called, returning:', isActive, 'sessionId:', this.chatSessionId);
+        return isActive;
     }
 
     /**
      * Chat session'ını sonlandırır
      */
     endChatSession() {
+        console.log('[AIChatService] endChatSession called, previous sessionId:', this.chatSessionId);
         this.chatSessionId = null;
-        console.log('🔚 Chat session ended');
+        console.log('[AIChatService] Chat session ended');
     }
     
     /**
@@ -231,7 +262,10 @@ class AIChatService {
      * @returns {Promise<Object>} Chat history
      */
     async getChatHistory(questionId) {
+        console.log('[AIChatService] getChatHistory called with questionId:', questionId);
+        
         if (!this.isEnabled) {
+            console.warn('[AIChatService] Cannot get chat history - service not enabled');
             return {
                 success: false,
                 error: 'AI Chat service is not available'
@@ -240,7 +274,10 @@ class AIChatService {
         
         // Quiz session ID'yi window'dan al
         const quizSessionId = window.QUIZ_CONFIG?.sessionId || window.QUIZ_SESSION_ID;
+        console.log('[AIChatService] Quiz session ID from window:', quizSessionId);
+        
         if (!quizSessionId) {
+            console.error('[AIChatService] Cannot get chat history - no quiz session ID');
             return {
                 success: false,
                 error: 'Quiz session ID bulunamadı'
@@ -249,9 +286,13 @@ class AIChatService {
         
         // Chat session ID'yi oluştur
         const chatSessionId = `chat_${quizSessionId}_${questionId}`;
+        console.log('[AIChatService] Generated chat session ID for history:', chatSessionId);
         
         try {
-            const response = await fetch(`${this.baseUrl}/chat/history?chat_session_id=${chatSessionId}`, {
+            const url = `${this.baseUrl}/chat/history?chat_session_id=${chatSessionId}`;
+            console.log('[AIChatService] Fetching chat history from:', url);
+            
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -259,20 +300,24 @@ class AIChatService {
             });
             
             const data = await response.json();
+            console.log('[AIChatService] Chat history response:', data);
             
             if (data.status === 'success') {
+                const messages = data.data.messages || [];
+                console.log('[AIChatService] Chat history loaded successfully, message count:', messages.length);
                 return {
                     success: true,
-                    messages: data.data.messages || []
+                    messages: messages
                 };
             } else {
+                console.error('[AIChatService] Failed to get chat history:', data.message);
                 return {
                     success: false,
                     error: data.message || 'Chat history alınamadı'
                 };
             }
         } catch (error) {
-            console.error('❌ Get chat history error:', error);
+            console.error('[AIChatService] Get chat history error:', error);
             return {
                 success: false,
                 error: 'Network error occurred'
@@ -285,13 +330,18 @@ class AIChatService {
      * @returns {Promise<boolean>} Servis sağlıklı mı
      */
     async healthCheck() {
+        console.log('[AIChatService] healthCheck called');
+        
         try {
             const response = await fetch(`${this.baseUrl}/system/health`);
             const data = await response.json();
             
-            return data.status === 'success' && data.data.healthy;
+            const isHealthy = data.status === 'success' && data.data.healthy;
+            console.log('[AIChatService] Health check result:', isHealthy);
+            
+            return isHealthy;
         } catch (error) {
-            console.error('❌ AI Health Check Error:', error);
+            console.error('[AIChatService] Health check error:', error);
             return false;
         }
     }

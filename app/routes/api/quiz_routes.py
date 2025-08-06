@@ -38,7 +38,6 @@ try:
     from app.services.auth_service import login_required
     from app.database.db_connection import DatabaseConnection
 except ImportError as e:
-    print(f"Warning: Could not import services: {e}")
     get_quiz_service = None
     QuizSessionService = None
     login_required = None
@@ -397,8 +396,6 @@ def get_session_status(session_id):
                 'message': 'Session not found'
             }), 404
         
-        print(f"📊 Session info for {session_id}: {session_info}")
-        
         # Session durumunu hesapla
         total_questions = len(session_info['questions'])
         answered_questions = len([q for q in session_info['questions'] if q['user_answer_option_id'] is not None])
@@ -409,8 +406,6 @@ def get_session_status(session_id):
         if session_info['session']['timer_enabled'] and session_info['session']['timer_duration']:
             start_time = session_info['session']['start_time']
             timer_duration = session_info['session']['timer_duration']
-            
-            print(f"🔍 Timer debug: timer_enabled={session_info['session']['timer_enabled']}, timer_duration={timer_duration}")
             
             if start_time:
                 try:
@@ -427,18 +422,13 @@ def get_session_status(session_id):
                     elapsed_seconds = int((current_datetime - start_datetime).total_seconds())
                     remaining_time_seconds = max(0, (timer_duration * 60) - elapsed_seconds)
                     
-                    print(f"⏰ Timer calculation: start_time={start_time}")
-                    print(f"⏰ Timer calculation: start_datetime={start_datetime}")
-                    print(f"⏰ Timer calculation: current_datetime={current_datetime}")
-                    print(f"⏰ Timer calculation: timer_duration={timer_duration}m, elapsed={elapsed_seconds}s, remaining={remaining_time_seconds}s")
                     
                 except Exception as e:
-                    print(f"❌ Timer calculation error: {e}")
                     remaining_time_seconds = 0
             else:
-                print(f"❌ Timer debug: start_time is None or empty")
+                pass
         else:
-            print(f"❌ Timer debug: timer_enabled={session_info['session']['timer_enabled']}, timer_duration={session_info['session']['timer_duration']}")
+            pass
         
         # Aktif sorunun bilgilerini al
         current_question_info = None
@@ -471,8 +461,6 @@ def get_session_status(session_id):
             'remaining_time_seconds': remaining_time_seconds
         }
         
-        print(f"📊 Status data: {status_data}")
-        
         return jsonify({
             'status': 'success',
             'message': 'Session status retrieved successfully',
@@ -480,9 +468,6 @@ def get_session_status(session_id):
         }), 200
         
     except Exception as e:
-        print(f"❌ Session status error: {e}")
-        import traceback
-        traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Failed to get session status',
@@ -539,8 +524,6 @@ def update_session_timer(session_id):
 def get_all_questions(session_id):
     """5.2.2c. Tüm soruları getirir."""
     try:
-        print(f"🔍 [API] Session ID kontrol ediliyor: {session_id}")
-        
         if not QuizSessionService:
             return jsonify({
                 'status': 'error',
@@ -552,18 +535,14 @@ def get_all_questions(session_id):
         # Session'ın var olup olmadığını kontrol et
         session = session_service.session_repo.get_session(session_id)
         if not session:
-            print(f"❌ [API] Session bulunamadı: {session_id}")
             return jsonify({
                 'status': 'error',
                 'message': f'Session not found: {session_id}'
             }), 404
         
-        print(f"✅ [API] Session bulundu: {session}")
-        
         session_info = session_service.get_session_info(session_id)
         
         if not session_info:
-            print(f"❌ [API] Session info alınamadı: {session_id}")
             return jsonify({
                 'status': 'error',
                 'message': 'Session info not available'

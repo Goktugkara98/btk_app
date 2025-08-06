@@ -280,7 +280,6 @@ class ChatMessageService:
             return formatted_messages
             
         except Exception as e:
-            print(f"❌ Error getting chat history: {e}")
             return []
     
     def create_system_message(self, message_type: str, context: Dict[str, Any] = None) -> str:

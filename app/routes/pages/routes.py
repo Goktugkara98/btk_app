@@ -30,33 +30,29 @@ pages_bp = Blueprint('pages', __name__)
 try:
     from .main_routes import main_bp
     pages_bp.register_blueprint(main_bp)
-    print("✅ Main page routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import main routes: {e}")
+    pass
 
 # Import authentication routes
 try:
     from .auth_routes import auth_bp
     pages_bp.register_blueprint(auth_bp)
-    print("✅ Authentication page routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import auth routes: {e}")
+    pass
 
 # Import quiz routes
 try:
     from .quiz_routes import quiz_bp
     pages_bp.register_blueprint(quiz_bp)
-    print("✅ Quiz page routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import quiz routes: {e}")
+    pass
 
 # Import user routes
 try:
     from .user_routes import user_bp
     pages_bp.register_blueprint(user_bp)
-    print("✅ User page routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import user routes: {e}")
+    pass
 
 # =============================================================================
 # 5.0. ANA SAYFA ROTALARI (MAIN PAGE ROUTES)
@@ -64,11 +60,6 @@ except ImportError as e:
 # Bu bölümde sadece ana sayfa seviyesinde olması gereken rotalar bulunur.
 # Özel rotalar ilgili modüllerde tanımlanmalıdır.
 
-print("🚀 Page routes modularization completed!")
-print("📋 Available page modules:")
-print("   • Main routes (/, /about, /contact)")
-print("   • Authentication routes (/login, /register)")
-print("   • Quiz routes (/quiz/*)")
-print("   • User routes (/profile)")
+
 
 

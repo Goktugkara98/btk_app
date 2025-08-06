@@ -78,18 +78,10 @@ class StateManager {
   // Sık kullanılan state güncellemeleri için yardımcı metotlar
 
   setQuestions(questions) {
-    console.log('[StateManager] setQuestions called with:', questions.length, 'questions');
-    
     // İlk soruyu ziyaret edilmiş olarak işaretle
     const initialVisitedQuestions = new Set();
     if (questions.length > 0) {
       initialVisitedQuestions.add(0);
-      console.log('[StateManager] First question data:', {
-        id: questions[0].question.id,
-        subject_name: questions[0].question.subject_name,
-        topic_name: questions[0].question.topic_name,
-        difficulty_level: questions[0].question.difficulty_level
-      });
     }
     
     this.setState({ 
@@ -102,28 +94,18 @@ class StateManager {
   }
 
   setCurrentQuestionIndex(index) {
-    console.log('[StateManager] setCurrentQuestionIndex called with index:', index);
-    
     if (index >= 0 && index < this.state.questions.length) {
       // Ziyaret edilen soruları takip et
       const newVisitedQuestions = new Set(this.state.visitedQuestions);
       newVisitedQuestions.add(index);
       
       const newCurrentQuestion = this.state.questions[index];
-      console.log('[StateManager] New current question data:', {
-        id: newCurrentQuestion.question.id,
-        subject_name: newCurrentQuestion.question.subject_name,
-        topic_name: newCurrentQuestion.question.topic_name,
-        difficulty_level: newCurrentQuestion.question.difficulty_level
-      });
       
       this.setState({
         currentQuestionIndex: index,
         currentQuestion: newCurrentQuestion,
         visitedQuestions: newVisitedQuestions
       }, 'SET_CURRENT_QUESTION');
-    } else {
-      console.warn('[StateManager] Invalid question index:', index, 'Total questions:', this.state.questions.length);
     }
   }
 
@@ -131,22 +113,8 @@ class StateManager {
     // questionId'yi her zaman number olarak sakla
     const numericQuestionId = parseInt(questionId, 10);
     
-    console.log('[StateManager] setAnswer called:', {
-      questionId,
-      numericQuestionId,
-      answer,
-      questionIdType: typeof questionId,
-      currentAnswers: Array.from(this.state.answers.entries())
-    });
-    
     const newAnswers = new Map(this.state.answers);
     newAnswers.set(numericQuestionId, answer);
-    
-    console.log('[StateManager] setAnswer result:', {
-      newAnswers: Array.from(newAnswers.entries()),
-      hasAnswer: newAnswers.has(numericQuestionId),
-      getAnswer: newAnswers.get(numericQuestionId)
-    });
     
     this.setState({ answers: newAnswers }, 'SET_ANSWER');
   }
@@ -155,19 +123,8 @@ class StateManager {
     // questionId'yi her zaman number olarak sakla
     const numericQuestionId = parseInt(questionId, 10);
     
-    console.log('[StateManager] removeAnswer called:', {
-      questionId,
-      numericQuestionId,
-      currentAnswers: Array.from(this.state.answers.entries())
-    });
-    
     const newAnswers = new Map(this.state.answers);
     newAnswers.delete(numericQuestionId);
-    
-    console.log('[StateManager] removeAnswer result:', {
-      newAnswers: Array.from(newAnswers.entries()),
-      hasAnswer: newAnswers.has(numericQuestionId)
-    });
     
     this.setState({ answers: newAnswers }, 'REMOVE_ANSWER');
   }

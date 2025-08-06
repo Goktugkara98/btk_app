@@ -64,7 +64,6 @@ function initApp() {
     }, 100);
     
   } catch (error) {
-    console.error('❌ Uygulama başlatılırken kritik hata:', error);
     stateManager?.setError({
       message: 'Uygulama başlatılamadı.',
       details: error.message

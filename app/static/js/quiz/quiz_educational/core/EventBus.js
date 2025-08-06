@@ -50,7 +50,7 @@ class EventBus {
         // Her bir abonenin callback fonksiyonu güvenli bir şekilde çağrılır.
         callback(data);
       } catch (error) {
-        console.error(`'${event}' olayı için abone çalıştırılırken hata oluştu:`, error);
+        // Event callback hatası
       }
     });
   }

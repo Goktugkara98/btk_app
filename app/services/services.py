@@ -63,18 +63,15 @@ class ServiceFactory:
         try:
             if UserService:
                 self._services['user'] = UserService()
-                print("✅ UserService başlatıldı")
             
             if QuizService:
                 self._services['quiz'] = QuizService()
-                print("✅ QuizService başlatıldı")
             
             if SystemService:
                 self._services['system'] = SystemService()
-                print("✅ SystemService başlatıldı")
                 
         except Exception as e:
-            print(f"❌ Servis başlatma hatası: {e}")
+            pass
     
     def get_service(self, service_name: str) -> Optional[Any]:
         """
@@ -128,23 +125,4 @@ def get_system_service() -> Optional[SystemService]:
 # DOĞRUDAN ÇALIŞTIRMA
 # =============================================================================
 if __name__ == "__main__":
-    print("🚀 Servis fabrikası test ediliyor...")
-    
-    # Test service availability
-    print(f"UserService mevcut: {service_factory.is_service_available('user')}")
-    print(f"QuizService mevcut: {service_factory.is_service_available('quiz')}")
-    print(f"SystemService mevcut: {service_factory.is_service_available('system')}")
-    
-    # Test service instances
-    user_service = get_user_service()
-    quiz_service = get_quiz_service()
-    system_service = get_system_service()
-    
-    if user_service:
-        print("✅ UserService başarıyla alındı")
-    if quiz_service:
-        print("✅ QuizService başarıyla alındı")
-    if system_service:
-        print("✅ SystemService başarıyla alındı")
-    
-    print("🎉 Servis fabrikası test tamamlandı!")
+    pass

@@ -70,7 +70,6 @@ class SystemService:
             }
             return health_status
         except Exception as e:
-            print(f"Error in get_health_status service: {e}")
             return {
                 'status': 'unhealthy',
                 'message': 'Health check failed',
@@ -107,7 +106,6 @@ class SystemService:
             }
             return status
         except Exception as e:
-            print(f"Error in get_system_status service: {e}")
             return {
                 'status': 'error',
                 'message': 'Failed to retrieve system status',
@@ -130,7 +128,6 @@ class SystemService:
             }
             return version_info
         except Exception as e:
-            print(f"Error in get_version_info service: {e}")
             return {
                 'status': 'error',
                 'message': 'Failed to retrieve version info',
@@ -157,7 +154,6 @@ class SystemService:
                     return False, {'message': 'Database connection test failed'}
                     
         except Exception as e:
-            print(f"Error in check_database_connection service: {e}")
             return False, {'message': 'Database connection failed', 'error': str(e)}
 
     def get_system_metrics(self) -> Dict[str, Any]:
@@ -203,7 +199,6 @@ class SystemService:
             
             return metrics
         except Exception as e:
-            print(f"Error in get_system_metrics service: {e}")
             return {
                 'error': 'Failed to retrieve system metrics',
                 'message': str(e),

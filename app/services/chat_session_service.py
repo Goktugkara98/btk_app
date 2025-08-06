@@ -24,7 +24,6 @@ class ChatSessionService:
             from app.database.chat_repository import ChatRepository
             self.chat_repo = ChatRepository(db_connection) if db_connection else None
         except ImportError as e:
-            print(f"Warning: Could not import ChatRepository: {e}")
             self.chat_repo = None
         
         # Context templates
@@ -63,7 +62,6 @@ class ChatSessionService:
         else:
             # Fallback: In-memory (deprecated)
             chat_session_id = f"chat_{quiz_session_id}_{question_id}_{datetime.now().timestamp()}"
-            print(f"⚠️ Using in-memory chat session: {chat_session_id}")
             return chat_session_id
     
     def get_session(self, chat_session_id: str) -> Optional[Dict[str, Any]]:
@@ -114,11 +112,9 @@ class ChatSessionService:
                     ai_model, prompt_used, response_time_ms, metadata
                 )
             except Exception as e:
-                print(f"❌ Error adding message to database: {e}")
                 return None
         else:
             # Fallback: In-memory (deprecated)
-            print(f"⚠️ Message not saved - no database connection")
             return None
     
     def get_conversation_context(self, chat_session_id: str, question_id: Optional[int] = None) -> str:
@@ -205,9 +201,6 @@ class ChatSessionService:
         
         for session_id in to_remove:
             del self.sessions[session_id]
-        
-        if to_remove:
-            print(f"🧹 Cleaned up {len(to_remove)} old chat sessions")
     
     def get_session_stats(self, chat_session_id: str) -> Dict[str, Any]:
         """

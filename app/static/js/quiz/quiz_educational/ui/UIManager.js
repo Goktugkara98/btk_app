@@ -40,7 +40,7 @@ export class UIManager {
     // Hangi elementlerin bulunamadığını kontrol et ve uyar.
     Object.entries(this.elements).forEach(([key, value]) => {
       if (!value || (value.length !== undefined && value.length === 0)) {
-        console.warn(`Element bulunamadı: ${key}`);
+        // Element bulunamadı
       }
     });
   }
@@ -193,15 +193,11 @@ export class UIManager {
    * @param {Object} question - Soru nesnesi.
    */
   renderQuestion(question) {
-    console.log('[UIManager] renderQuestion called with:', question);
-    
     if (!question || !this.elements.questionText || !this.elements.optionsContainer) {
-      console.warn('renderQuestion: Missing required elements or question');
       return;
     }
     
     // Navbar bilgilerini güncelle
-    console.log('[UIManager] Calling updateNavbarFromQuestion...');
     this.updateNavbarFromQuestion(question);
     
     // Soru metnini güncelle.
@@ -253,7 +249,6 @@ export class UIManager {
    */
   renderEducationalFeatures(question) {
     // Educational features AI Chat panelinde sağlanıyor
-    console.log('[UIManager] Educational features rendered via AI Chat panel');
   }
 
   /**
@@ -359,46 +354,25 @@ export class UIManager {
    * Aktif sorudan navbar bilgilerini günceller.
    */
   updateNavbarFromQuestion(question) {
-    console.log('[UIManager] updateNavbarFromQuestion called with:', question);
-    
     if (!question || !question.question) {
-      console.warn('[UIManager] updateNavbarFromQuestion: Invalid question data:', question);
       return;
     }
     
     const questionData = question.question;
-    console.log('[UIManager] Question data for navbar:', {
-      subject_name: questionData.subject_name,
-      topic_name: questionData.topic_name,
-      difficulty_level: questionData.difficulty_level
-    });
     
     // Ders adını güncelle
     if (this.elements.subjectName && questionData.subject_name) {
-      console.log('[UIManager] Updating subject name to:', questionData.subject_name);
       this.elements.subjectName.textContent = questionData.subject_name;
-    } else {
-      console.warn('[UIManager] Cannot update subject name:', {
-        subjectNameElement: !!this.elements.subjectName,
-        subject_name: questionData.subject_name
-      });
     }
     
     // Konu adını güncelle
     if (this.elements.topicName && questionData.topic_name) {
-      console.log('[UIManager] Updating topic name to:', questionData.topic_name);
       this.elements.topicName.textContent = questionData.topic_name;
-    } else {
-      console.warn('[UIManager] Cannot update topic name:', {
-        topicNameElement: !!this.elements.topicName,
-        topic_name: questionData.topic_name
-      });
     }
     
     // Zorluk seviyesini güncelle
     if (this.elements.difficultyBadge && questionData.difficulty_level) {
       const difficultyText = this.getDifficultyText(questionData.difficulty_level);
-      console.log('[UIManager] Updating difficulty to:', difficultyText);
       this.elements.difficultyBadge.textContent = difficultyText;
       
       // Zorluk seviyesi CSS sınıfını güncelle
@@ -406,11 +380,6 @@ export class UIManager {
       this.elements.difficultyBadge.classList.remove('easy', 'medium', 'hard', 'random');
       // Sonra yeni zorluk seviyesi sınıfını ekle
       this.elements.difficultyBadge.classList.add(questionData.difficulty_level);
-    } else {
-      console.warn('[UIManager] Cannot update difficulty:', {
-        difficultyBadgeElement: !!this.elements.difficultyBadge,
-        difficulty_level: questionData.difficulty_level
-      });
     }
   }
 }

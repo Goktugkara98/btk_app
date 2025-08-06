@@ -21,7 +21,6 @@ try:
     from .system_routes import system_bp
     from .quiz_routes import quiz_bp
 except ImportError as e:
-    print(f"Warning: Could not import some route modules: {e}")
     user_bp = None
     system_bp = None
     quiz_bp = None

@@ -26,6 +26,9 @@ export class QuizEngine {
     // Cevap kaldırma olayını dinle
     eventBus.subscribe('answer:remove', this.removeAnswer.bind(this));
     
+    // Yanlış cevap olayını dinle (şimdilik boş)
+    eventBus.subscribe('answer:wrong', this.handleWrongAnswer.bind(this));
+    
     eventBus.subscribe('quiz:complete', this.completeQuiz.bind(this));
     
     // Timer güncelleme için interval başlat
@@ -73,7 +76,6 @@ export class QuizEngine {
     try {
       const sessionId = stateManager.getState('sessionId');
       if (!sessionId) {
-        console.warn('Timer kaydedilemedi: sessionId bulunamadı');
         return;
       }
       
@@ -81,7 +83,7 @@ export class QuizEngine {
       await this.apiService.updateTimer({ sessionId, remainingTimeSeconds });
       
     } catch (error) {
-      console.warn('Timer kaydedilirken hata:', error);
+      // Timer kaydedilirken hata oluştu
     }
   }
 
@@ -89,21 +91,15 @@ export class QuizEngine {
    * Quiz için soruları yükler.
    */
   async loadQuestions() {
-    console.log('[QuizEngine] Sorular yükleniyor...');
     try {
       stateManager.setLoading(true);
       let sessionId = stateManager.getState('sessionId');
-      
-      console.log('[QuizEngine] State\'den alınan sessionId:', sessionId);
-      console.log('[QuizEngine] window.QUIZ_CONFIG:', window.QUIZ_CONFIG);
-      console.log('[QuizEngine] window.QUIZ_SESSION_ID:', window.QUIZ_SESSION_ID);
       
       // Session ID yoksa window'dan almayı dene
       if (!sessionId) {
         if (window.QUIZ_CONFIG && window.QUIZ_CONFIG.sessionId) {
           sessionId = window.QUIZ_CONFIG.sessionId;
           stateManager.setState({ sessionId });
-          console.log('[QuizEngine] SessionId window.QUIZ_CONFIG\'den alındı:', sessionId);
         } else if (window.QUIZ_SESSION_ID) {
           sessionId = window.QUIZ_SESSION_ID;
           stateManager.setState({ sessionId });
@@ -116,23 +112,12 @@ export class QuizEngine {
       
       const response = await this.apiService.fetchQuestions({ sessionId });
 
-      console.log('[QuizEngine] Raw API response:', response);
-      console.log('[QuizEngine] Raw questions data:', response.data?.questions);
-
       if (!response.data || !Array.isArray(response.data.questions)) {
         throw new Error('API yanıtı geçersiz formatta.');
       }
       
       // API'den gelen soru formatını JavaScript'in beklediği formata dönüştür
       const questions = response.data.questions.map((q, index) => {
-        console.log(`[QuizEngine] Processing question ${index + 1}:`, {
-          raw_question: q,
-          question_data: q.question,
-          subject_name: q.question?.subject_name,
-          topic_name: q.question?.topic_name,
-          difficulty_level: q.question?.difficulty_level
-        });
-        
         return {
           question_number: q.question_number,
           total_questions: q.total_questions,
@@ -151,14 +136,10 @@ export class QuizEngine {
         };
       });
       
-      console.log('[QuizEngine] Processed questions:', questions.map(q => ({
-        id: q.question.id,
-        subject_name: q.question.subject_name,
-        topic_name: q.question.topic_name,
-        difficulty_level: q.question.difficulty_level
-      })));
-      
       stateManager.setQuestions(questions);
+      
+      // Quiz modunu educational olarak ayarla
+      stateManager.setState({ quizMode: 'educational' });
       
       // Session bilgilerini güncelle
       if (response.data.session_id) {
@@ -247,8 +228,6 @@ export class QuizEngine {
       return;
     }
     
-    console.log(`[QuizEngine] Cevap gönderiliyor: Soru ${questionId}, Cevap ${answer}`);
-    
     try {
       // Gönderme başladığında state'i güncelle (UI'ı kilitlemek için).
       stateManager.setState({ isSubmitting: true }, 'SUBMIT_ANSWER_START');
@@ -261,27 +240,33 @@ export class QuizEngine {
       // Cevabı anında state'e kaydet (UI'ın hızlı güncellenmesi için).
       stateManager.setAnswer(questionId, answer);
       
+      // JavaScript tarafında cevap kontrolü yap
+      const isCorrect = this.checkAnswerLocally(questionId, answer);
+      
       const response = await this.apiService.submitAnswer({ sessionId, questionId, answer });
       
       // Cevabı gönderdikten hemen sonra isSubmitting'i false yap
       stateManager.setState({ isSubmitting: false }, 'SUBMIT_ANSWER_END');
       
-      // Educational modda yanlış cevap verilirse otomatik geçiş yapma
+      // Educational modda yanlış cevap verilirse farklı event tetikle
       const isEducationalMode = stateManager.getState('quizMode') === 'educational';
-      const isCorrect = response?.data?.is_correct;
+      
+      // Debug log ekle
+      console.log(`[QuizEngine] Cevap kontrolü: QuestionID=${questionId}, UserAnswer=${answer}, IsCorrect=${isCorrect}, Mode=${isEducationalMode}`);
       
       if (isEducationalMode && !isCorrect) {
-        // Yanlış cevap - AI chat'e yanlış cevap bilgisini gönder
-        eventBus.publish('answer:incorrect', {
+        // Yanlış cevap - yeni event tetikle
+        console.log(`[QuizEngine] Yanlış cevap tespit edildi! answer:wrong event'i tetikleniyor...`);
+        eventBus.publish('answer:wrong', {
           questionId: questionId,
           userAnswer: answer,
-          correctAnswer: response?.data?.correct_answer
+          correctAnswer: this.getCorrectAnswer(questionId)
         });
-        console.log('[QuizEngine] Yanlış cevap - otomatik geçiş yapılmıyor');
         return;
       }
       
       // Doğru cevap veya normal mod - kısa bir bekleme sonrası sonraki soruya geç
+      console.log(`[QuizEngine] Doğru cevap veya normal mod - sonraki soruya geçiliyor...`);
       setTimeout(() => this.nextQuestion(), 300);
       
     } catch (error) {
@@ -293,6 +278,88 @@ export class QuizEngine {
       // Hata durumunda da isSubmitting'i false yap
       stateManager.setState({ isSubmitting: false }, 'SUBMIT_ANSWER_ERROR');
     }
+  }
+
+  /**
+   * JavaScript tarafında cevap kontrolü yapar.
+   * @param {number} questionId - Soru ID'si
+   * @param {string} userAnswer - Kullanıcının cevabı
+   * @returns {boolean} Cevap doğru mu?
+   */
+  checkAnswerLocally(questionId, userAnswer) {
+    const { questions } = stateManager.getState();
+    const question = questions.find(q => q.question.id === parseInt(questionId, 10));
+    
+    if (!question || !question.question.options) {
+      console.log(`[QuizEngine] Soru bulunamadı veya seçenekler yok: QuestionID=${questionId}`);
+      return false;
+    }
+    
+    // Soru seçeneklerinin yapısını debug et
+    console.log(`[QuizEngine] Soru seçenekleri yapısı:`, question.question.options);
+    
+    // Doğru cevabı bul - farklı alan adlarını dene
+    let correctOption = question.question.options.find(option => option.is_correct === true);
+    
+    // Eğer is_correct bulunamazsa, diğer olası alan adlarını dene
+    if (!correctOption) {
+      correctOption = question.question.options.find(option => option.isCorrect === true);
+    }
+    if (!correctOption) {
+      correctOption = question.question.options.find(option => option.correct === true);
+    }
+    if (!correctOption) {
+      correctOption = question.question.options.find(option => option.is_correct === 1);
+    }
+    if (!correctOption) {
+      correctOption = question.question.options.find(option => option.correct === 1);
+    }
+    
+    if (!correctOption) {
+      console.log(`[QuizEngine] Doğru cevap bulunamadı: QuestionID=${questionId}`);
+      console.log(`[QuizEngine] Tüm seçenekler:`, question.question.options);
+      return false;
+    }
+    
+    // Kullanıcının cevabı ile doğru cevabı karşılaştır
+    const isCorrect = String(correctOption.id) === String(userAnswer);
+    
+    console.log(`[QuizEngine] Cevap kontrolü detayları:`);
+    console.log(`  - QuestionID: ${questionId}`);
+    console.log(`  - UserAnswer: ${userAnswer} (${typeof userAnswer})`);
+    console.log(`  - CorrectAnswer: ${correctOption.id} (${typeof correctOption.id})`);
+    console.log(`  - IsCorrect: ${isCorrect}`);
+    
+    return isCorrect;
+  }
+
+  /**
+   * Belirtilen sorunun doğru cevabını döndürür.
+   * @param {number} questionId - Soru ID'si
+   * @returns {Object|null} Doğru cevap seçeneği
+   */
+  getCorrectAnswer(questionId) {
+    const { questions } = stateManager.getState();
+    const question = questions.find(q => q.question.id === parseInt(questionId, 10));
+    
+    if (!question || !question.question.options) {
+      return null;
+    }
+    
+    return question.question.options.find(option => option.is_correct === true);
+  }
+
+  /**
+   * Yanlış cevap verildiğinde çalışacak fonksiyon (şimdilik boş).
+   * @param {Object} data - { questionId, userAnswer, correctAnswer }
+   */
+  handleWrongAnswer(data) {
+    // Şimdilik boş - buraya yanlış cevap işlemleri eklenecek
+    console.log('[QuizEngine] handleWrongAnswer çağrıldı!');
+    console.log('[QuizEngine] Yanlış cevap verildi:', data);
+    
+    // TODO: Burada yanlış cevap için özel işlemler yapılacak
+    // Örneğin: AI chat'e bilgi gönderme, UI güncelleme, vs.
   }
 
   /**
@@ -345,7 +412,7 @@ export class QuizEngine {
         }, 'UPDATE_SESSION_STATUS');
       }
     } catch (error) {
-      console.warn('Session status güncellenirken hata:', error);
+      // Session status güncellenirken hata oluştu
     }
   }
 

@@ -28,7 +28,6 @@ import sys
 try:
     from app.services.system_service import SystemService
 except ImportError as e:
-    print(f"Warning: Could not import system service: {e}")
     SystemService = None
 
 # Create the system blueprint

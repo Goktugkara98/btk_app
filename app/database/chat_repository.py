@@ -92,12 +92,12 @@ class ChatRepository:
         except Exception as e:
             return None
     
-    def get_chat_messages(self, chat_session_id: int) -> List[Dict[str, Any]]:
+    def get_chat_messages(self, chat_session_id: str) -> List[Dict[str, Any]]:
         """
         Chat session'ına ait mesajları getirir
         
         Args:
-            chat_session_id: Chat session ID
+            chat_session_id: Chat session ID (string)
             
         Returns:
             Mesajlar listesi
@@ -110,12 +110,15 @@ class ChatRepository:
                     WHERE chat_session_id = %s
                     ORDER BY created_at ASC
                 """
+                
                 conn.cursor.execute(query, (chat_session_id,))
                 results = conn.cursor.fetchall()
                 
+                # Since cursor is created with dictionary=True, results are already dictionaries
                 messages = []
                 for row in results:
-                    messages.append(dict(zip([col[0] for col in conn.cursor.description], row)))
+                    # row is already a dictionary, no need to convert
+                    messages.append(row)
                 
                 return messages
                 

@@ -30,33 +30,29 @@ api_bp = Blueprint('api', __name__)
 try:
     from .user_routes import user_bp
     api_bp.register_blueprint(user_bp)
-    print("✅ User routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import user routes: {e}")
+    pass
 
 # Import system routes
 try:
     from .system_routes import system_bp
     api_bp.register_blueprint(system_bp)
-    print("✅ System routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import system routes: {e}")
+    pass
 
 # Import quiz routes
 try:
     from .quiz_routes import quiz_bp
     api_bp.register_blueprint(quiz_bp)
-    print("✅ Quiz routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import quiz routes: {e}")
+    pass
 
 # Import AI chat routes
 try:
     from .ai_chat_v2_routes import ai_chat_v2_bp
     api_bp.register_blueprint(ai_chat_v2_bp)
-    print("✅ AI chat routes registered successfully")
 except ImportError as e:
-    print(f"⚠️  Warning: Could not import AI chat routes: {e}")
+    pass
 
 # =============================================================================
 # 5.0. ANA API ROTALARI (MAIN API ROUTES)
@@ -64,8 +60,4 @@ except ImportError as e:
 # Bu bölümde sadece ana API seviyesinde olması gereken rotalar bulunur.
 # Özel rotalar ilgili modüllerde tanımlanmalıdır.
 
-print("🚀 API routes modularization completed!")
-print("📋 Available API modules:")
-print("   • User routes (/api/users, /api/register, /api/login, etc.)")
-print("   • System routes (/api/health, /api/status, /api/version)")
-print("   • Quiz routes (/api/quiz/*)")
+

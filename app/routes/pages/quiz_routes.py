@@ -30,7 +30,6 @@ from flask import Blueprint, render_template, session, redirect, url_for, reques
 try:
     from app.services.auth_service import login_required
 except ImportError as e:
-    print(f"Warning: Could not import auth_service: {e}")
     login_required = None
 
 # Create the quiz pages blueprint
@@ -94,7 +93,6 @@ def quiz_session(session_id):
             # Session bulunamadıysa normal moda yönlendir
             return redirect(url_for('quiz.quiz_normal', session_id=session_id))
     except Exception as e:
-        print(f"Session routing error: {e}")
         # Hata durumunda normal moda yönlendir
         return redirect(url_for('quiz.quiz_normal', session_id=session_id))
 
@@ -122,7 +120,6 @@ def quiz_screen():
             # Session bulunamadıysa normal moda yönlendir
             return redirect(url_for('quiz.quiz_normal', session_id=session_id))
     except Exception as e:
-        print(f"Session routing error: {e}")
         # Hata durumunda normal moda yönlendir
         return redirect(url_for('quiz.quiz_normal', session_id=session_id))
 
@@ -150,10 +147,8 @@ def quiz_auto_start():
             
             if user_result:
                 test_user_id = user_result['id']
-                print(f"✅ Testuser bulundu, ID: {test_user_id}")
             else:
                 # Testuser yoksa oluştur
-                print("🆕 Testuser oluşturuluyor...")
                 
                 # Basit şifre hash'i oluştur
                 password_hash = hashlib.sha256("test123".encode()).hexdigest()
@@ -166,13 +161,10 @@ def quiz_auto_start():
                 
                 test_user_id = conn.cursor.lastrowid
                 conn.connection.commit()
-                
-                print(f"✅ Testuser oluşturuldu, ID: {test_user_id}")
             
             # Mevcut sınıfları kontrol et
             conn.cursor.execute("SELECT id, name FROM grades WHERE is_active = 1")
             grades = conn.cursor.fetchall()
-            print(f"📚 Mevcut sınıflar: {[g['name'] for g in grades]}")
             
             # 8. sınıf ID'sini bul
             conn.cursor.execute("SELECT id FROM grades WHERE name = '8. Sınıf' AND is_active = 1")
@@ -184,15 +176,12 @@ def quiz_auto_start():
                 if not grade_result:
                     return "Hiç sınıf bulunamadı", 404
                 grade_id = grade_result['id']
-                print(f"⚠️ 8. Sınıf bulunamadı, ilk sınıf kullanılıyor: {grade_id}")
             else:
                 grade_id = grade_result['id']
-                print(f"✅ 8. Sınıf bulundu, ID: {grade_id}")
             
             # Mevcut dersleri kontrol et
             conn.cursor.execute("SELECT id, name FROM subjects WHERE grade_id = %s AND is_active = 1", (grade_id,))
             subjects = conn.cursor.fetchall()
-            print(f"📖 Mevcut dersler: {[s['name'] for s in subjects]}")
             
             # Türkçe dersi ID'sini bul
             conn.cursor.execute("SELECT id FROM subjects WHERE name = 'Türkçe' AND grade_id = %s AND is_active = 1", (grade_id,))
@@ -204,15 +193,12 @@ def quiz_auto_start():
                 if not subject_result:
                     return "Hiç ders bulunamadı", 404
                 subject_id = subject_result['id']
-                print(f"⚠️ Türkçe dersi bulunamadı, ilk ders kullanılıyor: {subject_id}")
             else:
                 subject_id = subject_result['id']
-                print(f"✅ Türkçe dersi bulundu, ID: {subject_id}")
             
             # Mevcut üniteleri kontrol et
             conn.cursor.execute("SELECT id, name FROM units WHERE subject_id = %s AND is_active = 1", (subject_id,))
             units = conn.cursor.fetchall()
-            print(f"📚 Mevcut üniteler: {[u['name'] for u in units]}")
             
             # Fiilimsiler ünitesi ID'sini bul
             conn.cursor.execute("SELECT id FROM units WHERE name = 'Fiilimsiler' AND subject_id = %s AND is_active = 1", (subject_id,))
@@ -224,15 +210,12 @@ def quiz_auto_start():
                 if not unit_result:
                     return "Hiç ünite bulunamadı", 404
                 unit_id = unit_result['id']
-                print(f"⚠️ Fiilimsiler ünitesi bulunamadı, ilk ünite kullanılıyor: {unit_id}")
             else:
                 unit_id = unit_result['id']
-                print(f"✅ Fiilimsiler ünitesi bulundu, ID: {unit_id}")
             
             # Mevcut konuları kontrol et
             conn.cursor.execute("SELECT id, name FROM topics WHERE unit_id = %s AND is_active = 1", (unit_id,))
             topics = conn.cursor.fetchall()
-            print(f"📝 Mevcut konular: {[t['name'] for t in topics]}")
             
             # Sıfat-fiil konusu ID'sini bul
             conn.cursor.execute("SELECT id FROM topics WHERE name = 'Sıfat-fiil' AND unit_id = %s AND is_active = 1", (unit_id,))
@@ -244,10 +227,8 @@ def quiz_auto_start():
                 if not topic_result:
                     return "Hiç konu bulunamadı", 404
                 topic_id = topic_result['id']
-                print(f"⚠️ Sıfat-fiil konusu bulunamadı, ilk konu kullanılıyor: {topic_id}")
             else:
                 topic_id = topic_result['id']
-                print(f"✅ Sıfat-fiil konusu bulundu, ID: {topic_id}")
         
         # Quiz session oluştur
         quiz_config = {
@@ -262,8 +243,6 @@ def quiz_auto_start():
             'question_count': 5
         }
         
-        print(f"🚀 Quiz session oluşturuluyor... Config: {quiz_config}")
-        
         # Önce soruların var olup olmadığını kontrol et
         with DatabaseConnection() as conn:
             conn.cursor.execute("""
@@ -272,7 +251,6 @@ def quiz_auto_start():
                 WHERE t.id = %s AND q.is_active = 1
             """, (topic_id,))
             question_count = conn.cursor.fetchone()['count']
-            print(f"📊 Bu konu için {question_count} soru bulundu")
             
             if question_count == 0:
                 # Eğer bu konuda soru yoksa, tüm konulardan soru sayısını kontrol et
@@ -283,7 +261,6 @@ def quiz_auto_start():
                     WHERE u.id = %s AND q.is_active = 1
                 """, (unit_id,))
                 unit_question_count = conn.cursor.fetchone()['count']
-                print(f"📊 Bu ünite için toplam {unit_question_count} soru bulundu")
                 
                 if unit_question_count == 0:
                     return "Bu konu ve ünite için hiç soru bulunamadı. Lütfen önce soru verilerini yükleyin.", 404
@@ -293,20 +270,14 @@ def quiz_auto_start():
         
         if not success:
             error_msg = result.get('error', 'Bilinmeyen hata')
-            print(f"❌ Quiz session oluşturulamadı: {error_msg}")
             return f"Quiz session oluşturulamadı: {error_msg}", 500
         
         # Quiz screen'e yönlendir
         session_id = result['session_id']
-        print(f"✅ Quiz session oluşturuldu, Session ID: {session_id}")
-        print(f"🔄 Quiz screen'e yönlendiriliyor: /quiz/normal?session_id={session_id}")
         
         return redirect(f'/quiz/normal?session_id={session_id}')
         
     except Exception as e:
-        print(f"❌ Otomatik quiz başlatma hatası: {str(e)}")
-        import traceback
-        traceback.print_exc()
         return f"Otomatik quiz başlatma hatası: {str(e)}", 500
 
 @quiz_bp.route('/quiz/auto-start-educational')
@@ -326,10 +297,8 @@ def quiz_auto_start_educational():
             
             if user_result:
                 test_user_id = user_result['id']
-                print(f"✅ Testuser bulundu, ID: {test_user_id}")
             else:
                 # Testuser yoksa oluştur
-                print("🆕 Testuser oluşturuluyor...")
                 
                 # Basit şifre hash'i oluştur
                 password_hash = hashlib.sha256("test123".encode()).hexdigest()
@@ -342,13 +311,10 @@ def quiz_auto_start_educational():
                 
                 test_user_id = conn.cursor.lastrowid
                 conn.connection.commit()
-                
-                print(f"✅ Testuser oluşturuldu, ID: {test_user_id}")
             
             # Mevcut sınıfları kontrol et
             conn.cursor.execute("SELECT id, name FROM grades WHERE is_active = 1")
             grades = conn.cursor.fetchall()
-            print(f"📚 Mevcut sınıflar: {[g['name'] for g in grades]}")
             
             # 8. sınıf ID'sini bul
             conn.cursor.execute("SELECT id FROM grades WHERE name = '8. Sınıf' AND is_active = 1")
@@ -360,15 +326,12 @@ def quiz_auto_start_educational():
                 if not grade_result:
                     return "Hiç sınıf bulunamadı", 404
                 grade_id = grade_result['id']
-                print(f"⚠️ 8. Sınıf bulunamadı, ilk sınıf kullanılıyor: {grade_id}")
             else:
                 grade_id = grade_result['id']
-                print(f"✅ 8. Sınıf bulundu, ID: {grade_id}")
             
             # Mevcut dersleri kontrol et
             conn.cursor.execute("SELECT id, name FROM subjects WHERE grade_id = %s AND is_active = 1", (grade_id,))
             subjects = conn.cursor.fetchall()
-            print(f"📖 Mevcut dersler: {[s['name'] for s in subjects]}")
             
             # Türkçe dersi ID'sini bul
             conn.cursor.execute("SELECT id FROM subjects WHERE name = 'Türkçe' AND grade_id = %s AND is_active = 1", (grade_id,))
@@ -380,15 +343,12 @@ def quiz_auto_start_educational():
                 if not subject_result:
                     return "Hiç ders bulunamadı", 404
                 subject_id = subject_result['id']
-                print(f"⚠️ Türkçe dersi bulunamadı, ilk ders kullanılıyor: {subject_id}")
             else:
                 subject_id = subject_result['id']
-                print(f"✅ Türkçe dersi bulundu, ID: {subject_id}")
             
             # Mevcut üniteleri kontrol et
             conn.cursor.execute("SELECT id, name FROM units WHERE subject_id = %s AND is_active = 1", (subject_id,))
             units = conn.cursor.fetchall()
-            print(f"📚 Mevcut üniteler: {[u['name'] for u in units]}")
             
             # Fiilimsiler ünitesi ID'sini bul
             conn.cursor.execute("SELECT id FROM units WHERE name = 'Fiilimsiler' AND subject_id = %s AND is_active = 1", (subject_id,))
@@ -400,15 +360,12 @@ def quiz_auto_start_educational():
                 if not unit_result:
                     return "Hiç ünite bulunamadı", 404
                 unit_id = unit_result['id']
-                print(f"⚠️ Fiilimsiler ünitesi bulunamadı, ilk ünite kullanılıyor: {unit_id}")
             else:
                 unit_id = unit_result['id']
-                print(f"✅ Fiilimsiler ünitesi bulundu, ID: {unit_id}")
             
             # Mevcut konuları kontrol et
             conn.cursor.execute("SELECT id, name FROM topics WHERE unit_id = %s AND is_active = 1", (unit_id,))
             topics = conn.cursor.fetchall()
-            print(f"📝 Mevcut konular: {[t['name'] for t in topics]}")
             
             # Sıfat-fiil konusu ID'sini bul
             conn.cursor.execute("SELECT id FROM topics WHERE name = 'Sıfat-fiil' AND unit_id = %s AND is_active = 1", (unit_id,))
@@ -420,10 +377,8 @@ def quiz_auto_start_educational():
                 if not topic_result:
                     return "Hiç konu bulunamadı", 404
                 topic_id = topic_result['id']
-                print(f"⚠️ Sıfat-fiil konusu bulunamadı, ilk konu kullanılıyor: {topic_id}")
             else:
                 topic_id = topic_result['id']
-                print(f"✅ Sıfat-fiil konusu bulundu, ID: {topic_id}")
         
         # Quiz session oluştur
         quiz_config = {
@@ -438,8 +393,6 @@ def quiz_auto_start_educational():
             'question_count': 5
         }
         
-        print(f"🚀 Öğretici quiz session oluşturuluyor... Config: {quiz_config}")
-        
         # Önce soruların var olup olmadığını kontrol et
         with DatabaseConnection() as conn:
             conn.cursor.execute("""
@@ -448,7 +401,6 @@ def quiz_auto_start_educational():
                 WHERE t.id = %s AND q.is_active = 1
             """, (topic_id,))
             question_count = conn.cursor.fetchone()['count']
-            print(f"📊 Bu konu için {question_count} soru bulundu")
             
             if question_count == 0:
                 # Eğer bu konuda soru yoksa, tüm konulardan soru sayısını kontrol et
@@ -459,7 +411,6 @@ def quiz_auto_start_educational():
                     WHERE u.id = %s AND q.is_active = 1
                 """, (unit_id,))
                 unit_question_count = conn.cursor.fetchone()['count']
-                print(f"📊 Bu ünite için toplam {unit_question_count} soru bulundu")
                 
                 if unit_question_count == 0:
                     return "Bu konu ve ünite için hiç soru bulunamadı. Lütfen önce soru verilerini yükleyin.", 404
@@ -469,20 +420,14 @@ def quiz_auto_start_educational():
         
         if not success:
             error_msg = result.get('error', 'Bilinmeyen hata')
-            print(f"❌ Öğretici quiz session oluşturulamadı: {error_msg}")
             return f"Öğretici quiz session oluşturulamadı: {error_msg}", 500
         
         # Quiz screen'e yönlendir
         session_id = result['session_id']
-        print(f"✅ Öğretici quiz session oluşturuldu, Session ID: {session_id}")
-        print(f"🔄 Öğretici quiz screen'e yönlendiriliyor: /quiz/educational?session_id={session_id}")
         
         return redirect(f'/quiz/educational?session_id={session_id}')
         
     except Exception as e:
-        print(f"❌ Otomatik öğretici quiz başlatma hatası: {str(e)}")
-        import traceback
-        traceback.print_exc()
         return f"Otomatik öğretici quiz başlatma hatası: {str(e)}", 500
 
 @quiz_bp.route('/quiz/test-db')

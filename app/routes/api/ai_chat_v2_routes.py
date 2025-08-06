@@ -20,7 +20,6 @@ try:
     from app.services.quiz_session_service import QuizSessionService
     from app.database.db_connection import DatabaseConnection
 except ImportError as e:
-    print(f"Warning: Could not import AI chat v2 services: {e}")
     GeminiAPIService = None
     ChatSessionService = None
     ChatMessageService = None
@@ -63,7 +62,6 @@ def system_status():
         }), 200
         
     except Exception as e:
-        print(f"❌ AI system status error: {e}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to get AI system status',
@@ -95,7 +93,6 @@ def system_health():
         }), 200
         
     except Exception as e:
-        print(f"❌ AI system health check error: {e}")
         return jsonify({
             'status': 'error',
             'message': 'Health check failed',
@@ -172,8 +169,6 @@ def start_chat_session():
         }), 200
         
     except Exception as e:
-        print(f"❌ Start chat session error: {e}")
-        print(f"❌ Traceback: {traceback.format_exc()}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to start chat session',
@@ -205,7 +200,6 @@ def get_chat_history():
         })
         
     except Exception as e:
-        print(f"❌ Get chat history error: {e}")
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -248,7 +242,6 @@ def get_session_info(chat_session_id):
         }), 200
         
     except Exception as e:
-        print(f"❌ Get session info error: {e}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to get session info',
@@ -313,7 +306,7 @@ def send_chat_message():
         start_time = time.time()
         
         user_metadata = chat_message_service.create_message_metadata('user', question_id=question_id)
-        chat_session_service.add_message(
+        user_message_id = chat_session_service.add_message(
             chat_session_id, 'user', sanitized_message, 
             action_type='general', metadata=user_metadata
         )
@@ -339,7 +332,7 @@ def send_chat_message():
         
         # AI mesajını veritabanına kaydet
         ai_metadata = chat_message_service.create_message_metadata('ai', question_id=question_id)
-        chat_session_service.add_message(
+        ai_message_id = chat_session_service.add_message(
             chat_session_id, 'ai', formatted_response,
             action_type='general',
             ai_model='gemini-2.5-flash',
@@ -358,9 +351,6 @@ def send_chat_message():
         }), 200
         
     except Exception as e:
-        print(f"❌ Send chat message error: {e}")
-        print(f"❌ Traceback: {traceback.format_exc()}")
-        
         error_msg = chat_message_service.get_error_message('general_error') if chat_message_service else 'System error'
         return jsonify({
             'status': 'error',
@@ -469,9 +459,6 @@ def quick_action():
         }), 200
         
     except Exception as e:
-        print(f"❌ Quick action error: {e}")
-        print(f"❌ Traceback: {traceback.format_exc()}")
-        
         error_msg = chat_message_service.get_error_message('general_error') if chat_message_service else 'System error'
         return jsonify({
             'status': 'error',
@@ -504,7 +491,6 @@ def cleanup_sessions():
         }), 200
         
     except Exception as e:
-        print(f"❌ Session cleanup error: {e}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to cleanup sessions',

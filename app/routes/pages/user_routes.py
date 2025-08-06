@@ -23,7 +23,6 @@ from flask import Blueprint, render_template, session, redirect, url_for
 try:
     from app.services.auth_service import login_required
 except ImportError as e:
-    print(f"Warning: Could not import auth_service: {e}")
     login_required = None
 
 # Create the user pages blueprint
@@ -60,5 +59,4 @@ def profile():
         return render_template('profile.html', title='Profile', user=user_profile)
         
     except Exception as e:
-        print(f"Error loading profile: {e}")
         return render_template('profile.html', title='Profile', user=None) 

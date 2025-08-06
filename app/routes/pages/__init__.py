@@ -23,7 +23,6 @@ try:
     from .quiz_routes import quiz_bp
     from .user_routes import user_bp
 except ImportError as e:
-    print(f"Warning: Could not import some route modules: {e}")
     main_bp = None
     auth_bp = None
     quiz_bp = None

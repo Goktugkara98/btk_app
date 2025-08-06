@@ -34,10 +34,8 @@ class GeminiAPIService:
     def _check_configuration(self) -> bool:
         """API key konfigürasyonunu kontrol eder."""
         if not self.api_key:
-            print("⚠️ GEMINI_API_KEY environment variable not set")
             return False
         
-        print("✅ Gemini API configured successfully")
         return True
     
     def is_available(self) -> bool:
@@ -88,7 +86,6 @@ class GeminiAPIService:
             
             if response.status_code == 200:
                 result = response.json()
-                print(f"🔍 Gemini API Response: {json.dumps(result, indent=2)}")
                 
                 # Response'dan text'i çıkar
                 if 'candidates' in result and len(result['candidates']) > 0:
@@ -96,7 +93,6 @@ class GeminiAPIService:
                     
                     # Check if response was truncated due to token limits
                     if 'finishReason' in candidate and candidate['finishReason'] == 'MAX_TOKENS':
-                        print("⚠️ Gemini API: Response truncated due to token limits")
                         return "Üzgünüm, yanıtım çok uzun oldu. Lütfen sorunuzu daha kısa tutabilir misiniz?"
                     
                     if 'content' in candidate and 'parts' in candidate['content']:
@@ -104,24 +100,18 @@ class GeminiAPIService:
                         if len(parts) > 0 and 'text' in parts[0]:
                             return parts[0]['text']
                 
-                print("⚠️ Gemini API: No content in response")
                 return None
                 
             else:
-                print(f"❌ Gemini API error: {response.status_code} - {response.text}")
                 return None
                 
         except requests.exceptions.Timeout:
-            print("❌ Gemini API timeout")
             return None
         except requests.exceptions.RequestException as e:
-            print(f"❌ Gemini API request error: {e}")
             return None
         except json.JSONDecodeError as e:
-            print(f"❌ Gemini API JSON decode error: {e}")
             return None
         except Exception as e:
-            print(f"❌ Gemini API unexpected error: {e}")
             return None
     
     def get_service_status(self) -> Dict[str, Any]:
@@ -142,5 +132,4 @@ class GeminiAPIService:
         """
         test_prompt = "Hello, test message."
         response = self.generate_content(test_prompt)
-        print(response)
         return response is not None
