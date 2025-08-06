@@ -36,24 +36,13 @@ export class QuizEngine {
    * Timer'ı otomatik olarak günceller.
    */
   startTimerUpdate() {
-    console.log('[QuizEngine] Timer interval başlatılıyor...');
-    
     let saveCounter = 0; // 10 saniyede bir kaydetmek için sayaç
     
     setInterval(() => {
       const timer = stateManager.getState('timer');
-      console.log('[QuizEngine] Timer tick:', {
-        enabled: timer.enabled,
-        remainingTimeSeconds: timer.remainingTimeSeconds,
-        totalTime: timer.totalTime
-      });
       
       if (timer.enabled && timer.remainingTimeSeconds > 0) {
         const newRemainingTime = timer.remainingTimeSeconds - 1;
-        console.log('[QuizEngine] Timer güncelleniyor:', {
-          old: timer.remainingTimeSeconds,
-          new: newRemainingTime
-        });
         
         stateManager.setState({
           timer: {
@@ -71,7 +60,6 @@ export class QuizEngine {
         
         // Süre bittiğinde quiz'i otomatik tamamla
         if (newRemainingTime <= 0) {
-          console.log('[QuizEngine] Süre doldu, quiz otomatik tamamlanıyor...');
           eventBus.publish('quiz:complete');
         }
       }
@@ -85,22 +73,15 @@ export class QuizEngine {
     try {
       const sessionId = stateManager.getState('sessionId');
       if (!sessionId) {
-        console.warn('[QuizEngine] Timer kaydedilemedi: sessionId bulunamadı');
+        console.warn('Timer kaydedilemedi: sessionId bulunamadı');
         return;
       }
-      
-      console.log('[QuizEngine] Timer veritabanına kaydediliyor:', {
-        sessionId,
-        remainingTimeSeconds
-      });
       
       // Timer'ı veritabanına kaydetmek için API çağrısı
       await this.apiService.updateTimer({ sessionId, remainingTimeSeconds });
       
-      console.log('[QuizEngine] Timer başarıyla kaydedildi');
-      
     } catch (error) {
-      console.warn('[QuizEngine] Timer kaydedilirken hata:', error);
+      console.warn('Timer kaydedilirken hata:', error);
     }
   }
 
@@ -126,7 +107,6 @@ export class QuizEngine {
         } else if (window.QUIZ_SESSION_ID) {
           sessionId = window.QUIZ_SESSION_ID;
           stateManager.setState({ sessionId });
-          console.log('[QuizEngine] SessionId window.QUIZ_SESSION_ID\'den alındı:', sessionId);
         }
       }
       
@@ -134,35 +114,50 @@ export class QuizEngine {
         throw new Error('Geçerli bir oturum ID bulunamadı. Lütfen sayfayı yenileyin.');
       }
       
-      console.log('[QuizEngine] Kullanılacak sessionId:', sessionId);
-      
       const response = await this.apiService.fetchQuestions({ sessionId });
 
-      console.log('[QuizEngine] API Response:', response);
+      console.log('[QuizEngine] Raw API response:', response);
+      console.log('[QuizEngine] Raw questions data:', response.data?.questions);
 
       if (!response.data || !Array.isArray(response.data.questions)) {
         throw new Error('API yanıtı geçersiz formatta.');
       }
       
       // API'den gelen soru formatını JavaScript'in beklediği formata dönüştür
-      const questions = response.data.questions.map(q => ({
-        question_number: q.question_number,
-        total_questions: q.total_questions,
-        question: {
-          id: q.question.id,
-          text: q.question.text,
-          explanation: q.question.explanation,
-          difficulty_level: q.question.difficulty_level,
-          points: q.question.points,
-          subject_name: q.question.subject_name,
-          topic_name: q.question.topic_name,
-          options: q.question.options || []
-        },
-        user_answer_option_id: q.user_answer_option_id,
-        progress: q.progress
-      }));
+      const questions = response.data.questions.map((q, index) => {
+        console.log(`[QuizEngine] Processing question ${index + 1}:`, {
+          raw_question: q,
+          question_data: q.question,
+          subject_name: q.question?.subject_name,
+          topic_name: q.question?.topic_name,
+          difficulty_level: q.question?.difficulty_level
+        });
+        
+        return {
+          question_number: q.question_number,
+          total_questions: q.total_questions,
+          question: {
+            id: q.question.id,
+            text: q.question.text,
+            explanation: q.question.explanation,
+            difficulty_level: q.question.difficulty_level,
+            points: q.question.points,
+            subject_name: q.question.subject_name,
+            topic_name: q.question.topic_name,
+            options: q.question.options || []
+          },
+          user_answer_option_id: q.user_answer_option_id,
+          progress: q.progress
+        };
+      });
       
-      console.log(`[QuizEngine] ${questions.length} adet soru yüklendi.`);
+      console.log('[QuizEngine] Processed questions:', questions.map(q => ({
+        id: q.question.id,
+        subject_name: q.question.subject_name,
+        topic_name: q.question.topic_name,
+        difficulty_level: q.question.difficulty_level
+      })));
+      
       stateManager.setQuestions(questions);
       
       // Session bilgilerini güncelle
@@ -181,7 +176,7 @@ export class QuizEngine {
       eventBus.publish('quiz:questionsLoaded');
       
     } catch (error) {
-      console.error('[QuizEngine] Sorular yüklenirken hata oluştu:', error);
+      console.error('Sorular yüklenirken hata oluştu:', error);
       stateManager.setError({
         message: 'Sorular yüklenirken bir hata oluştu.',
         details: error.message
@@ -202,7 +197,6 @@ export class QuizEngine {
       this.goToQuestion(nextIndex);
     } else {
       // Son sorudayken 'Sonraki Soru' butonu 'Quizi Bitir'e dönüşür ve bu olayı tetikler.
-      console.log('[QuizEngine] Quiz tamamlanıyor...');
       eventBus.publish('quiz:complete');
     }
   }
@@ -259,8 +253,6 @@ export class QuizEngine {
       
       await this.apiService.submitAnswer({ sessionId, questionId, answer });
       
-      console.log('[QuizEngine] Cevap başarıyla gönderildi.');
-      
       // Cevabı gönderdikten hemen sonra isSubmitting'i false yap
       stateManager.setState({ isSubmitting: false }, 'SUBMIT_ANSWER_END');
       
@@ -268,7 +260,7 @@ export class QuizEngine {
       setTimeout(() => this.nextQuestion(), 300);
       
     } catch (error) {
-      console.error('[QuizEngine] Cevap gönderilirken hata oluştu:', error);
+      console.error('Cevap gönderilirken hata oluştu:', error);
       stateManager.setError({
         message: 'Cevap gönderilirken bir hata oluştu.',
         details: error.message
@@ -288,8 +280,6 @@ export class QuizEngine {
       return;
     }
     
-    console.log(`[QuizEngine] Cevap kaldırılıyor: Soru ${questionId}`);
-    
     try {
       const sessionId = stateManager.getState('sessionId');
       if (!sessionId || !questionId) {
@@ -302,10 +292,8 @@ export class QuizEngine {
       // API'ye cevabı kaldırma isteği gönder (null değer)
       await this.apiService.submitAnswer({ sessionId, questionId, answer: null });
       
-      console.log('[QuizEngine] Cevap başarıyla kaldırıldı.');
-      
     } catch (error) {
-      console.error('[QuizEngine] Cevap kaldırılırken hata oluştu:', error);
+      console.error('Cevap kaldırılırken hata oluştu:', error);
       stateManager.setError({
         message: 'Cevap kaldırılırken bir hata oluştu.',
         details: error.message
@@ -322,12 +310,6 @@ export class QuizEngine {
       if (response.data) {
         const statusData = response.data;
         
-        console.log('[QuizEngine] Session status alındı:', {
-          timer_enabled: statusData.timer_enabled,
-          remaining_time_seconds: statusData.remaining_time_seconds,
-          timer_duration: statusData.timer_duration
-        });
-        
         // Sadece timer bilgilerini güncelle (navbar bilgileri artık aktif sorudan alınıyor)
         stateManager.setState({
           timer: {
@@ -336,11 +318,9 @@ export class QuizEngine {
             totalTime: statusData.timer_duration || 0
           }
         }, 'UPDATE_SESSION_STATUS');
-        
-        console.log('[QuizEngine] Timer state güncellendi');
       }
     } catch (error) {
-      console.warn('[QuizEngine] Session status güncellenirken hata:', error);
+      console.warn('Session status güncellenirken hata:', error);
     }
   }
 
@@ -350,7 +330,6 @@ export class QuizEngine {
   async completeQuiz() {
     if (stateManager.getState('isSubmitting')) return;
     
-    console.log('[QuizEngine] Quiz tamamlanıyor ve sonuçlar gönderiliyor...');
     try {
       stateManager.setState({ isLoading: true, isSubmitting: true }, 'QUIZ_COMPLETE_START');
       
@@ -359,8 +338,6 @@ export class QuizEngine {
       
       const results = await this.apiService.completeQuiz({ sessionId, answers });
       
-      console.log('[QuizEngine] Quiz başarıyla tamamlandı.', results);
-      
       stateManager.setState({ quizCompleted: true, results }, 'QUIZ_COMPLETED');
       eventBus.publish('quiz:completed', { results });
       
@@ -368,7 +345,7 @@ export class QuizEngine {
       window.location.href = `/quiz/results?session_id=${sessionId}`;
       
     } catch (error) {
-      console.error('[QuizEngine] Quiz tamamlanırken hata oluştu:', error);
+      console.error('Quiz tamamlanırken hata oluştu:', error);
       stateManager.setError({
         message: 'Sınav tamamlanırken bir hata oluştu.',
         details: error.message

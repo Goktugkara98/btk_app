@@ -20,11 +20,11 @@
                     <div class="col-md-4">
                         <div class="quiz-info">
                             <div class="subject-breadcrumb">
-                                <span class="subject" id="subject-name">Türkçe</span>
+                                <span class="subject" id="subject-name">--</span>
                                 <span class="separator">•</span>
-                                <span class="topic" id="topic-name">Fiilimsiler</span>
+                                <span class="topic" id="topic-name">--</span>
                                 <span class="separator">•</span>
-                                <span class="difficulty" id="difficulty-badge">Orta</span>
+                                <span class="difficulty" id="difficulty-badge">--</span>
                             </div>
                         </div>
                     </div>
@@ -39,11 +39,13 @@
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
-                        <div class="timer-widget">
-                            <div class="timer-icon">⏱️</div>
-                            <div class="timer-content">
-                                <div class="timer-label">Süre</div>
-                                <div class="timer-display" id="timer">15:30</div>
+                        <div class="timer-wrapper">
+                            <div class="timer-widget compact">
+                                <div class="timer-icon">⏱️</div>
+                                <div class="timer-content">
+                                    <div class="timer-label">Süre</div>
+                                    <div class="timer-display" id="timer">15:30</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -108,22 +110,18 @@
         <footer class="quiz-footer">
             <div class="container-fluid">
                 <div class="row align-items-center">
-                    <div class="col-md-4">
+                    <div class="footer-content">
                         <button class="btn btn-outline-primary nav-btn prev-btn" id="prev-button" disabled>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             Önceki
                         </button>
-                    </div>
-                    <div class="col-md-4 text-center">
                         <div class="quiz-mode">
                             <div class="mode-label">Quiz Modu:</div>
                             <div class="mode-name" id="quiz-mode">Pratik</div>
                         </div>
-                    </div>
-                    <div class="col-md-4 text-end">
-                        <button class="btn btn-primary nav-btn next-btn" id="next-button">
+                        <button class="btn btn-outline-primary nav-btn next-btn" id="next-button">
                             Sonraki
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -147,9 +145,6 @@
             sessionId: '{{ session_id }}',
             debug: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         };
-        
-        console.log('🚀 Quiz Application Starting...');
-        console.log('📋 Session ID:', window.QUIZ_CONFIG.sessionId);
     </script>
     
     <!-- Main Application Script -->

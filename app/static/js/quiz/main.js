@@ -27,13 +27,10 @@ window.onerror = function(message, source, lineno, colno, error) {
 
 // Uygulamayı başlatan ana fonksiyon
 function initApp() {
-  console.log('🚀 Quiz Uygulaması Başlatılıyor...');
-  
   try {
     // Session ID'yi state'e ayarla
     if (window.QUIZ_CONFIG && window.QUIZ_CONFIG.sessionId) {
       stateManager.setState({ sessionId: window.QUIZ_CONFIG.sessionId });
-      console.log('📋 Session ID ayarlandı:', window.QUIZ_CONFIG.sessionId);
     }
     
     // Gerekli modüllerin varlığını kontrol et.
@@ -56,7 +53,6 @@ function initApp() {
     // Her şeyin yüklendiğinden emin olmak için küçük bir gecikmeyle quizi başlat.
     setTimeout(() => {
       eventBus.publish('quiz:start');
-      console.log('✅ Quiz Uygulaması başarıyla başlatıldı.');
     }, 100);
     
   } catch (error) {

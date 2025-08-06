@@ -21,9 +21,6 @@ export class ApiService {
    */
   async _fetch({ endpoint, method = 'GET', data = null }) {
     const url = `${this.baseUrl}${endpoint}`;
-    const requestId = Math.random().toString(36).substr(2, 9);
-    
-    console.log(`[ApiService] ${method} ${url}`, { requestId, timestamp: new Date().toISOString() });
 
     const options = {
       method,
@@ -36,35 +33,19 @@ export class ApiService {
     }
 
     try {
-      const startTime = performance.now();
       const response = await fetch(url, options);
-      const endTime = performance.now();
-      
-      console.log(`[ApiService] Response (${requestId}):`, {
-        status: response.status,
-        ok: response.ok,
-        duration: `${(endTime - startTime).toFixed(2)}ms`,
-      });
-      
       const responseData = await response.json().catch(() => ({}));
       
       if (!response.ok) {
         const error = new Error(responseData.message || `HTTP hatası! Durum: ${response.status}`);
         error.status = response.status;
         error.response = responseData;
-        console.error(`[ApiService] Hata (${requestId}):`, error);
         throw error;
       }
 
       return responseData;
       
     } catch (error) {
-      console.error(`[ApiService] İstek başarısız oldu (${requestId}):`, {
-        url,
-        method,
-        errorMessage: error.message,
-      });
-      
       // Hata nesnesini daha fazla bağlamla zenginleştir
       const enhancedError = new Error(`API isteği başarısız oldu: ${error.message}`);
       enhancedError.originalError = error;
@@ -78,20 +59,10 @@ export class ApiService {
    * Quiz için soruları getirir.
    */
   async fetchQuestions({ sessionId }) {
-    console.log('[ApiService] fetchQuestions çağrıldı, sessionId:', sessionId);
-    
-    try {
-      const result = await this._fetch({
-        endpoint: `/quiz/session/${sessionId}/questions`,
-        method: 'GET'
-      });
-      
-      console.log('[ApiService] fetchQuestions başarılı:', result);
-      return result;
-    } catch (error) {
-      console.error('[ApiService] fetchQuestions hatası:', error);
-      throw error;
-    }
+    return await this._fetch({
+      endpoint: `/quiz/session/${sessionId}/questions`,
+      method: 'GET'
+    });
   }
 
   /**

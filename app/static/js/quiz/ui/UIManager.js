@@ -39,7 +39,7 @@ export class UIManager {
     // Hangi elementlerin bulunamadığını kontrol et ve uyar.
     Object.entries(this.elements).forEach(([key, value]) => {
       if (!value) {
-        console.warn(`[UIManager] Element bulunamadı: ${key}`);
+        console.warn(`Element bulunamadı: ${key}`);
       }
     });
   }
@@ -73,7 +73,6 @@ export class UIManager {
       if (optionElement?.dataset.questionId && optionElement?.dataset.optionId) {
         // Eğer bir cevap zaten gönderiliyorsa, yeni bir işlem yapma.
         if (stateManager.getState('isSubmitting')) {
-          console.warn('Zaten bir cevap gönderiliyor. Lütfen bekleyin.');
           return;
         }
         
@@ -82,23 +81,8 @@ export class UIManager {
         const currentAnswer = currentAnswers.get(parseInt(questionId, 10));
         const numericOptionId = parseInt(optionId, 10);
         
-        console.log('[UIManager] Seçenek tıklandı:', {
-          questionId,
-          optionId,
-          numericOptionId,
-          currentAnswer,
-          currentAnswerType: typeof currentAnswer,
-          numericOptionIdType: typeof numericOptionId,
-          isSameAnswer: currentAnswer === numericOptionId,
-          isSameAnswerStrict: currentAnswer === numericOptionId,
-          isSameAnswerLoose: currentAnswer == numericOptionId,
-          currentAnswers: Array.from(currentAnswers.entries())
-        });
-        
         // Eğer tıklanan seçenek zaten seçiliyse, seçimi kaldır
         if (String(currentAnswer) === String(numericOptionId)) {
-          console.log('[UIManager] Aynı seçenek tekrar tıklandı - Seçim kaldırılıyor:', { questionId, optionId });
-          
           // State'den cevabı kaldır
           eventBus.publish('answer:remove', { questionId });
           
@@ -107,9 +91,6 @@ export class UIManager {
           e.preventDefault();
           return;
         }
-        
-        // Farklı seçenek seçildi - normal seçim işlemi
-        console.log('[UIManager] Farklı seçenek seçildi - Normal seçim:', { questionId, optionId });
         
         // Diğer seçeneklerden 'selected' class'ını kaldır.
         this.elements.optionsContainer.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
@@ -124,7 +105,6 @@ export class UIManager {
     // Retry Button
     const retryButton = document.getElementById('retry-button');
     retryButton?.addEventListener('click', () => {
-      console.log('[UIManager] Retry button clicked, reloading questions...');
       eventBus.publish('quiz:start');
     });
   }
@@ -134,13 +114,6 @@ export class UIManager {
    */
   initializeStateSubscriptions() {
     eventBus.subscribe('state:changed', ({ currentState, prevState }) => {
-      console.log('[UIManager] State changed:', {
-        action: 'state:changed',
-        currentQuestionChanged: prevState.currentQuestion !== currentState.currentQuestion,
-        answersChanged: prevState.answers !== currentState.answers,
-        currentQuestionId: currentState.currentQuestion?.question?.id
-      });
-      
       // Belirli state değişikliklerine göre UI güncelleme fonksiyonlarını çağır.
       if (prevState.isLoading !== currentState.isLoading) {
         this.toggleLoading(currentState.isLoading);
@@ -151,7 +124,6 @@ export class UIManager {
       
       // Soru değiştiğinde render et ve navbar'ı güncelle
       if (prevState.currentQuestion !== currentState.currentQuestion) {
-        console.log('[UIManager] Current question changed, rendering...');
         this.renderQuestion(currentState.currentQuestion);
         this.updateNavbarFromQuestion(currentState.currentQuestion);
       }
@@ -171,7 +143,6 @@ export class UIManager {
         if (prevState.answers !== currentState.answers && 
             currentState.currentQuestion && 
             prevState.currentQuestion === currentState.currentQuestion) {
-          console.log('[UIManager] Answers changed for same question, re-rendering...');
           this.renderQuestion(currentState.currentQuestion);
         }
       }
@@ -221,10 +192,16 @@ export class UIManager {
    * @param {Object} question - Soru nesnesi.
    */
   renderQuestion(question) {
+    console.log('[UIManager] renderQuestion called with:', question);
+    
     if (!question || !this.elements.questionText || !this.elements.optionsContainer) {
-      console.warn('[UIManager] renderQuestion: Missing required elements or question');
+      console.warn('renderQuestion: Missing required elements or question');
       return;
     }
+    
+    // Navbar bilgilerini güncelle
+    console.log('[UIManager] Calling updateNavbarFromQuestion...');
+    this.updateNavbarFromQuestion(question);
     
     // Soru metnini güncelle.
     this.elements.questionText.innerHTML = question.question?.text || 'Soru metni yüklenemedi.';
@@ -237,28 +214,10 @@ export class UIManager {
     const answers = stateManager.getState('answers');
     const selectedAnswer = answers.get(questionId);
 
-    console.log('[UIManager] Rendering question:', {
-      questionId,
-      questionIdType: typeof questionId,
-      selectedAnswer,
-      totalAnswers: answers.size,
-      answers: Array.from(answers.entries()),
-      hasAnswer: answers.has(questionId),
-      allKeys: Array.from(answers.keys())
-    });
-
     options.forEach((option, index) => {
       const optionElement = document.createElement('div');
       // Tip uyumsuzluğunu çöz: her ikisini de string'e çevir
       const isSelected = String(selectedAnswer) === String(option.id);
-      
-      console.log(`[UIManager] Option ${index + 1} (${option.id}):`, {
-        optionId: option.id,
-        optionIdType: typeof option.id,
-        selectedAnswer,
-        selectedAnswerType: typeof selectedAnswer,
-        isSelected
-      });
       
       optionElement.className = 'option-item' + (isSelected ? ' selected' : '');
       optionElement.dataset.questionId = questionId;
@@ -283,8 +242,6 @@ export class UIManager {
     const { questions, currentQuestionIndex, answers, visitedQuestions } = stateManager.getState();
     if (!this.elements.questionNav) return;
     
-
-    
     this.elements.questionNav.innerHTML = questions.map((q, index) => {
       const isCurrent = index === currentQuestionIndex;
       const questionId = parseInt(q.question.id, 10);
@@ -300,14 +257,6 @@ export class UIManager {
         isAnswered ? 'answered' : (isSkipped ? 'skipped' : '') // Cevap verilmişse answered, yoksa skipped
       ].filter(Boolean).join(' ');
       
-      console.log(`[UIManager] Question ${index + 1} (ID: ${q.question.id}):`, {
-        isCurrent,
-        isAnswered,
-        isVisited,
-        isSkipped,
-        classes
-      });
-      
       return `<div class="${classes}" data-index="${index}">${index + 1}</div>`;
     }).join('');
   }
@@ -318,16 +267,9 @@ export class UIManager {
   updateNavButtons() {
     const { currentQuestionIndex, questions, isSubmitting } = stateManager.getState();
     
-    console.log('[UIManager] Updating nav buttons:', {
-      currentQuestionIndex,
-      totalQuestions: questions.length,
-      isSubmitting
-    });
-    
     if (this.elements.prevBtn) {
       const prevDisabled = currentQuestionIndex === 0 || isSubmitting;
       this.elements.prevBtn.disabled = prevDisabled;
-      console.log('[UIManager] Prev button:', { disabled: prevDisabled });
     }
     
     if (this.elements.nextBtn) {
@@ -335,11 +277,6 @@ export class UIManager {
       this.elements.nextBtn.disabled = nextDisabled;
       const isLastQuestion = currentQuestionIndex === questions.length - 1;
       this.elements.nextBtn.textContent = isLastQuestion ? 'Quizi Bitir' : 'Sonraki Soru';
-      console.log('[UIManager] Next button:', { 
-        disabled: nextDisabled, 
-        text: this.elements.nextBtn.textContent,
-        isLastQuestion 
-      });
     }
   }
 
@@ -401,24 +338,58 @@ export class UIManager {
    * Aktif sorudan navbar bilgilerini günceller.
    */
   updateNavbarFromQuestion(question) {
-    if (!question || !question.question) return;
+    console.log('[UIManager] updateNavbarFromQuestion called with:', question);
+    
+    if (!question || !question.question) {
+      console.warn('[UIManager] updateNavbarFromQuestion: Invalid question data:', question);
+      return;
+    }
     
     const questionData = question.question;
+    console.log('[UIManager] Question data for navbar:', {
+      subject_name: questionData.subject_name,
+      topic_name: questionData.topic_name,
+      difficulty_level: questionData.difficulty_level
+    });
     
     // Ders adını güncelle
     if (this.elements.subjectName && questionData.subject_name) {
+      console.log('[UIManager] Updating subject name to:', questionData.subject_name);
       this.elements.subjectName.textContent = questionData.subject_name;
+    } else {
+      console.warn('[UIManager] Cannot update subject name:', {
+        subjectNameElement: !!this.elements.subjectName,
+        subject_name: questionData.subject_name
+      });
     }
     
     // Konu adını güncelle
     if (this.elements.topicName && questionData.topic_name) {
+      console.log('[UIManager] Updating topic name to:', questionData.topic_name);
       this.elements.topicName.textContent = questionData.topic_name;
+    } else {
+      console.warn('[UIManager] Cannot update topic name:', {
+        topicNameElement: !!this.elements.topicName,
+        topic_name: questionData.topic_name
+      });
     }
     
     // Zorluk seviyesini güncelle
     if (this.elements.difficultyBadge && questionData.difficulty_level) {
       const difficultyText = this.getDifficultyText(questionData.difficulty_level);
+      console.log('[UIManager] Updating difficulty to:', difficultyText);
       this.elements.difficultyBadge.textContent = difficultyText;
+      
+      // Zorluk seviyesi CSS sınıfını güncelle
+      // Önce tüm zorluk seviyesi sınıflarını kaldır
+      this.elements.difficultyBadge.classList.remove('easy', 'medium', 'hard', 'random');
+      // Sonra yeni zorluk seviyesi sınıfını ekle
+      this.elements.difficultyBadge.classList.add(questionData.difficulty_level);
+    } else {
+      console.warn('[UIManager] Cannot update difficulty:', {
+        difficultyBadgeElement: !!this.elements.difficultyBadge,
+        difficulty_level: questionData.difficulty_level
+      });
     }
   }
 }

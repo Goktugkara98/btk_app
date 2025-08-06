@@ -78,13 +78,19 @@ class StateManager {
   // Sık kullanılan state güncellemeleri için yardımcı metotlar
 
   setQuestions(questions) {
+    console.log('[StateManager] setQuestions called with:', questions.length, 'questions');
+    
     // İlk soruyu ziyaret edilmiş olarak işaretle
     const initialVisitedQuestions = new Set();
     if (questions.length > 0) {
       initialVisitedQuestions.add(0);
+      console.log('[StateManager] First question data:', {
+        id: questions[0].question.id,
+        subject_name: questions[0].question.subject_name,
+        topic_name: questions[0].question.topic_name,
+        difficulty_level: questions[0].question.difficulty_level
+      });
     }
-    
-
     
     this.setState({ 
       questions,
@@ -96,18 +102,28 @@ class StateManager {
   }
 
   setCurrentQuestionIndex(index) {
+    console.log('[StateManager] setCurrentQuestionIndex called with index:', index);
+    
     if (index >= 0 && index < this.state.questions.length) {
       // Ziyaret edilen soruları takip et
       const newVisitedQuestions = new Set(this.state.visitedQuestions);
       newVisitedQuestions.add(index);
       
-
+      const newCurrentQuestion = this.state.questions[index];
+      console.log('[StateManager] New current question data:', {
+        id: newCurrentQuestion.question.id,
+        subject_name: newCurrentQuestion.question.subject_name,
+        topic_name: newCurrentQuestion.question.topic_name,
+        difficulty_level: newCurrentQuestion.question.difficulty_level
+      });
       
       this.setState({
         currentQuestionIndex: index,
-        currentQuestion: this.state.questions[index],
+        currentQuestion: newCurrentQuestion,
         visitedQuestions: newVisitedQuestions
       }, 'SET_CURRENT_QUESTION');
+    } else {
+      console.warn('[StateManager] Invalid question index:', index, 'Total questions:', this.state.questions.length);
     }
   }
 

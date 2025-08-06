@@ -401,7 +401,9 @@ class QuizSessionRepository:
                            COUNT(qo.id) as option_count
                     FROM questions q
                     LEFT JOIN question_options qo ON q.id = qo.question_id
-                    WHERE q.subject_id = %s 
+                    JOIN topics t ON q.topic_id = t.id
+                    JOIN units u ON t.unit_id = u.id
+                    WHERE u.subject_id = %s 
                     AND q.is_active = 1
                     {difficulty_filter}
                     GROUP BY q.id
@@ -476,7 +478,8 @@ class QuizSessionRepository:
                            s.name as subject_name
                     FROM questions q
                     JOIN topics t ON q.topic_id = t.id
-                    JOIN subjects s ON q.subject_id = s.id
+                    JOIN units u ON t.unit_id = u.id
+                    JOIN subjects s ON u.subject_id = s.id
                     WHERE q.id = %s
                 """, (question_id,))
                 
